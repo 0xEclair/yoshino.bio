@@ -1,11 +1,11 @@
 
 const BLOG = {
-  anthor: 'Witt',
-  title: 'Witt - unix.bio',
-  description: 'Witt\'s blog',
-  summary: 'JavaScript 工程师，对开发者体验感兴趣。',
+  anthor: 'yoshino',
+  title: 'yoshino',
+  description: 'yoshino\'s blog',
+  summary: 'blog',
   language: 'en-us',
-  latestLimit: 5,
+  latestLimit: 8,
   
   labels: {
     default: '文章',
@@ -13,14 +13,14 @@ const BLOG = {
     list: '所有',
   },
   
-  email: 'unix.bio@gmail.com',
-  github: 'unix',
-  twitter: 'echo_witt',
-  domain: 'unix.bio',
+  email: '',
+  github: 'eclair-lumiere',
+  twitter: '',
+  domain: 'yoshino.studio',
   
-  googleAnalytics: 'UA-110371817-3',
+  googleAnalytics: '',
   cn: true,
-  enableViews: true,
+  enableViews: false,
 }
 
 export default BLOG

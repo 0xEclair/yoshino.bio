@@ -1,0 +1,99 @@
+import Layout from 'lib/components/layout'
+import {} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Language support library',
+  date: '2020-03-15T15:36:49.889Z',
+  description: '',
+}
+
+## 18.6 Dynamic memory management 
+1. 头文件<new\>定义了一些在程序中管理动态内存分配的函数。同时定义了报告内存管理错误的部件。
+
+    ### Header <new\> 概要
+    ```
+    namespace std { 
+        class bad_alloc; 
+        class bad_array_new_length; 
+        struct nothrow_t {}; 
+        extern const nothrow_t nothrow; 
+        typedef void (*new_handler)(); 
+        new_handler get_new_handler() noexcept; 
+        new_handler set_new_handler(new_handler new_p) noexcept; 
+    }
+    void* operator new(std::size_t size); 
+    void* operator new(std::size_t size, const std::nothrow_t&) noexcept; 
+    void operator delete(void* ptr) noexcept; 
+    void operator delete(void* ptr, const std::nothrow_t&) noexcept; 
+    void* operator new[](std::size_t size); 
+    void* operator new[](std::size_t size, const std::nothrow_t&) noexcept; 
+    void operator delete[](void* ptr) noexcept; 
+    void operator delete[](void* ptr, const std::nothrow_t&) noexcept;
+
+    void* operator new (std::size_t size, void* ptr) noexcept;
+    void* operator new[](std::size_t size, void* ptr) noexcept; 
+    void operator delete (void* ptr, void*) noexcept; 
+    void operator delete[](void* ptr, void*) noexcept; 
+
+    ```
+    ### 18.6.1 内存申请和释放
+    1.除非另有说明，库版本的**operator new**和**operator delete**符合(3.7.4)的规定。
+    #### 18.6.1.1 单对象形式
+    `void* operator new(std::size_t size);`
+    
+    1.*影响：*通过new表达式调用的申请函数来分配适当对齐的size字节来表示任一size大小的对象。
+    
+    2.*可更换的：*一个C++程序可能定义一个函数，这个函数的签名取代在C++标准库里定义的默认版本。
+
+    3.*必要行为：*返回一个非空指针，指向适当对齐的内存；否则抛出一个 **bad_alloc** 错误。这个要求绑定到此函数的替换版本。
+
+    4.*默认行为：*
+     - 执行一个循环：在循环中，函数首先尝试分配请求的内存。未指定这次尝试是否调用C库函数**malloc**。
+     - 如果尝试成功，返回一个指向分配到的内存的指针。否则，如果现在的**new_handler**是一个空指针，抛出**bad_alloc**。
+     - 否则，分配函数调用现在的**new_handler**函数。如果被调用的函数返回了，重复循环。
+     - 当 成功分配到需要的内存 或 一个被调用的**new_handler**没有返回。
+
+    `void* operator new(std::size_t size, const std::nothrow_t&) noexcept; `
+
+    5.*影响：*和上面一样，除非当一个C++程序更倾向于用空指针替代**bad_alloc**异常作为错误标识的时候，被一个替换版本的new表达式调用。
+
+    6.*可替换的：*一个C++程序可能定义一个函数，这个函数的签名取代在C++标准库里定义的默认版本。
+
+    7.*必要行为:*返回一个指向适当对齐的内存的非空指针，或者返回一个空指针。这个**operator new**的不抛出异常版本返回一个指针，就像普通版本(可能被替换)一样。这个要求绑定到此函数的替换版本。
+
+    8.*默认行为:*调用**operator new(size)**。如果调用正常地返回，返回调用的结果。否则返回空指针。
+
+    9.[*Example:*
+        
+        T* p1 = new T;              // 失败返回bad_alloc
+        T* p2 = new(nothrow) T;     // 失败返回0
+
+    -*end example*]
+
+    `void operator delete(void* ptr) noexcept;`
+
+    10.*影响：*释放函数通过delete表达式调用，使得ptr的值无效。
+
+    11.*可替换的：*同上
+
+    12.*要求：* *ptr*应当是一个空指针 或 它的值应当是之前通过如上2个new表达式的返回值，且这个值还未被**operator delete(void*)**干预(intervening call)。如果调用正常地返回，返回调用的结果。否则返回空指针。
+
+    13.*要求：*  如果实现具有严格的指针安全性，则ptr应该是安全派生的指针。
+
+    14.*默认行为：*如果ptr为空，不做任何事。否则，收回之前通过**operator new**分配到的内存。
+
+    15.*备注：* 在什么条件下这样被收回的部分或全部内存将会通过一些调用分配(operator new，calloc，malloc，realloc均可)是未指定的。
+    
+    (It is unspeciﬁed under what conditions part or all of such reclaimed storage will be allocated by subsequent calls to operator new or any of calloc, malloc, or realloc, declared in <cstdlib\>. )
+
+    `void operator delete(void* ptr, const std::nothrow_t&) noexcept;`
+
+    16.*影响：* The deallocation function (3.7.4.2) called by the implementation to render the value of ptr invalid when the constructor invoked from a nothrow placement version of the new-expression throws an exception. 
+
+    17.*可替换的：*同上
+
+    18.*要求：*如果实现具有严格的指针安全性，则ptr应该是安全派生的指针。
+
+    19.*默认行为：*调用**operator delete(ptr)**
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

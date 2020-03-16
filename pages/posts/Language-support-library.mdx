@@ -185,5 +185,37 @@ export const meta = {
     库版本的**operator delete**，用户定义的全局**operator delete**以及C标准库函数**free**的行为就好像它们通过第一个参数仅访问和修改了被引用的内存一样。
     C标准库函数**realloc**的行为就像它通过第一个参数和返回值仅访问和修改被引用的内存一样。
     通过这些函数的调用来分配和回收一个内存的特定单元应该以一个single total顺序发生，并且每个这样的回收行为应该按此顺序在下一次分配(如果有)之前发生。
+
+    ### 18.6.2 内存分配错误(Storage allocation errors)
+
+    #### 18.6.2.1 类 bad_alloc
+    ```
+    namespace std { 
+        class bad_alloc : public exception { 
+            public: bad_alloc() noexcept; 
+            bad_alloc(const bad_alloc&) noexcept; 
+            bad_alloc& operator=(const bad_alloc&) noexcept; 
+            virtual const char* what() const noexcept; 
+        }; 
+    } 
+    ```
+
+    1.类**bad_alloc**定义通过实现将异常抛出的对象类型 来报告内存分配失败。(The class bad_alloc deﬁnes the type of objects thrown as exceptions by the implementation to report a failure to allocate storage. )
+
+    `bad_alloc() noexcept;`
+
+    2.*影响：* 构造一个类对象**bad_alloc**。
+
+    3.*备注：* 在新构造的对象上调用**what()**的结果是实现定义的。
+
+    `bad_alloc(const bad_alloc&) noexcept;`
+
+    `bad_alloc& operator=(const bad_alloc&) noexcept;`
+
+    4.*影响：* copy一个bad_alloc对象。
+
+    `virtual const char* what() const noexcept;`
+
+    5.*返回值：*一个实现定义的**NTBS**。
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

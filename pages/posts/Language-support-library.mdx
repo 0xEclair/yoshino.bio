@@ -188,7 +188,7 @@ export const meta = {
 
     ### 18.6.2 内存分配错误(Storage allocation errors)
 
-    #### 18.6.2.1 类 bad_alloc
+    #### 18.6.2.1 类bad_alloc
     ```
     namespace std { 
         class bad_alloc : public exception { 
@@ -217,5 +217,50 @@ export const meta = {
     `virtual const char* what() const noexcept;`
 
     5.*返回值：*一个实现定义的**NTBS**。
+
+    #### 18.6.2.2 类bad_array_new_length
+    ```
+    namespace std { 
+        class bad_array_new_length : public bad_alloc { 
+        public: 
+            bad_array_new_length() noexcept; 
+        }; 
+    }
+    ```
+
+    1.类**bad_array_new_length**定义通过实现将异常抛出的对象类型 来报告尝试分配一个小于0或大于实现定义的限制 大小的数组。
+
+    `bad_array_new_length() noexcept;`
+
+    2.*影响：*构造一个bad_array_new_length对象。
+
+    3.*备注：*在新构造的对象上调用**what()**的结果是实现定义的。
+
+    #### 18.6.2.3 类型 new_handler
+
+    `typedef void (*new_handler)();`
+
+    1.当**operator new()**或**operator new[]()**不能满足一个额外内存的请求时，类型*handle function*会被它们调用。
+
+    2.*必要行为：* 一个**new_handler**必须表现以下行为之一:
+     - 让更多的内存可用于分配，然后返回。
+     - 抛出一个**bad_alloc**异常或继承自**bad_alloc**的类。
+     - 终止程序执行，不返回给调用方。
+    
+    #### 18.6.2.4 set_new_handler
+
+    `new_handler set_new_handler(new_handler new_p) noexcept;`
+
+    1.*影响：*创建由**new_p**指定的函数作为当前的**new_handler**。
+
+    2.*返回值：*先前的**new_handler**。
+
+    3.*备注：* 初始的**new_handler**是一个空指针。
+
+    #### 18.6.2.5 get_new_handler
+
+    `new_handler get_new_handler() noexcept;`
+
+    1.*返回值：* 现在的**new_handler**。\[*Note:*这可能返回一个空指针值。 -*end note*\]
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

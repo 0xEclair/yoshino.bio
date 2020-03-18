@@ -262,5 +262,194 @@ export const meta = {
     `new_handler get_new_handler() noexcept;`
 
     1.*返回值：* 现在的**new_handler**。\[*Note:*这可能返回一个空指针值。 -*end note*\]
+
+    ## 18.7 类型认证(Type identification)
+
+    1.头文件\<typeinfo\>定义和由实现生成的类型信息有关的类型。也定义了两个用于报告动态类型认证错误的类型。
+
+    ```
+    namespace std { 
+        class type_info; 
+        class bad_cast; 
+        class bad_typeid; 
+    } 
+    ```
+
+    ### 18.7.1 类type_info
+
+    ```
+    namespace std { 
+        class type_info { 
+        public: 
+            virtual ~type_info(); 
+            bool operator==(const type_info& rhs) const noexcept; 
+            bool operator!=(const type_info& rhs) const noexcept; 
+            bool before(const type_info& rhs) const noexcept; 
+            size_t hash_code() const noexcept; 
+            const char* name() const noexcept; 
+            type_info(const type_info& rhs) = delete; // cannot be copied 
+            type_info& operator=(const type_info& rhs) = delete; // cannot be copied 
+        }; 
+    }
+    ```
+
+    1.类**type_info**描述了由实现生成的类型信息。这个类的对象有效地保存了一个指向这个类型名字的指针和比较二个类型相等的方法或对照顺序。
+    类型的名字，编码规则，相对顺序，是未指定的并可能程序间有差异。
+
+    `bool operator==(const type_info& rhs) const noexcept;`
+
+    2.*影响：* 和rhs比较现在的对象。
+
+    3.*返回值：* 如果两个值描述相同的类型，返回true。
+
+    `bool operator!=(const type_info& rhs) const noexcept;`
+
+    4.*返回值：* !(*this == rhs)。
+
+    `bool before(const type_info& rhs) const noexcept;`
+
+    5.*影响：* 和rhs比较现在的对象。
+
+    6.*返回值：* 如果*this在实现的对照顺序里先于rhs，返回true。
+
+    `size_t hash_code() const noexcept;`
+
+    7.*返回值：* 一个未指定的值，除非在一个单一执行的程序内部，如果是任意两个相同对象，它会返回同样的值。
+    
+    8.*备注：* 如果任意两个type_info对象不相同，实现应该返回不同值。
+
+    `const char* name() const noexcept;`
+
+    9.*返回值：* 一个实现定义的NTBS。
+
+    10.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。
+
+    ### 18.7.2 类bad_cast
+
+    ```
+    namespace std { 
+        class bad_cast : public exception { 
+        public: 
+            bad_cast() noexcept; 
+            bad_cast(const bad_cast&) noexcept; 
+            bad_cast& operator=(const bad_cast&) noexcept; 
+            virtual const char* what() const noexcept; 
+        }; 
+    } 
+    ```
+    1.类**bad_cast**定义由实现抛出异常错误的类型，来报告无效动态强制转换表达式(dynamic-cast)的执行。
+
+    `bad_cast() noexcept;`
+    
+    2.*影响：* 构造一个类bad_cast的对象。
+
+    3.*备注：* 在最新构造的对象上调用**what()**的结果是实现定义的。
+
+    `bad_cast(const bad_cast&) noexcept;`
+
+    `bad_cast& operator=(const bad_cast&) noexcept;`
+
+    4.*影响：* copy一个bad_cast对象。
+
+    `virtual const char* what() const noexcept;`
+
+    5.*返回值：* 一个实现定义的NTBS。
+
+    6.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。
+
+    ### 18.7.3 类bad_typeid
+    
+    ```
+    namespace std { 
+        class bad_typeid : public exception { 
+        public: 
+            bad_typeid() noexcept; 
+            bad_typeid(const bad_typeid&) noexcept; 
+            bad_typeid& operator=(const bad_typeid&) noexcept; 
+            virtual const char* what() const noexcept; 
+        }; 
+    }
+    ```
+    1.类bad_typeid定义由实现抛出异常错误的类型，来报告一个**typeid**表达式的空指针。
+
+    `bad_typeid() noexcept;`
+
+    2.*影响：* 构造一个bad_typeid对象。
+
+    3.*备注：* 在最新构造的对象上调用**whta()**的结果是实现定义的。
+
+    `bad_typeid(const bad_typeid&) noexcept;`
+
+    `bad_typeid& operator=(const bad_typeid&) noexcept;`
+
+    4.*影响：* copy一个bad_typeid对象。
+
+    `virtual const char* what() const noexcept;`
+
+    5.*返回值：* 一个实现定义的NTBS。
+
+    6.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。
+
+    ### 18.8 异常处理(Exception handling)
+
+    1.头文件\<exception\>定义了一些在一个C++程序中与异常处理有关的类型和函数。
+
+    ### Header <exception> 概要
+
+    ```
+    namespace std { 
+        class exception; 
+        class bad_exception; 
+        class nested_exception;
+
+        typedef void (*unexpected_handler)(); 
+        unexpected_handler get_unexpected() noexcept; 
+        unexpected_handler set_unexpected(unexpected_handler f) noexcept; 
+        [[noreturn]] void unexpected();
+
+        typedef void (*terminate_handler)(); 
+        terminate_handler get_terminate() noexcept; 
+        terminate_handler set_terminate(terminate_handler f) noexcept; 
+        [[noreturn]] void terminate() noexcept;
+
+        bool uncaught_exception() noexcept;
+
+        typedef unspecified exception_ptr;
+
+        exception_ptr current_exception() noexcept; 
+        [[noreturn]] void rethrow_exception(exception_ptr p); 
+        template<class E> exception_ptr make_exception_ptr(E e) noexcept;
+
+        [[noreturn]] template <class T> void throw_with_nested(T&& t); 
+        template <class E> void rethrow_if_nested(const E& e);
+    } 
+    ```
+
+    #### 18.8.1 类exception
+
+    ```
+    namespace std{
+        class exception{
+        public:
+            exception() noexcept;
+            exception(const exception&) noexcept; 
+            exception& operator=(const exception&) noexcept; 
+            virtual ~exception(); 
+            virtual const char* what() const noexcept;
+        };
+    }
+    ```
+
+    1.类**exception**定义了C++标准库部件中用于抛出对象异常的基类，并且在某些表达式中来报告程序运行期的错误。
+
+    2.每个标准库继承自**exception**的class T 必须有一个不会退出执行的公共地可访问的copy构造函数和copy赋值运算符。
+    这些成员函数必须满足下列的后置条件：如果两个对象 lhs 和 rhs 都由动态类型T并且lhs一个rhs的copy，那么strcmp(lhs.what(),rhs.what())必须等于0。
+
+    `exception() noexcept;`
+
+    3.*影响：* 构造一个exception对象。
+
+    4.*备注：* 不抛出任何异常。
+
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

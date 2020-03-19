@@ -643,11 +643,11 @@ export const meta = {
 
     6.*要求：* U是复制可构造的(CopyConstructible)。
 
-    7.*抛出：* 如果U不是从nested_exception派生的non-union类型，则是一个未指定类型的异常，该异常是同时从U和nested_exception派生并从std::forward<T\>(t)构造的，否则是std::forward<T\>(t)。
+    7.*抛出：* 如果U不是从nested_exception派生的non-union类型，则是一个未指定类型的异常，该异常是同时从U和nested_exception派生并从std::forward\<T\>(t)构造的，否则是std::forward\<T\>(t)。
 
     `template <class E> void rethrow_if_nested(const E& e);`
 
-    8.*影响：* 如果e的动态类型是公共地明确地从nested_exception派生的，调用dynamic_cast<const nested_exception&\>(e).rethrow_nested()。
+    8.*影响：* 如果e的动态类型是公共地明确地从nested_exception派生的，调用dynamic_cast<const nested_exception\&\>(e).rethrow_nested()。
 
 ## 18.9 初始化列表(Initializer list)
 1. 头文件<initializer_list\>定义一个类型。
@@ -663,7 +663,7 @@ export const meta = {
             typedef const E& reference; 
             typedef const E& const_reference; 
             typedef size_t size_type;
-            
+
             typedef const E* iterator; 
             typedef const E* const_iterator;
 

@@ -8,7 +8,7 @@ export const meta = {
 }
 
 ## 18.6 Dynamic memory management 
-1. 头文件<new\>定义了一些在程序中管理动态内存分配的函数。同时定义了报告内存管理错误的部件。
+1. 头文件<new\>定义一些在程序中管理动态内存分配的函数。同时定义了报告内存管理错误的部件。
 
     ### Header <new\> 概要
     ```
@@ -392,9 +392,9 @@ export const meta = {
 
     6.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。
 
-### 18.8 异常处理(Exception handling)
+## 18.8 异常处理(Exception handling)
 
-1. 头文件<exception\>定义了一些在一个C++程序中与异常处理有关的类型和函数。
+1. 头文件<exception\>定义一些在一个C++程序中与异常处理有关的类型和函数。
 
     ### Header <exception\> 概要
 
@@ -427,7 +427,7 @@ export const meta = {
     } 
     ```
 
-    #### 18.8.1 类exception
+    ### 18.8.1 类exception
 
     ```
     namespace std{
@@ -452,6 +452,235 @@ export const meta = {
     3.*影响：* 构造一个exception对象。
 
     4.*备注：* 不抛出任何异常。
+
+    `exception(const exception& rhs) noexcept;`
+    `exception& operator=(const exception& rhs) noexcept;`
+
+    5.*影响：* copy一个exception对象。
+
+    6.*后置条件：* 如果*this和rhs都有动态类型异常 ，strcmp(what(),rhs.what()) == 0 。
+
+    `virtual ~exception();`
+
+    7.*影响：* 析构一个exception对象。
+
+    8.*备注：* 不抛出任何异常。
+
+    `virtual const char* what() const noexcept;`
+
+    9.*返回值：* 一个实现定义的NTBS。
+
+    10.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。返回值保留有效，直到从中获取返回值的异常对象被破坏或调用该异常对象的non-const成员函数。
+
+    ### 18.8.2 类bad_exception
+
+    ```
+    namespace std {
+        class bad_exception : public exception {
+        public:
+            bad_exception() noexcept;
+            bad_exception(const bad_exception&) noexcept; 
+            bad_exception& operator=(const bad_exception&) noexcept; 
+            virtual const char* what() const noexcept;
+        };
+    }
+    ```
+
+    1.类bad_exception定义了（15.5.2所述）抛出的对象的类型。
+
+    `bad_exception() noexcept;`
+
+    2.*影响：* 构造一个bad_exception对象。
+
+    3.*备注：* 在最新构造的对象上调用**what()**的结果是实现定义的。
+
+    `bad_exception(const bad_exception&) noexcept;`
+
+    `bad_exception& operator=(const bad_exception&) noexcept;`
+
+    4.*影响：* copy一个bad_exception对象。
+
+    `virtual const char* what() const noexcept;`
+
+    5.*返回值：* 一个实现定义的NTBS。
+
+    6.*备注：* 消息是一个空终止多字节string，适配并且表现像**wstring**。
+
+    ### 18.8.3 异常终止(Abnormal termination)
+
+    #### 18.8.3.1 类型terminate_handler
+
+    `typedef void (*terminate_handler)();`
+
+    1.终止异常处理时的一个被terminate()调用的**handler function**类型。
+
+    2.*必要行为：* 一个**terminate_handler**必须终止程序的执行并且不返回给调用者。
+
+    3.*默认行为：* 实现的默认**terminate_handler**调用abort()。·
+
+    #### 18.8.3.2 set_terminate
+
+    `terminate_handler set_terminate(terminate_handler f) noexcept;`
+
+    1.*影响：* 建立由f指定的函数作为当前的处理函数来终止程序执行。
+
+    2.*备注：* 一个空指针值是否指向默认terminate_handler是未指定的。
+
+    3.*返回值：* 先前的terminate_handler。
+
+    #### 18.8.3.3 get_terminate
+
+    `terminate_handler get_terminate() noexcept;`
+
+    1.*返回值：* 当前的terminate_handler。 \[*Note:*可能是一个空指针值。 *-end note*\]
+
+    #### 18.8.3.4 terminate
+
+    `[[noreturn]] void terminate() noexcept;`
+
+    1.*备注：* 在调用throw表达式后立即生效时，由于多种原因(15.5.1)中的任何一个原因必须放弃异常处理时，由实现调用。也可以由程序直接调用。
+
+    2.*影响：* 调用当前的terminate_handler函数。 \[*Node:* 一个默认的terminate_handler总被认为在这个上下文中是可调用的handler。 *-end note*\]
+
+    ### 18.8.4 uncaught_exception
+
+    `bool uncaught_exception() noexcept;`
+
+    1.*返回值：* 在当前线程初始化一个异常对象之后直到一个异常handler是激活的，为true。
+
+    2.*备注：* 当uncaught_exception()返回true，抛出一个可以导致terminate()的异常。
+
+    ### 18.8.5 异常传播
+
+    `typedef unspecified exception_ptr;`
+
+    1.类型exception_ptr可用于引用异常对象。
+
+    2.exception_ptr必须满足**NullablePointer**(17.6.3.3)的要求。
+
+    3.二个非空值的exception_ptr实例当且仅当它们指向相同异常是相等的。
+
+    4.exception_ptr的默认构造函数产生该类型的空值。
+
+    5.exception_ptr不可隐式转换到任一arithmetic,enumeration,或者pointer类型。
+
+    6.\[*Note:* 一个实现可能使用了引用计数的智能指针作为exception_ptr。 *-end note*\]
+
+    7.For purposes of determining the presence of a data race, operations on exception_ptr objects shall access and modify only the exception_ptr objects themselves and not the exceptions they refer to. 
+    Use of rethrow_exception on exception_ptr objects that refer to the same exception object shall not introduce a data race. 
+    \[Note: if rethrow_exception rethrows the same exception object (rather thanacopy), concurrent access to that rethrown exception object may introduce adatarace. 
+    Changes in the number of exception_ptr objects that refer to a particular exception do not introduce a data race. —end note\] 
+
+    `exception_ptr current_exception() noexcept;`
+
+    8.*返回值：* 引用当前已处理的异常或当前已处理的异常的copy的exception_ptr对象；如果未处理任何异常，则为null exception_ptr对象。被引用对象至少在存在一个引用该对象的exception_ptr对象时才保持有效。
+    如果函数需要分配内存并且尝试失败，则它将返回一个指向bad_alloc实例的exception_ptr对象。尚不确定两次对current_exception的连续调用的返回值是否引用相同的异常对象。
+    \[*Note:* 也就是说，不确定current_exception每次调用时是否从创建一个新copy。 *-end note*\]
+    如果尝试copy当前异常对象时引发了异常，则该函数将返回一个exceptio_ptr对象，该对象引用引发的异常，或者如果不可能，则返回bad_exception的实例。
+    \[*Note:* 抛出的异常的copy构造函数也可能失败，因此允许该实现替换bad_exception对象以避免无限递归\]
+
+    `[[noreturn]] void rethrow_exception(exception_ptr p); `
+
+    9.*要求：* p不应该是一个空指针。
+
+    10.*抛出：* p指向对象的异常。
+
+    `template<class E> exception_ptr make_exception_ptr(E e) noexcept;`
+
+    11.*影响：* 创建一个指向e的一个copy的exception_ptr对象，就像:
+    
+    ```
+    try{
+        throw e;
+    }
+    catch(...){
+        return current_exception();
+    }
+    ```
+
+    12. \[*Note:* 提供此函数是为了方便和高效。*-end note*\]
+
+    ### 18.8.6 nested_exception
+
+    ```
+    namespace std { 
+        class nested_exception { 
+        public: 
+            nested_exception() noexcept; 
+            nested_exception(const nested_exception&) noexcept = default; 
+            nested_exception& operator=(const nested_exception&) noexcept = default; 
+            virtual ~nested_exception() = default;
+
+            // access functions 
+            [[noreturn]] void rethrow_nested() const; 
+            exception_ptr nested_ptr() const noexcept;
+        };
+
+        [[noreturn]] template<class T> void throw_with_nested(T&& t); 
+        template <class E> void rethrow_if_nested(const E& e);
+    }
+    ```
+
+    1.类nested_exception设计用于通过多重继承作为mixin。它捕获当前处理的异常并且为了之后的使用保存它。
+
+    2.\[*Note:* nested_exception有一个用于成为多态类的虚析构函数。可以使用dynamic_cast测试其存在。 *-end note*\]
+
+    `nested_exception() noexcept;`
+
+    3.*影响：* 构造函数调用current_exception() 并且保存其返回值。
+
+    `[[noreturn]] void rethrow_nested() const;`
+
+    4.*影响：* 如果nested_ptr()返回一个空指针，这个函数调用terminate()。否则，它抛出被*this捕获的保存的异常。
+
+    `exception_ptr nested_ptr() const noexcept;`
+
+    5.*返回值：* 被这个nested_exceptioon对象捕获后保存的异常。
+
+    `[[noreturn]] template <class T> void throw_with_nested(T&& t);`
+
+    Let U be remove_reference<T>::type. 
+
+    6.*要求：* U是复制可构造的(CopyConstructible)。
+
+    7.*抛出：* 如果U不是从nested_exception派生的non-union类型，则是一个未指定类型的异常，该异常是同时从U和nested_exception派生并从std::forward<T\>(t)构造的，否则是std::forward<T\>(t)。
+
+    `template <class E> void rethrow_if_nested(const E& e);`
+
+    8.*影响：* 如果e的动态类型是公共地明确地从nested_exception派生的，调用dynamic_cast<const nested_exception&\>(e).rethrow_nested()。
+
+## 18.9 初始化列表(Initializer list)
+1. 头文件<initializer_list\>定义一个类型。
+
+    ### Header <initializer_list\> 概要
+
+    ```
+    namespace std { 
+        template<class E> 
+        class initializer_list { 
+        public: 
+            typedef E value_type; 
+            typedef const E& reference; 
+            typedef const E& const_reference; 
+            typedef size_t size_type;
+            
+            typedef const E* iterator; 
+            typedef const E* const_iterator;
+
+            initializer_list() noexcept; 
+
+            size_t size() const noexcept; // number of elements 
+            const E* begin() const noexcept; // ﬁrst element 
+            const E* end() const noexcept; // one past the last element
+        };
+
+        // 18.9.3 initializer list range access 
+        template<class E> const E* begin(initializer_list<E> il) noexcept; 
+        template<class E> const E* end(initializer_list<E> il) noexcept;
+    }
+    ```
+
+
 
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

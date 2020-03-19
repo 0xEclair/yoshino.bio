@@ -647,7 +647,7 @@ export const meta = {
 
     `template <class E> void rethrow_if_nested(const E& e);`
 
-    8.*影响：* 如果e的动态类型是公共地明确地从nested_exception派生的，调用dynamic_cast<const nested_exception\&\>(e).rethrow_nested()。
+    8.*影响：* 如果e的动态类型是公共地明确地从nested_exception派生的，调用dynamic_cast<const nested_exception&\>(e).rethrow_nested()。
 
 ## 18.9 初始化列表(Initializer list)
 1. 头文件<initializer_list\>定义一个类型。

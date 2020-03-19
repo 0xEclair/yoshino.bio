@@ -1,15 +1,9 @@
 import Head from 'next/head'
-import { useCallback, useState, useEffect, useMemo } from 'react'
-import { ThemeProvider, useTheme, CSSBaseline } from '@zeit-ui/react'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
+import { ZEITUIProvider, useTheme, CSSBaseline } from '@zeit-ui/react'
 import ThemeConfigProvider from 'lib/components/theme-config-provider'
+import { getDNSPrefetchValue } from 'lib/date-transform'
 import BLOG from '../blog.config'
-
-const getDNSPrefetchValue = domain => {
-  if (!domain) return null
-  if (domain.startsWith('http')) return domain.replace(/https?:/, '')
-  if (domain.startsWith('//')) return domain
-  return `//${domain}`
-}
 
 const Application = ({ Component, pageProps }) => {
   const theme = useTheme()
@@ -40,14 +34,20 @@ const Application = ({ Component, pageProps }) => {
       <meta name="google" value="notranslate" />
       <meta name="referrer" content="strict-origin" />
       <meta name="description" content={BLOG.description} />
-      <meta property="og:title" content={BLOG.title} />
+      <meta property="og:site_name" content={BLOG.title} />
+      <meta property="og:description" content={BLOG.description} />
       <meta property="og:type" content="website" />
       <meta name="generator" content="unix.bio" />
+      <meta name="twitter:card" content="summary_large_image" />
       <meta name="author" content={BLOG.anthor} />
+      <meta name="twitter:creator" content={`@${BLOG.twitter}`} />
+      <meta property="og:title" content={BLOG.title} />
       <meta property="og:url" content={BLOG.domain} />
+      <meta property="og:image" content={`https:${domain}/assets/og-main.png`} />
+      <meta property="twitter:image" content={`https:${domain}/assets/og-main.png`} />
       <meta name="viewport" content="initial-scale=1, maximum-scale=5, minimum-scale=1, viewport-fit=cover" />
     </Head>
-    <ThemeProvider theme={{ type: themeType }}>
+    <ZEITUIProvider theme={{ type: themeType }}>
       <CSSBaseline>
       <ThemeConfigProvider onChange={changeHandle}>
         <Component {...pageProps} />
@@ -100,7 +100,7 @@ const Application = ({ Component, pageProps }) => {
           }
         }
       `}</style>
-    </ThemeProvider>
+    </ZEITUIProvider>
     </>
   )
 }

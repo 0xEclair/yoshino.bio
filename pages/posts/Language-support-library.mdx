@@ -679,8 +679,17 @@ export const meta = {
         template<class E> const E* end(initializer_list<E> il) noexcept;
     }
     ```
+2. initializer_list<E\>的对象提供一个const E的对象数组的访问。
+    \[*Note:* 一组指针或一个指针加一个长度将是initializer_list的明显表示形式。 
+        initializer_list常被用于实现像8.5.4中规定的初始化列表。
+        copy一个初始化列表不会copy基本元素。
+    *-end note*\]
+    ### 18.9.1
 
+    `initializer_list() noexcept;`
+    1.*影响：* 构造一个空的initializer_list对象。
 
+    2.*后置条件：* size() == 0
 
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

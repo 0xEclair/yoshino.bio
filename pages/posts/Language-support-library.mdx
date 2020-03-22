@@ -684,12 +684,40 @@ export const meta = {
         initializer_list常被用于实现像8.5.4中规定的初始化列表。
         copy一个初始化列表不会copy基本元素。
     *-end note*\]
-    ### 18.9.1
+    ### 18.9.1 Initializer list constructors
 
     `initializer_list() noexcept;`
+
     1.*影响：* 构造一个空的initializer_list对象。
 
     2.*后置条件：* size() == 0
+
+    ### 18.9.2 Initializer list acccess
+
+    `const E* begin() const noexcept;`
+    1.*返回值：* 一个指向array起点的指针。如果size()==0，begin()和end()的值是未指定的，但它们相等。
+
+    `const E* end() const noexcept;`
+
+    2.*返回值：* begin()+size()
+
+    `size_t size() const noexcept; `
+
+    3.*返回值：* 数组中的元素数量。
+
+    4.*复杂度：* O(1)(常数时间)
+
+    ### 18.9.3 Initializer list range access
+
+    `template<class E> const E* begin(initializer_list<E> il) noexcept;`
+
+    1.*返回值：* il.begin()
+
+    `template<class E> const E* end(initializer_list<E> il) noexcept;`
+
+    2.*返回值：* il.end()
+
+## 18.10 其他运行期支持(other runtime support)
 
 ## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

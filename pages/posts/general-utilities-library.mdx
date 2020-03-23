@@ -211,10 +211,10 @@ export const meta = {
       int i = 2; 
       shared_ptr<A> sp2 = factory<A>(i, 1.414); // OK 
     } 
+  ```
   5.In the ﬁrst call to factory, A1 is deduced as int, so 2 is forwarded to A’s constructor as an rvalue. 
     In the second call to factory, A1 is deduced as int&, so i is forwarded to A’s constructor as an lvalue. 
     In both cases, A2 is deduced as double, so 1.414 is forwarded to A’s constructor as an rvalue.
-  ```
     *-end note* \]
 
 

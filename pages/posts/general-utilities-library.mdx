@@ -217,8 +217,125 @@ export const meta = {
     In both cases, A2 is deduced as double, so 1.414 is forwarded to A’s constructor as an rvalue.
     *-end note* \]
 
+  6.[*Example:* 
+    ```
+    template <class T, class A1> 
+    shared_ptr<T> factory(A1&& a1) { 
+      return shared_ptr<T>(new T(std::forward<A1>(a1))); 
+    }
 
+    struct A { 
+      A(); 
+      A(const A&); // copies from lvalues 
+      A(A&&); // moves from rvalues 
+    };
 
+    void g() { 
+      A a; 
+      shared_ptr<A> sp1 = factory<A>(a); // “a” binds to A(const A&) 
+      shared_ptr<A> sp1 = factory<A>(std::move(a)); // “a” binds to A(A&&)
+    }
+    ```
+  7.In the ﬁrst call to factory, A1 is deduced as A&, so a is forwarded as a non-const lvalue. 
+    This binds to theconstructor A(const A&), which copies the value from a. 
+    In the second call to factory, because of the call std::move(a),A1 is deduced as A,so a is forwarded as an rvalue. 
+    This binds to the constructor A(A&&), which moves the value from a. 
+    *-end note* \]
+
+  `template <class T> typename conditional<`
+  
+  `!is_nothrow_move_constructible<T>::value && is_copy_constructible<T>::value,`
+
+  `const T&, T&&>::type move_if_noexcept(T& x) noexcept;`
+
+  8.*返回值：* std::move(x)
+
+  ### 20.2.4 函数模板declval
+
+  1.该库提供函数模板declval,以简化对未求值运算符中出现的表达式的定义。
+
+  `template <class T>`
+
+  `typename add_rvalue_reference<T>::type declval() noexcept; // as unevaluated operand`
+
+  2.*备注：* 如果这个函数被odr式使用，程序ill-formed
+
+  3.*备注：* declval的模板参数T可能是未完成类型。
+
+  [*Example:* 
+  ```
+  template <class To, class From> 
+  decltype(static_cast<To>(declval<From>())) convert(From&&);
+  ```
+  声明一个函数模板convert,仅当From类型可以显式转换为To类型时，该转换才参与重载。
+  有关另一个示例，请参见类模板common_type。
+  *-end note*\]
+
+## 20.3 Pairs
+
+  ### 20.3.1 概览
+
+  1.该库为合成值对提供了模板。 
+  该库还提供了一个匹配功能模板以简化其构造，并提供了多个模板，
+  这些模板可以访问配对对象，就像它们是tuple对象一样。
+
+  ### 20.3.2 类模板pair
+
+  ```
+  // deﬁned in header <utility>
+
+  namespace std { 
+    template <class T1, class T2> 
+    struct pair { 
+      typedef T1 first_type; 
+      typedef T2 second_type;
+
+      T1 first; 
+      T2 second; 
+      pair(const pair&) = default; 
+      pair(pair&&) = default;
+
+      constexpr pair(); 
+      pair(const T1& x, const T2& y); 
+      template<class U, class V> pair(U&& x, V&& y); 
+      template<class U, class V> pair(const pair<U, V>& p); 
+      template<class U, class V> pair(pair<U, V>&& p); 
+      template <class... Args1, class... Args2> 
+      pair(piecewise_construct_t, tuple<Args1...> first_args, tuple<Args2...> second_args);
+
+    pair& operator=(const pair& p); 
+    template<class U, class V> pair& operator=(const pair<U, V>& p); 
+    pair& operator=(pair&& p) noexcept(see below); 
+    template<class U, class V> pair& operator=(pair<U, V>&& p);
+
+    void swap(pair& p) noexcept(see below);
+  };
+}
+```
+1.构造函数和pair成员函数不会抛出异常，除非指定的对此操作调用的元素抛出异常。
+
+`constexpr pair();`
+
+2.*要求：* is_default_constructible<first_type\>::value 是 true and 
+is_default_constructible<second_type\>::value 是 true.
+
+3.*影响：* 值初始化first和second.
+
+`pair(const T1& x, const T2& y);`
+
+4.*要求：* is_copy_constructible<first_type\>::value 是 true and 
+is_copy_constructible<second_type\>::value 是 true. 
+
+5.*影响:* 这个构造函数用x初始化first，用y初始化second.
+
+`template<class U, class V> pair(U&& x, V&& y);`
+
+6.*要求：* is_constructible<first_type, U&&\>::value 是 true and 
+is_constructible<second_type, V&&\>::value 是 true. 
+
+7.*影响：* 这个构造函数用std::forward<U\>(x)初始化first，用std::forward<V\>(y)初始化second.
+
+8.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议。
 
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

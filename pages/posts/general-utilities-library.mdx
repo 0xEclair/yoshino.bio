@@ -162,7 +162,7 @@ export const meta = {
 
   ### 20.2.2 swap
 
-  `template<class T> void swap(T& a, T& b) noexcept(see below); `
+  `template<class T> void swap(T& a, T& b) noexcept(see below);`
 
   1.*备注：* noexcept里的表达式等价于:
   ```
@@ -175,6 +175,7 @@ export const meta = {
   3.*影响:* 交换保存在两个位置的值。
 
   `template<class T, size_t N>`
+
   `void swap(T (&a)[N], T (&b)[N]) noexcept(noexcept(swap(*a, *b)));`
 
   4.*要求：* 对于[0,N\]内的所有i，a[i\]应可与b[i\]交换。
@@ -185,15 +186,14 @@ export const meta = {
 
   1.该库提供了模板化的(helper)函数，以简化将移动语义应用于左值并简化转发功能的实现。
 
-  `template <class T> T&& forward(typename remove_reference<T>::type& t) noexcept; `
-  `template <class T> T&& forward(typename remove_reference<T>::type&& t) noexcept; `
+  `template <class T> T&& forward(typename remove_reference<T>::type& t) noexcept;`
+  `template <class T> T&& forward(typename remove_reference<T>::type&& t) noexcept;`
 
   2.*返回值：* static_cast<T&&\>(t)
 
   3.如果第二个形式被一个左值引用实例化，程序ill-formed。
 
   4.[*Example:* 
-    ```
     template <class T, class A1, class A2>
     shared_ptr<T> factory(A1&& a1, A2&& a2) { 
       return shared_ptr<T>(new T(std::forward<A1>(a1), std::forward<A2>(a2))); 
@@ -208,7 +208,6 @@ export const meta = {
       int i = 2; 
       shared_ptr<A> sp2 = factory<A>(i, 1.414); // OK 
     } 
-    ```
   5.In the ﬁrst call to factory, A1 is deduced as int, so 2 is forwarded to A’s constructor as an rvalue. 
     In the second call to factory, A1 is deduced as int&, so i is forwarded to A’s constructor as an lvalue. 
     In both cases, A2 is deduced as double, so 1.414 is forwarded to A’s constructor as an rvalue.

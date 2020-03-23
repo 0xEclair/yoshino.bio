@@ -145,9 +145,74 @@ export const meta = {
 
   5.*返回值：* y<x
 
+  `template <class T> bool operator<=(const T& x, const T& y);`
 
+  6.*要求：* T是LessThanComparable。
 
+  7.*返回值：* !(y<x)
 
+  `template <class T> bool operator>=(const T& x, const T& y);`
+
+  8.*要求：* T是LessThanComparable。
+
+  9.*返回值：* !(x<y)
+
+  10.在这个库，每当对 != , > , >= , <= 进行声明时，
+  并且未显示提供要求和语义，则要求和语义均在像本条款中指定的。
+
+  ### 20.2.2 swap
+
+  `template<class T> void swap(T& a, T& b) noexcept(see below); `
+
+  1.*备注：* noexcept里的表达式等价于:
+  ```
+  is_nothrow_move_constructible<T>::value &&
+  is_nothrow_move_assignable<T>::value
+  ```
+
+  2.*要求：* T应该是MoveConstructible和MoveAssignable。
+
+  3.*影响:* 交换保存在两个位置的值。
+
+  `template<class T, size_t N>`
+  `void swap(T (&a)[N], T (&b)[N]) noexcept(noexcept(swap(*a, *b)));`
+
+  4.*要求：* 对于[0,N\]内的所有i，a[i\]应可与b[i\]交换。
+
+  5.*影响：* swap_ranges(a,a+N,b)
+
+  ### 20.2.3 forward/move helpers
+
+  1.该库提供了模板化的(helper)函数，以简化将移动语义应用于左值并简化转发功能的实现。
+
+  `template <class T> T&& forward(typename remove_reference<T>::type& t) noexcept; `
+  `template <class T> T&& forward(typename remove_reference<T>::type&& t) noexcept; `
+
+  2.*返回值：* static_cast<T&&\>(t)
+
+  3.如果第二个形式被一个左值引用实例化，程序ill-formed。
+
+  4.[*Example:* 
+    ```
+    template <class T, class A1, class A2>
+    shared_ptr<T> factory(A1&& a1, A2&& a2) { 
+      return shared_ptr<T>(new T(std::forward<A1>(a1), std::forward<A2>(a2))); 
+    }
+
+    struct A { 
+      A(int&, const double&); 
+    };
+
+    void g() { 
+      shared_ptr<A> sp1 = factory<A>(2, 1.414); // error: 2 will not bind to int& 
+      int i = 2; 
+      shared_ptr<A> sp2 = factory<A>(i, 1.414); // OK 
+    } 
+    ```
+  5.In the ﬁrst call to factory, A1 is deduced as int, so 2 is forwarded to A’s constructor as an rvalue. 
+    In the second call to factory, A1 is deduced as int&, so i is forwarded to A’s constructor as an lvalue. 
+    In both cases, A2 is deduced as double, so 1.414 is forwarded to A’s constructor as an rvalue.
+    *-end note* \]
 
 
 

@@ -165,6 +165,7 @@ export const meta = {
   `template<class T> void swap(T& a, T& b) noexcept(see below);`
 
   1.*备注：* noexcept里的表达式等价于:
+
   ```
   is_nothrow_move_constructible<T>::value &&
   is_nothrow_move_assignable<T>::value
@@ -187,6 +188,7 @@ export const meta = {
   1.该库提供了模板化的(helper)函数，以简化将移动语义应用于左值并简化转发功能的实现。
 
   `template <class T> T&& forward(typename remove_reference<T>::type& t) noexcept;`
+  
   `template <class T> T&& forward(typename remove_reference<T>::type&& t) noexcept;`
 
   2.*返回值：* static_cast<T&&\>(t)

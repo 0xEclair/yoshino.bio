@@ -263,15 +263,14 @@ export const meta = {
   3.*备注：* declval的模板参数T可能是未完成类型。
 
   [*Example:* 
-
     ```
     template <class To, class From> 
     decltype(static_cast<To>(declval<From>())) convert(From&&);
     ```
-    
+
   声明一个函数模板convert,仅当From类型可以显式转换为To类型时，该转换才参与重载。
   有关另一个示例，请参见类模板common_type。
-  *-end note*\]
+  *-end note* \]
 
 ## 20.3 Pairs
 1.  for align

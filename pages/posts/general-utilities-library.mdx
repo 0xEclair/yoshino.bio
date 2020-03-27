@@ -845,14 +845,65 @@ export const meta = {
   ```
   int i; float j;
   make_tuple(i,ref(i),cref(j))
-
   创建一个如下类型的tuple
-
   tuple<int, int&, const float&>
   ```
   *-end example* ]
 
+  `template <class... Tuples>`
 
+  `tuple<CTypes...> tuple_cat(Tuples&&... tpls);`
+
+  9.在以下各段中，让Ti为tuple中的第i个类型，让Ui为remove_reference<Ti\>::type，
+  并且tpi为函数参数包tpls中的第i个参数，其中所有index均基于0。
+
+  10.11.12.13 略
+
+  #### 20.4.2.5 Tuple helper classes
+
+  ```
+  template <class... Types> 
+  class tuple_size<tuple<Types...> > 
+    : public integral_constant<size_t, sizeof...(Types)> { }; 
+    
+  template <size_t I, class... Types> 
+  class tuple_element<I, tuple<Types...> > { 
+  public: 
+    typedef TI type; 
+  }; 
+  ```
+
+  1.*要求：* I < sizeof...(Types).
+  如果I越界，程序ill-formed.
+
+  2.*类型：* TI是Types的第I个元素的类型，index从0开始
+
+  `template <class T> class tuple_size<const T>;`
+
+  `template <class T> class tuple_size<volatile T>;`
+
+  `template <class T> class tuple_size<const volatile T>;`
+
+  3.让TS表示无cv类型T的tuple_size<T\>.
+  然后三个模板中的每一个都应满足UnaryTypeTrait的要求，
+  其BaseCharacteristic是**integral_constant<remove_cv<decltype(TS::value)\>::type, TS::value\>**
+
+  `template <size_t I, class T> class tuple_element<I, const T>;`
+
+  `template <size_t I, class T> class tuple_element<I, volatile T>;`
+
+  `template <size_t I, class T> class tuple_element<I, const volatile T>;`
+
+  令TE表示无cv类型T的tuple_element<I，T|>。
+  然后三个模板中的每一个都应满足TransformationTrait的要求，
+  成员typedef类型的名称如下：
+    -第一个特化,add_const<TE::type\>::type,
+    -第二个特化,add_volatile<TE::type\>::type,
+    -第三个特化,add_cv<TE::type\>::type
+
+  #### 20.4.2.6 元素访问(Element access)
+
+  532
 
 
 

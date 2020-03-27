@@ -694,7 +694,7 @@ export const meta = {
 
   17.*要求：*  sizeof...(Types)==sizeof...(UTypes). is_constructible<Ti, Ui&&\>::value is true for all i. 
 
-  18.*影响：*   对全部i，std::forward<Ui\>(get<i>(u))用初始化*this的第i个元素。
+  18.*影响：*   对全部i，std::forward<Ui\>(get<i\>(u))用初始化*this的第i个元素。
 
   19.*备注：* 这个构造函数不参与重载决议，除非UTypes的每个类型可以隐式转换从在Types中对应的类型。
 

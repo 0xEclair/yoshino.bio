@@ -437,7 +437,7 @@ export const meta = {
 
   2.*返回值：* x.first < y.first || (!(y.first < x.first) && x.second < y.second )
 
-  #### 剩下的和20.2.1/20.2.2要求一样
+  ##### 剩下的和20.2.1/20.2.2要求一样
 
   `template<class T1, class T2>`
   
@@ -894,7 +894,7 @@ export const meta = {
 
   `template <size_t I, class T> class tuple_element<I, const volatile T>;`
 
-  令TE表示无cv类型T的tuple_element<I，T|>。
+  令TE表示无cv类型T的tuple_element<I，T\>。
   然后三个模板中的每一个都应满足TransformationTrait的要求，
   成员typedef类型的名称如下：
     -第一个特化,add_const<TE::type\>::type,
@@ -903,8 +903,94 @@ export const meta = {
 
   #### 20.4.2.6 元素访问(Element access)
 
-  532
+  `template <size_t I, class... Types>`
 
+  `typename tuple_element<I, tuple<Types...>>::type& get(tuple<Types...>& t) noexcept;`
+
+  1.*要求：* I < sizeof...(Types).如果I越界，程序ill-formed.
+
+  2.*返回值：* t的第I个元素的引用，index从0开始。
+
+  `template <size_t I, class... types>`
+
+  `typename tuple_element<I, tuple<Types...>>::type&& get(tuple<Types...>&& t) noexcept;`
+
+  3.*影响：* 等价于返回Equivalent to return std::forward<typename tuple_element<I, tuple<Types...\>\>::type&&\>(get<I\>(t));
+
+  4.*Note:* 如果Types中的T是某个引用类型X&，则返回类型为X&，而不是X&&。
+  但是，如果元素类型为非引用类型T，则返回类型为T&&。
+
+  `template <size_t I, class... Types>`
+
+  `typename tuple_element<I, tuple<Types...>>::type const& get(const tuple<Types...>& t) noexcept;`
+
+  5.*要求：* I < sizeof...(Types).如果I越界，程序ill-formed.
+
+  6.*返回值：* t的第I个元素的const 引用，index从0开始。
+
+  7.[*Note:*  Constness is shallow.如果Types中的T是某个引用类型X&,返回值是X&,而不是const X&。
+  但是，如果元素类型是非引用类型T，返回类型是const T&.这与将constness定义为引用类型的成员变量的方式一致。
+  *-end note*]
+
+  8.[*Note:* get是一个非成员函数的理由是 如果实现了作为成员函数的这种设计，
+  依赖template参数的类型的代码需要使用template关键字。
+  *-end note*]
+
+  #### 20.4.2.7 相关运算符(Relational operators)
+
+  `template<class... TTypes, class... UTypes>`
+
+  `bool operator==(const tuple<TTypes...>& t, const tuple<UTypes...>& u);`
+
+  1.*要求：* 每个i，其中0 <= i和i < sizeof...（Types)，get<i\>(t) == get<i\>(u)是有效表达式，
+  返回可转换为bool的类型。 sizeof...(TTypes) == sizeof...(UTypes).
+
+  2.*返回值：* 每个i，如果get<i\>(t) == get<i\>(u)，返回true。对任意两个0长度的tuple e和f来说,e == f返回true.
+
+  3.*影响：* 从0开始按顺序执行基本比较。在第一个相等比较结果为false之后，不执行任何比较或元素访问。
+
+  `template<class... TTypes, class... UTypes>`
+
+  `bool operator<(const tuple<TTypes...>& t, const tuple<UTypes...>& u);`
+
+  4.*要求：* 每个i，其中0 <= i和i < sizeof...（Types)，get<i\>(t) < get<i\>(u)和get<i\>(u) < get<i\>(t)是有效表达式，
+  返回可转换为bool的类型。 sizeof...(TTypes) == sizeof...(UTypes).
+
+  5.*影响：* t和u之前loxicographical比较的结果。结果定义如下：
+  (bool)(get<0\>(t) < get<0\>(u)) ||  (!(bool)(get<0\>(u) < get<0\>(t)) && ttail < utail.
+  其中某个tuple r的rtail是一个包含除r的第一个元素以外的所有元素的tuple。对于任何两个零长度tuple e和f，e < f返回false。
+
+  ##### 剩下的和20.2.1/20.2.2要求一样
+
+  #### 20.4.2.8 Tuple traits
+
+  `template <class... Types, class Alloc>`
+
+  `struct uses_allocator<tuple<Types...>, Alloc> : true_type { };`
+
+  *要求：* Alloc应该是个Allocator(17.6.3.5).
+
+  1.[*Note:* 此traits的特化informs其他库组件，即使没有嵌套的allocator_type，
+  也可以使用alloctor构造tuple。 *-end note*]
+
+  #### 20.4.2.9 Tuple特化算法(Tuple specialized algorithms)
+
+  `template <class... Types>`
+
+  `void swap(tuple<Types...>& x, tuple<Types...>& y) noexcept(see below);`
+
+  1.*备注：* noexcept里的表达式等价于：
+
+    `noexcept(x.swap(y))`
+
+  2.*影响：* x.swap(y).
+
+## 20.5 类模板 bitset
+1. for align
+
+  ### 头文件<bitset> 概要
+
+  534
 
 
 

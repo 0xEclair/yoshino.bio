@@ -9,16 +9,16 @@ export const meta = {
 
 ## 20.1 概览
 
-1. 这个条款描述了在C++程序中广泛使用的工具；一些用于C++标准库的其他元素。
+1. 这个条款描述了在C++程序中广泛使用的工具；一些用于C++标准库的其他元素.
 
 ## 20.2 Utility components
 
-1. 这个副条款包含了一些用于库的其余部分的基础函数和类模板。
+1. 这个副条款包含了一些用于库的其余部分的基础函数和类模板.
 
   ### 头文件<utility\> 概要
 
-2. 头文件<utility\>定义在这个条款里描述的若干类型和函数模板。
-它也定义the template pair和大量用于pair对象操作的函数模板。
+2. 头文件<utility\>定义在这个条款里描述的若干类型和函数模板.
+它也定义the template pair和大量用于pair对象操作的函数模板.
 
   ```
   #include <initializer_list>
@@ -131,34 +131,34 @@ export const meta = {
 
   ### 20.2.1 运算符
 
-  1.为了避免多余定义，!=用==，>,<=和>=使用<。
+  1.为了避免多余定义，!=用==，>,<=和>=使用<.
 
   `template <class T> bool operator!=(const T& x, const T& y);`
 
-  2.*要求：* T是EqualityComparable。
+  2.*要求：* T是EqualityComparable.
 
   3.*返回值：* !(x==y).
 
   `template <class T> bool operator>(const T& x, const T& y);`
 
-  4.*要求：* T是LessThanComparable。
+  4.*要求：* T是LessThanComparable.
 
   5.*返回值：* y<x
 
   `template <class T> bool operator<=(const T& x, const T& y);`
 
-  6.*要求：* T是LessThanComparable。
+  6.*要求：* T是LessThanComparable.
 
   7.*返回值：* !(y<x)
 
   `template <class T> bool operator>=(const T& x, const T& y);`
 
-  8.*要求：* T是LessThanComparable。
+  8.*要求：* T是LessThanComparable.
 
   9.*返回值：* !(x<y)
 
   10.在这个库，每当对 != , > , >= , <= 进行声明时，
-  并且未显示提供要求和语义，则要求和语义均在像本条款中指定的。
+  并且未显示提供要求和语义，则要求和语义均在像本条款中指定的.
 
   ### 20.2.2 swap
 
@@ -171,21 +171,21 @@ export const meta = {
   is_nothrow_move_assignable<T>::value
   ```
 
-  2.*要求：* T应该是MoveConstructible和MoveAssignable。
+  2.*要求：* T应该是MoveConstructible和MoveAssignable.
 
-  3.*影响:* 交换保存在两个位置的值。
+  3.*影响:* 交换保存在两个位置的值.
 
   `template<class T, size_t N>`
 
   `void swap(T (&a)[N], T (&b)[N]) noexcept(noexcept(swap(*a, *b)));`
 
-  4.*要求：* 对于[0,N\]内的所有i，a[i\]应可与b[i\]交换。
+  4.*要求：* 对于[0,N\]内的所有i，a[i\]应可与b[i\]交换.
 
   5.*影响：* swap_ranges(a,a+N,b)
 
   ### 20.2.3 forward/move helpers
 
-  1.该库提供了模板化的(helper)函数，以简化将移动语义应用于左值并简化转发功能的实现。
+  1.该库提供了模板化的(helper)函数，以简化将移动语义应用于左值并简化转发功能的实现.
 
   `template <class T> T&& forward(typename remove_reference<T>::type& t) noexcept;`
 
@@ -193,7 +193,7 @@ export const meta = {
 
   2.*返回值：* static_cast<T&&\>(t)
 
-  3.如果第二个形式被一个左值引用实例化，程序ill-formed。
+  3.如果第二个形式被一个左值引用实例化，程序ill-formed.
 
   4.[*Example:* 
   ```
@@ -252,7 +252,7 @@ export const meta = {
 
   ### 20.2.4 函数模板declval
 
-  1.该库提供函数模板declval,以简化对未求值运算符中出现的表达式的定义。
+  1.该库提供函数模板declval,以简化对未求值运算符中出现的表达式的定义.
 
   `template <class T>`
 
@@ -260,7 +260,7 @@ export const meta = {
 
   2.*备注：* 如果这个函数被odr式使用，程序ill-formed
 
-  3.*备注：* declval的模板参数T可能是未完成类型。
+  3.*备注：* declval的模板参数T可能是未完成类型.
 
   [*Example:* 
     ```
@@ -268,17 +268,17 @@ export const meta = {
     decltype(static_cast<To>(declval<From>())) convert(From&&);
     ```
 
-  声明一个函数模板convert,仅当From类型可以显式转换为To类型时，该转换才参与重载。
-  有关另一个示例，请参见类模板common_type。
+  声明一个函数模板convert,仅当From类型可以显式转换为To类型时，该转换才参与重载.
+  有关另一个示例，请参见类模板common_type.
   *-end note* \]
 
 ## 20.3 Pairs
 1.  for align
   ### 20.3.1 概览
 
-  1.该库为合成值对提供了模板。 
+  1.该库为合成值对提供了模板. 
   该库还提供了一个匹配功能模板以简化其构造，并提供了多个模板，
-  这些模板可以访问pair对象，就像它们是tuple对象一样。
+  这些模板可以访问pair对象，就像它们是tuple对象一样.
 
   ### 20.3.2 类模板pair
 
@@ -313,7 +313,7 @@ export const meta = {
     };
   }
   ```
-  1.构造函数和pair成员函数不会抛出异常，除非指定的对此操作调用的元素抛出异常。
+  1.构造函数和pair成员函数不会抛出异常，除非指定的对此操作调用的元素抛出异常.
 
   `constexpr pair();`
 
@@ -336,16 +336,16 @@ export const meta = {
 
   7.*影响：* 这个构造函数用std::forward<U\>(x)初始化first，用std::forward<V\>(y)初始化second.
 
-  8.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议。
+  8.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议.
 
   `template<class U, class V> pair(const pair<U, V>& p);`
 
   9.*要求：* is_constructible<first_type, const U&\>::value 是 true and
   is_constructible<second_type, const V&\>::value 是 true.
 
-  10.*影响：*  从参数对应的成员中初始化。
+  10.*影响：*  从参数对应的成员中初始化.
 
-  11.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议。
+  11.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议.
 
   `template<class U, class V> pair(pair<U, V>&& p);`
 
@@ -354,7 +354,7 @@ export const meta = {
 
   13.*影响：* 让std::forward<U\>(p.first)初始化first，std::forward<V\>(p.second)初始化second.
 
-  14.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议。
+  14.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的，这个构造函数不得参与重载决议.
 
   `template<class... Args1, class... Args2>`
 
@@ -365,7 +365,7 @@ export const meta = {
 
   16.*影响：* 让通过转发first_args获得的Args1...类型的参数初始化first,通过转发fsecond_args获得的Args2...类型的参数初始化second.
   这里，转发类型U的一个元素x在tuple对象内意味着调用std::forward<U\>(x).
-  这个形式的构造函数，第一和第二个参数分别在单独的tuple对象中提供，称为分段构造。
+  这个形式的构造函数，第一和第二个参数分别在单独的tuple对象中提供，称为分段构造.
 
   `pair& operator=(const pair& p);`
 
@@ -397,7 +397,7 @@ export const meta = {
   24.*要求：* is_move_assignable<first_type\>::value is true and 
   is_move_assignable<second_type\>::value is true. 
 
-  25.*影响：* 用std::forward<first_type\>(p.first)对first赋值，std::forward<second_type\>(p.second)对second赋值。
+  25.*影响：* 用std::forward<first_type\>(p.first)对first赋值，std::forward<second_type\>(p.second)对second赋值.
 
   26.*返回值：* *this
 
@@ -406,7 +406,7 @@ export const meta = {
   27.*要求：*   is_assignable<first_type&, U&&\>::value is true and 
   is_assignable<second_type&, V&&\>::value is true.
 
-  28.*影响：* 用std::forward<U\>(p.first)对first赋值，std::forward<V\>(p.second)对second赋值。
+  28.*影响：* 用std::forward<U\>(p.first)对first赋值，std::forward<V\>(p.second)对second赋值.
 
   29.*返回值：* *this
 
@@ -419,7 +419,7 @@ export const meta = {
   noexcept(swap(second, p.second))
   ```
 
-  31.*要求：* first和p.first可交换，second和p.second可交换。
+  31.*要求：* first和p.first可交换，second和p.second可交换.
 
   32.*影响：* 交换first和p.first，second和p.second.
 
@@ -445,7 +445,7 @@ export const meta = {
 
   8.*返回值：*  pair<V1, V2\>(std::forward<T1\>(x), std::forward<T2\>(y)); 
 
-  V1和V2这样确定: 令每个Ui为每个Ti的decay<Ti\>::type。如果Ui等于reference_wrapper<X\>，令每个Vi是X&，否则Vi是Ui。
+  V1和V2这样确定: 令每个Ui为每个Ti的decay<Ti\>::type.如果Ui等于reference_wrapper<X\>，令每个Vi是X&，否则Vi是Ui.
   (Let Ui be decay<Ti\>::type for each Ti. Then each Vi is X& if Ui equals reference_wrapper<X\>, otherwise Vi is Ui.)
 
   9.[*Example:* 替代：
@@ -462,7 +462,7 @@ export const meta = {
 
   `tuple_size<pair<T1, T2> >::value`
 
-  1.*返回值：* 整数常量表达式。
+  1.*返回值：* 整数常量表达式.
 
   2.*值：* 2
 
@@ -481,7 +481,7 @@ export const meta = {
   const typename tuple_element<I, std::pair<T1, T2> >::type& get(const pair<T1, T2>&) noexcept;
   ```
 
-  5.*返回值：* 如果 I == 0 返回p.first;如果 I == 1 返回p.second;否则程序ill-formed。
+  5.*返回值：* 如果 I == 0 返回p.first;如果 I == 1 返回p.second;否则程序ill-formed.
 
   ```
   template<size_t I, class T1, class T2> 
@@ -489,7 +489,7 @@ export const meta = {
   ```
 
   6.*返回值：* 如果 I == 0 返回std::forward<T1&&\>(p1.first);如果 I == 1 返回std::forward<T2&&\>(p.second);
-  否则程序ill-formed。
+  否则程序ill-formed.
 
   ### 20.3.5 分段构造(Piecewise construction)
 
@@ -497,7 +497,7 @@ export const meta = {
 
   `constexpr piecewise_construct_t piecewise_construct = piecewise_construct_t();`
 
-  1.piecewise_construct_t是个空的结构体类型，用作独特的类型来消除构造函数和函数重载的歧义。
+  1.piecewise_construct_t是个空的结构体类型，用作独特的类型来消除构造函数和函数重载的歧义.
   具体来说，pair具有一个piecewise_construct_t作为第一参数的构造函数，随后是两个被用于pair对象的元素的分段构造的tuple元素
 
 ## 20.4
@@ -505,9 +505,9 @@ export const meta = {
 
   ### 20.4.1 概览
 
-  1.本小节描述了提供tuple类型的tuple库，该tuple类型可以作为可以使用任意数量的参数实例化的类模板tuple。
-  每个模板参数指定tuple中元素的类型。因此，tuple是异构的固定大小的值集合。
-  具有两个参数的tuple的实例化与具有相同两个参数的pair的实例化相似。见20.3。
+  1.本小节描述了提供tuple类型的tuple库，该tuple类型可以作为可以使用任意数量的参数实例化的类模板tuple.
+  每个模板参数指定tuple中元素的类型.因此，tuple是异构的固定大小的值集合.
+  具有两个参数的tuple的实例化与具有相同两个参数的pair的实例化相似.见20.3.
 
   2.头文件 <tuple\> 概要
 
@@ -646,7 +646,7 @@ export const meta = {
 
   #### 20.4.2.1 构造函数
   
-  1.对每个构造函数来说，仅在Types中的一个类型构造函数中抛出异常。
+  1.对每个构造函数来说，仅在Types中的一个类型构造函数中抛出异常.
 
   2.In the constructor descriptions that follow, let i be in the range [0,sizeof...(Types)) in order, Ti be the ith type in Types, and Ui be the ith type in a template parameter pack named UTypes, where indexing is zero-based.
 
@@ -654,21 +654,21 @@ export const meta = {
   
   3.*要求：* 每个i，is_default_constructible<Ti\>::value 是true.
 
-  4.*影响：* 值初始化每个元素。
+  4.*影响：* 值初始化每个元素.
 
   `explicit tuple(const Types&...);`
 
   5.*要求：* 每个i，is_copy_constructible<Ti\>::value 是true.
 
-  6.*影响：* 使用相应的参数初始化每个元素。
+  6.*影响：* 使用相应的参数初始化每个元素.
 
   `template <class... UTypes> explicit tuple(UTypes&&... u); `
 
   7.*要求：* sizeof...(Types)==sizeof...(UTypes). is_constructible<Ti, Ui&&\>::value is true for all i.
 
-  8.*影响：* 用在std::forward<UTypes\>(u)中的相应的值初始化tuple中的每个元素。
+  8.*影响：* 用在std::forward<UTypes\>(u)中的相应的值初始化tuple中的每个元素.
 
-  9.*备注：* 这个构造函数不参与重载决议，除非每个UTypes中的类型可以隐式转换成在Types中对应的类型。
+  9.*备注：* 这个构造函数不参与重载决议，除非每个UTypes中的类型可以隐式转换成在Types中对应的类型.
 
   `tuple(const tuple& u) = default;`
 
@@ -688,22 +688,22 @@ export const meta = {
 
   15.*影响：* 用对应的u的元素构造每个*this的元素
 
-  16.*备注：* 这个构造函数不参与重载决议，除非每个i，const Ui&可以隐式转换到Ti。
+  16.*备注：* 这个构造函数不参与重载决议，除非每个i，const Ui&可以隐式转换到Ti.
 
   `template <class... UTypes> tuple(tuple<UTypes...>&& u);`
 
   17.*要求：*  sizeof...(Types)==sizeof...(UTypes). is_constructible<Ti, Ui&&\>::value is true for all i. 
 
-  18.*影响：*   对全部i，std::forward<Ui\>(get<i\>(u))用初始化*this的第i个元素。
+  18.*影响：*   对全部i，std::forward<Ui\>(get<i\>(u))用初始化*this的第i个元素.
 
-  19.*备注：* 这个构造函数不参与重载决议，除非UTypes的每个类型可以隐式转换从在Types中对应的类型。
+  19.*备注：* 这个构造函数不参与重载决议，除非UTypes的每个类型可以隐式转换从在Types中对应的类型.
 
   `template <class U1, class U2> tuple(const pair<U1, U2>& u);`
 
   20.*要求：* sizeof...(Types) == 2. 
   对第一个类型T0来说，is_constructible<T0, const U1&\>::value 是true，对第二个类型T1来说，is_constructible<T1, const U2&\>::value 是true
 
-  21.*影响：* 用u.first构造第一个元素，u.second构造第二个元素。
+  21.*影响：* 用u.first构造第一个元素，u.second构造第二个元素.
 
   22.*备注：* 这个构造函数不参加重载决议，除非const U1& 可隐式转换到T0，const U2& 可隐式转换到T1.
 
@@ -712,7 +712,7 @@ export const meta = {
   23.*要求：*  sizeof...(Types) == 2.
   对第一个类型T0来说，is_constructible<T0, U1&&\>::value 是true，对第二个类型T1来说，is_constructible<T1, U2&&\>::value 是true. 
 
-  24.*影响：* 用std::forward<U1\>(u.first)初始化第一个元素，std::forward<U2\>(u.second)初始化第二个元素。
+  24.*影响：* 用std::forward<U1\>(u.first)初始化第一个元素，std::forward<U2\>(u.second)初始化第二个元素.
 
   25.*备注：* 这个构造函数不参与重载决议，除非U1可隐式转换到T0，U2可隐式转换到T1.
 
@@ -737,21 +737,21 @@ export const meta = {
   tuple(allocator_arg_t, const Alloc& a, pair<U1, U2>&&);
   ```
 
-  26.*要求：* Alloc应该满足Allocator(17.6.3.5)的要求。
+  26.*要求：* Alloc应该满足Allocator(17.6.3.5)的要求.
 
-  27.*影响：* 等价于前面的构造函数，不同之处在于每个元素都是使用uses_allocator(?)构造的。
+  27.*影响：* 等价于前面的构造函数，不同之处在于每个元素都是使用uses_allocator(?)构造的.
 
   #### 20.4.2.2 赋值(Assignment)
 
-  1.对于每个tuple赋值运算符，仅当Types中的一种类型的赋值引发异常时，才会引发异常。
+  1.对于每个tuple赋值运算符，仅当Types中的一种类型的赋值引发异常时，才会引发异常.
   在下面的函数描述中，按顺序让i在[0，sizeof ...(Types))范围内，Ti是Types中的第i个类型，Ui是名为UTypes的模板参数包中的第i个类型，
-  其中，index是从0开始的。
+  其中，index是从0开始的.
 
   `tuple& operator=(const tuple& u);`
 
-  2.*要求：* 每个i，is_copy_assignable<Ti\>::value 是true。
+  2.*要求：* 每个i，is_copy_assignable<Ti\>::value 是true.
 
-  3.*影响：* 令每个u的元素赋值给对应的*this的元素。
+  3.*影响：* 令每个u的元素赋值给对应的*this的元素.
 
   4.*返回值：* *this
 
@@ -763,9 +763,9 @@ export const meta = {
   is_nothrow_move_assignable<Ti>::value 
   ```
 
-  Ti是Types里的第i个类型。
+  Ti是Types里的第i个类型.
 
-  6.*要求：* 每个i，is_move_assignable<Ti\>::value 是true。
+  6.*要求：* 每个i，is_move_assignable<Ti\>::value 是true.
 
   7.*影响：* 对于全部的i,令std::forward<Ti\>(get<i\>(u))赋值给get<i\>(*this).
 
@@ -776,7 +776,7 @@ export const meta = {
   9.*要求：* sizeof...(Types) == sizeof...(UTypes).
   每个i，is_assignable<Ti&,const Ui&\>::value是true.
 
-  10.*影响：* 令每个u的元素赋值给对应的*this的元素。
+  10.*影响：* 令每个u的元素赋值给对应的*this的元素.
 
   11.*返回值：* *this
 
@@ -802,11 +802,11 @@ export const meta = {
   `template <class U1, class U2> tuple& operator=(pair<U1, U2>&& u);`
 
   18.*要求：* sizeof...(Types) == 2. 
-  对第一个类型T0来说，is_assignable<T0&, U2&&\>::value 是true。
-  对第二个类型T1来说，is_assignable<T1&, U2&&\>::value 是true。
+  对第一个类型T0来说，is_assignable<T0&, U2&&\>::value 是true.
+  对第二个类型T1来说，is_assignable<T1&, U2&&\>::value 是true.
 
   19.*影响：* 令std::forward<U1\>(u.first)赋值给*this的第一个元素，
-  std::forward<U2\>(u.second)赋值给 *this的第二个元素。
+  std::forward<U2\>(u.second)赋值给 *this的第二个元素.
 
   20.*返回值：* *this
 
@@ -820,24 +820,24 @@ export const meta = {
   noexcept(swap(declval<Ti&>>(), declval<Ti&>())) 
   ```
 
-  Ti是Types里的第i个类型。
+  Ti是Types里的第i个类型.
 
   2.*要求：* 每个*this里的元素应该和rhs对应的元素可交换
 
   3.*影响:* 对*this的每个元素和rhs中相应的元素调用swap
 
-  4.*Throws:* 无除非一个逐元素swap调用抛出异常。
+  4.*Throws:* 无除非一个逐元素swap调用抛出异常.
 
   #### 20.4.2.4 创建tuple函数(Tuple creation functions)
 
   1.在下面的函数描述中，按顺序让i在[0，sizeof ...(TTypes))范围内，并让Ti为名为TTypes的模板参数包中的第i个类型； 
-  让j按顺序在[0，sizeof ...(UTypes))范围内，并且Uj是名为UTypes的模板参数包中的第j个类型，其中index从0开始。
+  让j按顺序在[0，sizeof ...(UTypes))范围内，并且Uj是名为UTypes的模板参数包中的第j个类型，其中index从0开始.
 
   `template<class... Types>`
 
   `tuple<VTypes...> make_tuple(Types&&... t);`
 
-  2.每个i，Ui是decay<Ti\>::type.如果Ui等价于reference_wrapper<X\>,VTypes的每个Vi是X&，否则Vi是Ui。
+  2.每个i，Ui是decay<Ti\>::type.如果Ui等价于reference_wrapper<X\>,VTypes的每个Vi是X&，否则Vi是Ui.
 
   3.*返回值：* tuple<VTypes...\>(std::forward<Types\>(t)...)
 
@@ -855,7 +855,7 @@ export const meta = {
   `tuple<CTypes...> tuple_cat(Tuples&&... tpls);`
 
   9.在以下各段中，让Ti为tuple中的第i个类型，让Ui为remove_reference<Ti\>::type，
-  并且tpi为函数参数包tpls中的第i个参数，其中所有index均基于0。
+  并且tpi为函数参数包tpls中的第i个参数，其中所有index均基于0.
 
   10.11.12.13 略
 
@@ -894,7 +894,7 @@ export const meta = {
 
   `template <size_t I, class T> class tuple_element<I, const volatile T>;`
 
-  令TE表示无cv类型T的tuple_element<I，T\>。
+  令TE表示无cv类型T的tuple_element<I，T\>.
   然后三个模板中的每一个都应满足TransformationTrait的要求，
   成员typedef类型的名称如下：
     -第一个特化,add_const<TE::type\>::type,
@@ -909,7 +909,7 @@ export const meta = {
 
   1.*要求：* I < sizeof...(Types).如果I越界，程序ill-formed.
 
-  2.*返回值：* t的第I个元素的引用，index从0开始。
+  2.*返回值：* t的第I个元素的引用，index从0开始.
 
   `template <size_t I, class... types>`
 
@@ -917,8 +917,8 @@ export const meta = {
 
   3.*影响：* 等价于返回Equivalent to return std::forward<typename tuple_element<I, tuple<Types...\>\>::type&&\>(get<I\>(t));
 
-  4.*Note:* 如果Types中的T是某个引用类型X&，则返回类型为X&，而不是X&&。
-  但是，如果元素类型为非引用类型T，则返回类型为T&&。
+  4.*Note:* 如果Types中的T是某个引用类型X&，则返回类型为X&，而不是X&&.
+  但是，如果元素类型为非引用类型T，则返回类型为T&&.
 
   `template <size_t I, class... Types>`
 
@@ -926,14 +926,14 @@ export const meta = {
 
   5.*要求：* I < sizeof...(Types).如果I越界，程序ill-formed.
 
-  6.*返回值：* t的第I个元素的const 引用，index从0开始。
+  6.*返回值：* t的第I个元素的const 引用，index从0开始.
 
-  7.[*Note:*  Constness is shallow.如果Types中的T是某个引用类型X&,返回值是X&,而不是const X&。
-  但是，如果元素类型是非引用类型T，返回类型是const T&.这与将constness定义为引用类型的成员变量的方式一致。
+  7.[*Note:*  Constness is shallow.如果Types中的T是某个引用类型X&,返回值是X&,而不是const X&.
+  但是，如果元素类型是非引用类型T，返回类型是const T&.这与将constness定义为引用类型的成员变量的方式一致.
   *-end note*]
 
   8.[*Note:* get是一个非成员函数的理由是 如果实现了作为成员函数的这种设计，
-  依赖template参数的类型的代码需要使用template关键字。
+  依赖template参数的类型的代码需要使用template关键字.
   *-end note*]
 
   #### 20.4.2.7 相关运算符(Relational operators)
@@ -943,22 +943,22 @@ export const meta = {
   `bool operator==(const tuple<TTypes...>& t, const tuple<UTypes...>& u);`
 
   1.*要求：* 每个i，其中0 <= i和i < sizeof...（Types)，get<i\>(t) == get<i\>(u)是有效表达式，
-  返回可转换为bool的类型。 sizeof...(TTypes) == sizeof...(UTypes).
+  返回可转换为bool的类型. sizeof...(TTypes) == sizeof...(UTypes).
 
-  2.*返回值：* 每个i，如果get<i\>(t) == get<i\>(u)，返回true。对任意两个0长度的tuple e和f来说,e == f返回true.
+  2.*返回值：* 每个i，如果get<i\>(t) == get<i\>(u)，返回true.对任意两个0长度的tuple e和f来说,e == f返回true.
 
-  3.*影响：* 从0开始按顺序执行基本比较。在第一个相等比较结果为false之后，不执行任何比较或元素访问。
+  3.*影响：* 从0开始按顺序执行基本比较.在第一个相等比较结果为false之后，不执行任何比较或元素访问.
 
   `template<class... TTypes, class... UTypes>`
 
   `bool operator<(const tuple<TTypes...>& t, const tuple<UTypes...>& u);`
 
   4.*要求：* 每个i，其中0 <= i和i < sizeof...（Types)，get<i\>(t) < get<i\>(u)和get<i\>(u) < get<i\>(t)是有效表达式，
-  返回可转换为bool的类型。 sizeof...(TTypes) == sizeof...(UTypes).
+  返回可转换为bool的类型. sizeof...(TTypes) == sizeof...(UTypes).
 
-  5.*影响：* t和u之前loxicographical比较的结果。结果定义如下：
+  5.*影响：* t和u之前loxicographical比较的结果.结果定义如下：
   (bool)(get<0\>(t) < get<0\>(u)) ||  (!(bool)(get<0\>(u) < get<0\>(t)) && ttail < utail.
-  其中某个tuple r的rtail是一个包含除r的第一个元素以外的所有元素的tuple。对于任何两个零长度tuple e和f，e < f返回false。
+  其中某个tuple r的rtail是一个包含除r的第一个元素以外的所有元素的tuple.对于任何两个零长度tuple e和f，e < f返回false.
 
   ##### 剩下的和20.2.1/20.2.2要求一样
 
@@ -971,7 +971,7 @@ export const meta = {
   *要求：* Alloc应该是个Allocator(17.6.3.5).
 
   1.[*Note:* 此traits的特化informs其他库组件，即使没有嵌套的allocator_type，
-  也可以使用alloctor构造tuple。 *-end note*]
+  也可以使用alloctor构造tuple. *-end note*]
 
   #### 20.4.2.9 Tuple特化算法(Tuple specialized algorithms)
 
@@ -990,7 +990,260 @@ export const meta = {
 
   ### 头文件<bitset\> 概要
 
-  534
+  ```
+  #include <string> 
+  #include <iosfwd> // for istream, ostream 
+  namespace std { 
+    template <size_t N> class bitset;
+
+    // 20.5.4 bitset operators: 
+    template <size_t N> 
+    bitset<N> operator&(const bitset<N>&, const bitset<N>&) noexcept; 
+    template <size_t N> 
+    bitset<N> operator|(const bitset<N>&, const bitset<N>&) noexcept; 
+    template <size_t N> 
+    bitset<N> operator^(const bitset<N>&, const bitset<N>&) noexcept; 
+    template <class charT, class traits, size_t N> 
+    basic_istream<charT, traits>& operator>>(basic_istream<charT, traits>& is, bitset<N>& x); 
+    template <class charT, class traits, size_t N> 
+    basic_ostream<charT, traits>& operator<<(basic_ostream<charT, traits>& os, const bitset<N>& x);
+  }
+  ```
+
+  1.头文件<bitset\>定义一个类模板和一些相关的函数，用于表示和操作固定大小的位序列.
+
+  ```
+  namespace std { 
+    template<size_t N> class bitset { 
+    public: 
+      // bit reference: 
+      class reference { 
+        friend class bitset; 
+        reference() noexcept;
+      public: 
+        ~reference() noexcept; 
+        reference& operator=(bool x) noexcept; // for b[i] = x; 
+        reference& operator=(const reference&) noexcept; // for b[i] = b[j]; 
+        bool operator~() const noexcept; // ﬂips the bit 
+        operator bool() const noexcept; // for x = b[i]; 
+        reference& flip() noexcept; // for b[i].flip(); 
+      }; 
+
+      // 20.5.1 constructors: 
+      constexpr bitset() noexcept; 
+      constexpr bitset(unsigned long long val) noexcept; 
+      template<class charT, class traits, class Allocator> 
+      explicit bitset(const basic_string<charT,traits,Allocator>& str, 
+        typename basic_string<charT,traits,Allocator>::size_type pos = 0, 
+        typename basic_string<charT,traits,Allocator>::size_type n = basic_string<charT,traits,Allocator>::npos, 
+        charT zero = charT(’0’), charT one = charT(’1’)); 
+      template <class charT> 
+      explicit bitset(const charT* str, 
+        typename basic_string<charT>::size_type n = basic_string<charT>::npos, 
+        charT zero = charT(’0’), charT one = charT(’1’));
+
+      // 20.5.2 bitset operations: 
+      bitset<N>& operator&=(const bitset<N>& rhs) noexcept; 
+      bitset<N>& operator|=(const bitset<N>& rhs) noexcept; 
+      bitset<N>& operator^=(const bitset<N>& rhs) noexcept; 
+      bitset<N>& operator<<=(size_t pos) noexcept; 
+      bitset<N>& operator>>=(size_t pos) noexcept; 
+      bitset<N>& set() noexcept; 
+      bitset<N>& set(size_t pos, bool val = true); 
+      bitset<N>& reset() noexcept; bitset<N>& reset(size_t pos); 
+      bitset<N> operator~() const noexcept; bitset<N>& flip() noexcept; 
+      bitset<N>& flip(size_t pos);
+      
+      // element access: 
+      constexpr bool operator[](size_t pos) const; // for b[i]; reference 
+      operator[](size_t pos); // for b[i];
+
+      unsigned long to_ulong() const; 
+      unsigned long long to_ullong() const; 
+      template <class charT = char, 
+          class traits = char_traits<charT>, 
+          class Allocator = allocator<charT>> 
+      basic_string<charT, traits, Allocator> 
+      to_string(charT zero = charT(’0’), charT one = charT(’1’)) const; 
+      size_t count() const noexcept; constexpr size_t size() noexcept; 
+      bool operator==(const bitset<N>& rhs) const noexcept; 
+      bool operator!=(const bitset<N>& rhs) const noexcept; 
+      bool test(size_t pos) const; bool all() const noexcept; 
+      bool any() const noexcept; bool none() const noexcept; 
+      bitset<N> operator<<(size_t pos) const noexcept; 
+      bitset<N> operator>>(size_t pos) const noexcept;
+    };
+
+    // 20.5.3 hash support
+    template <class T> struct hash; 
+    template <size_t N> struct hash<bitset<N>>;
+  } 
+  ```
+
+2.类模板bitset<N\>描述了一个可以保存由固定位数N组成的序列.
+
+3.每个bit表示值0(reset)或1(set).切换(toggle)一位是只将值0更改为1或者将值1更改为0.
+每个bit有一个非负位置pos.一个bitset<N\>对象和一些整型值互相转换时，bit位置pos对应*bit value*1<<pos.
+对应于两个或多个bit的整数值是它们的bit值之和.
+
+4.本节中描述的函数可以报告三种错误，每种错误都与一个明显的异常相关：
+ - 无效参数错误与invalid_argument类型的异常相关
+ - 超出范围的错误与out_of_range类型的异常相关
+ - 溢出错误与overflow_error类型的异常相关
+
+### 20.5.1 bitset构造函数
+
+`constexpr bitset() noexcept;`
+
+1.*影响：* 构造一个bitset<N\>，所有bit初始化为0.
+
+`constexpr bitset(unsigned long long val) noexcept;`
+
+2.*影响：* 构造一个bitset<N\>，初始化其首（最低） M bit位置为对应 val 的位值，
+其中 M 是 unsigned long long 的位数和正在构造的 bitset 中的位数 N 的较小者.
+如果 M 小于 N，则剩余bit位置被初始化为零.
+
+`template <class charT, class traits, class Allocator>`
+
+`explicit bitset(const basic_string<charT, traits, Allocator>& str,`
+
+` typename basic_string<charT, traits, Allocator>::size_type pos = 0,`
+
+` typename basic_string<charT, traits, Allocator>::size_type n = basic_string<charT, traits, Allocator>::npos,`
+
+` charT zero = charT(’0’), charT one = charT(’1’));`
+
+3.*要求：* pos <= str.size().
+
+4.*Throws:* 如果pos > str.size(),抛出 out_of_range.
+
+5.*影响：* 确定初始化string的有效长度rlen，rlen=min(n,str.size() - pos).
+
+  如果在pos开头的任何其他字符都不为0或1，则该函数将引发无效参数. 
+  该函数使用traits::eq()比较字符值.
+
+  否则，该函数将构造一个bitset<N\>类的对象，将第一个M bit位置初始化为由字符串str中相应字符确定的值.
+  M是N和rlen中的较小者.
+
+6.如果str中从位置pos开始的相应字符为0，则构造的字符串的元素的值为零.否则，元素的值为1.
+字符位置pos + M-1对应于bit位置0.随后减少的字符位置对应于增加的bit位置.(?)
+
+7.如果 M < N，剩余的bit位被初始化为0.
+
+`template <class charT>`
+
+`explicit bitset( const charT* str, `
+
+` typename basic_string<charT>::size_type n = basic_string<charT>::npos,`
+
+` charT zero = charT(’0’), charT one = charT(’1’));`
+
+8.*影响：* 构造一个bitset<N\>对象就像bitset( n == basic_string<charT>::npos ? basic_string<charT>(str) : basic_string<charT>(str, n), 0, n, zero, one)
+
+### 20.5.2 bitset members
+
+`bitset<N>& operator&=(const bitset<N>& rhs) noexcept;`
+
+1.*影响：* 清除*this中的每个bit，为此清零rhs中对应的bit，其他位保持不变.
+
+2.*返回值：* *this.
+
+`bitset<N>& operator|=(const bitset<N>& rhs) noexcept;`
+
+3.*影响：* set*this中的每个bit，为此set rhs中对应的bit，其他位保持不变.
+
+4.*返回值：* *this.
+
+`bitset<N>& operator^=(const bitset<N>& rhs) noexcept;`
+
+5.*影响：* 切换*this中的每个bit，为此切换rhs中对应的bit，其他位保持不变.
+
+6.*返回值：* *this.
+
+`bitset<N>& operator<<=(size_t pos) noexcept;`
+
+7.*影响：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
+ - 如果 I < pos,新值是0;
+ - 如果 I >= pos,新值是 I - pos 处先前的值.
+
+8.*返回值：* *this.
+
+`bitset<N>& operator>>=(size_t pos) noexcept;`
+
+9.*影响：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
+ - 如果 pos >= N - I,新值是0;
+ - 如果 pos < N -  I,新值是 I + pos 处先前的值.
+
+10.*返回值：* *this.
+
+`bitset<N>& set() noexcept;`
+
+11.*影响：* 设置*this的所有bit.
+
+12.*返回值：*  *this.
+
+`bitset<N>& set(size_t pos, bool val = true);`
+
+13.*要求：* pos是合理的.
+
+14.*Throws:* 如果pos不对应一个合理的bit位置，抛出out_of_range.
+
+15.*影响：* 在*this中位置pos的bit中保存一个新值.如果val为非零，则保存的值为1，否则为0.
+
+16.*返回值：* *this.
+
+`bitset<N>& reset() noexcept;`
+
+17.*影响：* 重置*this的所有bit.
+
+18.*返回值：* *this.
+
+`bitset<N>& reset(size_t pos);`
+
+19.*要求：* pos是合理的.
+
+20.*Throws:* 如果pos不对应一个合理的bit位置，抛出out_of_range.
+
+21.*影响：* 重置*this中在pos位置的bit.
+
+22.*返回值：* *this.
+
+`bitset<N> operator~() const noexcept;`
+
+23.*影响：* 构造一个bitset<N\>对象x并且用*this初始化.
+
+24.*返回值：* x.flip().
+
+`bitset<N>& flip() noexcept;`
+
+25.*影响：* 切换*this中所有bit.
+
+26.*返回值：* *this.
+
+`bitset<N>& flip(size_t pos);`
+
+27.*要求：* pos是合理的.
+
+28.*Throws:* 如果pos不对应一个合理的bit位置，抛出out_of_range.
+
+29.*影响：* 切换*this中在pos位置的bit.
+
+30.*返回值：* *this.
+
+`unsigned long to_ulong() const;`
+
+31.*Throws:* 如果*this中的值不能被unsigned long表示，抛出overflow_error.
+
+32.*返回值：* x.
+
+`unsigned long long to_ullong() const;`
+
+33.*Throws:* 如果*this中的值不能被unsigned long long表示，抛出overflow_error.
+
+34.*返回值：* x.
+
+539
+
 
 
 

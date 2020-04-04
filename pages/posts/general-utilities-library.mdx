@@ -1621,7 +1621,10 @@ export const meta = {
 
   ### 20.6.4 Pointer safety
 
-  1.一个完整的对象被声明为reachable,而带有一个引用了该对象的参数对declare_reachable的调用次数超过了带有一个引用了该对象的参数对undeclare_reachable的调用次数.
+  1.一个完整的对象被声明为reachable,当带有一个引用了该对象的参数对declare_reachable的调用次数超过了带有一个引用了该对象的参数对undeclare_reachable的调用次数.
+
+  (当declare_reachable(p)的次数 > undeclare_reachable(p)的次数,p是reachable.)
+
   (A complete object is declared reachable while the number of calls to declare_reachable with an argument referencing the object exceeds the number of calls to undeclare_reachable with an argument referencing the object.)
 
   `void declare_reachable(void *p);`
@@ -1640,9 +1643,464 @@ export const meta = {
 
   7.*Throws:* Nothing.
 
-  8.**
+  8.[*Note:* 
+    除非遇到匹配的calltoundeclare_reachable(p)，否则对declare_reachable(p)的调用会消耗少量的内存，
+    除非引用对象占用了该内存.长时间运行的程序应安排调用匹配.
+  *-end note*]
 
-  546
+  `void declare_no_pointers(char *p, size_t n);`
+
+  9.*要求：* 当前没有在指定的范围内的任何字节注册到clarate_no_pointers().
+  如果指定范围在分配的对象中,则它必须完全在单个分配的对象之内.
+  该对象必须处于活动状态,直到相应的undeclare_no_pointers()调用为止.
+  [*Note:* 在垃圾回收实现中,对象中的区域已通过clarify_no_pointers()注册的事实不应阻止对象的收集. *-end note*]
+
+  10.从p开始的n个字节不再包含可跟踪的指针位置，而与它们的类型无关。 
+  因此，如果指针所指向的对象是由全局运算符new创建的，并且以前未声明可访问的，则不能取消指向该指针的引用。
+  [*Note:* 这可以用于通知垃圾收集器或泄漏检测器不需要跟踪此内存区域. *-end note*]
+
+  11.*Throws:* Nothing.
+
+  12.[*Note:* 在某些情况下,实现可能需要分配内存.但是,如果内存分配失败,则可以忽略该请求. *-end note*]
+
+  `void undeclare_no_pointers(char *p, size_t n);`
+
+  13.*要求：* 必须事先将相同的范围传递给declare_no_pointers().
+
+  14.解除注册先前以std::declare_no_pointers()注册的范围.必须在对象的生存期结束之前调用它.
+
+  15.*Throws:* Nothing.
+
+  `pointer_safety get_pointer_safety() noexcept;`
+
+  16.*返回值：*  如果实现具有严格的指针安全性，返回pointer_safety::strict.
+  如果实现具有宽松的指针安全性,由实现定义是否返回pointer_safety::relaxed 或 pointer_safety::preferred
+
+  ### 20.6.5 Align
+
+  `void *align(std::size_t alignment, std::size_t size, void *&ptr, std::size_t& space);`
+
+  1.*影响：* 如果可以通过对齐带有长度space的ptr指向的buffer来对齐存储的size字节,
+  该函数将ptr更新为指向此类存储的第一个可能的地址,并通过对齐所使用的字节数减少space.否则，该函数不做任何事.
+
+  2.*要求：* 
+   - 对齐方式应为基本对齐方式值或此实现中支持的扩展对齐方式值.
+   - ptr应指向至少space字节的连续存储.
+  
+  3.*返回值：* 如果申请的对齐的buffer无法匹配可用空间,返回null.否则返回ptr的调整值.
+
+  4.[*Note:* 该函数更新ptr和space参数,使可以对同一buffer使用不同的alignment和size参数重复调用. *-end note*]
+  
+  ### 20.6.6 Allocator argument tag
+
+  ```
+  namespace std { 
+    struct allocator_arg_t { }; 
+    constexpr allocator_arg_t allocator_arg = allocator_arg_t(); 
+  }
+  ```
+
+  1.allocator_arg_t 是用于消除构造函数和函数重载歧义的空结构体类型.
+  特别的,一些类型拥有allocator_arg_t作为第一参数的构造函数,紧接着是满足Allocator类型要求的参数.
+
+  ### 20.6.7 uses_allocator
+
+  #### 20.6.7.1 uses_allocator trait
+
+  `template <class T, class Alloc> struct uses_allocator;`
+
+  1.*备注：* 自动检测T是否有可从Alloc转换的嵌套类型allocator_type.符合BinaryTypeTrait要求.
+  如果一个类型T::allocator_type存在并且is_convertible<Alloc,T::allocator_type\>::value != false, 实现需提供从true_type派生的定义;
+  否则,它应该从false_type派生.
+  一个程序可以特化此模板来从true_type派生出用户定义的类型T,该类型T么有嵌套的allocator_type,但是仍可以使用分配器构造,必须满足下列要求之一:
+   - 构造函数的第一个参数的类型为allocator_arg_t, 第二个参数的类型为Alloc.
+   - 构造函数的最后一个参数的类型为Alloc.
+
+  #### 20.6.7.2 uses-allocator construction
+
+  1.带有分配器Alloc进行uses-allocator construction是指分别使用类型V1，V2，...，VN的构造函数参数v1，v2，...，vN和类型为的分配器alloc构造类型T的对象obj的构造.
+  有以下规则:
+   - 如果uses_allocator<T，Alloc\>::valueisfalseandis_constructible<T，V1，V2，...，VN\>::value为true，则obj初始化为obj(v1，v2，...，vN);
+   - 否则,如果uses_allocator<T，Alloc\>::value为true并且is_constructible<T，allocator_arg_t，Alloc，V1，V2，...，VN\>::value为true，则obj初始化为obj(allocator_arg，alloc，v1， v2，...，vN);
+   - 否则,如果uses_allocator<T，Alloc\>::value为true并且is_constructible<T，V1，V2，...，VN，Alloc\>::value为true，则obj初始化为obj(v1，v2，...， vN，alloc)；
+   - 否则,uses-allocator construction的请求ill-formed.[*Note:* 如果uses_allocator<T，Alloc\>::value为true，但特定的构造函数不使用分配器，将导致错误。此定义可防止将分配器传递给元素的无提示失败。*-end note*]
+
+  ### 20.6.8 Allocator traits
+
+  1.类模板allocator_traits提供所有alloc类型的统一接口.一个allocator不能是一个非类类型,但是,即使allocator_traits提供了所需的整个接口.
+  [*Note:* 因此,创建一个派生自allocator的类总是可能的. *-end note*]
+
+  ```
+  namespace std { 
+    template <class Alloc> struct allocator_traits { 
+      typedef Alloc allocator_type;
+
+      typedef typename Alloc::value_type value_type;
+
+      typedef see below pointer; 
+      typedef see below const_pointer; 
+      typedef see below void_pointer; 
+      typedef see below const_void_pointer;
+
+      typedef see below difference_type; 
+      typedef see below size_type;
+
+      typedef see below propagate_on_container_copy_assignment; 
+      typedef see below propagate_on_container_move_assignment; 
+      typedef see below propagate_on_container_swap;
+
+      template <class T> using rebind_alloc = see below; 
+      template <class T> using rebind_traits = allocator_traits<rebind_alloc<T>>;
+
+      static pointer allocate(Alloc& a, size_type n); 
+      static pointer allocate(Alloc& a, size_type n, const_void_pointer hint);
+
+      static void deallocate(Alloc& a, pointer p, size_type n);
+
+      template <class T, class... Args> 
+      static void construct(Alloc& a, T* p, Args&&... args);
+
+      template <class T> 
+      static void destroy(Alloc& a, T* p);
+
+      static size_type max_size(const Alloc& a);
+
+      static Alloc select_on_container_copy_construction(const Alloc& rhs);
+    };
+  }
+  ```
+
+  `typedef see below pointer;`
+
+  1.*Type:* 如果这样的类型存在,Alloc::pointer;否则,value_tyope* .
+
+  `typedef see below const_pointer;`
+
+  2.*Type:* 如果这样的类型存在,Alloc::const_pointer;否则,pointer_traits<pointer\>::rebind<const value_type\>.
+
+  `typedef see below void_pointer;`
+
+  3.*Type:* 如果这样的类型存在,Alloc::void_pointer;否则,pointer_traits<pointer\>::rebind<void\>.
+
+  `typedef see below const_void_pointer;`
+
+  4.*Type:* 如果这样的类型存在,Alloc::const_void_pointer;否则,pointer_traits<pointer\>::rebind<const void\>.
+
+  `typedef see below difference_type;`
+
+  5.*Type:* 如果这样的类型存在,Alloca::difference_type;否则,pointer_traits<pointer\>::difference_type.
+
+  `typedef see below size_type;`
+
+  6.*Type:* 如果这样的类型存在,Alloca::size_type;否则,make_unsigned<difference_type\>::type.
+
+  `typedef see below propagate_on_container_copy_assignment;`
+
+  7.*Type:* 如果这样的类型存在,Alloc::propagate_on_container_copy_assignment;否则,false_type.
+
+  `typedef see below propagate_on_container_move_assignment;`
+
+  8.*Type:* 如果这样的类型存在,Alloc::propagate_on_container_move_assignment;否则,false_type.
+
+  `typedef see below propagate_on_container_swap;`
+
+  9.*Type:* 如果这样的类型存在, Alloc::propagate_on_container_swap;否则,false_type.
+
+  `template <class T> using rebind_alloc = see below;`
+
+  10.*别名模板：* 如果这样的类型存在, Alloc::rebind<T\>::other;
+  否则,如果Alloc是Alloc<U,Args\>的类模板实例化,Alloc<T,Args\>,其中Args是0个或多个类型参数;否则rebind_alloc ill-formed.
+
+  #### 20.6.8.2 Allocator traits static member functions
+
+  `static pointer allocate(Alloc& a, size_type n);`
+
+  1.*返回值：* a.allocate(n).
+
+  `static pointer allocate(Alloc& a, size_type n, const_void_pointer hint);`
+
+  2.*返回值：* a.allocate(n,hint)(如果表达式是良好的.);否则,a.allocate(n).
+
+  `static void deallocate(Alloc& a, pointer p, size_type n);`
+
+  3.*影响：* 调用a.deallocate(p,n).
+
+  4.*Throws:* Nothing.
+
+  `template <class T, class... Args> static void construct(Alloc& a, T* p, Args&&... args);`
+
+  5.*影响：* 如果调用是良好的,调用a.construct(p,std::forward<Args\>(args)...);
+  否则,执行::new(static_cast<void*\>(p)) T(std::forward<Args\>(args)...).
+
+  `template <class T> static void destroy(Alloc& a, T* p);`
+
+  6.*影响：* 如果调用是良好的,调用a.destroy(p);否则,执行p->~T().
+
+  `static size_type max_size(Alloc& a);`
+
+  7.*返回值：* 如果表达式是良好的,a.max_size();否则,numeric_limits<size_type\>::max().
+
+  `static Alloc select_on_container_copy_construction(const Alloc& rhs);`
+
+  8.*返回值：* 如果表达式是良好的,rhs.select_on_container_copy_construction();否则,rhs.
+
+  ### 20.6.9 The default allocator
+
+  ```
+  namespace std {
+    template <class T> class allocator; 
+    
+    // specialize for void: 
+    template <> class allocator<void> { 
+    public: 
+      typedef void* pointer; 
+      typedef const void* const_pointer; 
+      // reference-to-void members are impossible. 
+      typedef void value_type; 
+      template <class U> struct rebind { typedef allocator<U> other; }; 
+    };
+
+    template <class T> class allocator { 
+    public: 
+      typedef size_t size_type; 
+      typedef ptrdiff_t difference_type; 
+      typedef T* pointer; 
+      typedef const T* const_pointer; 
+      typedef T& reference; 
+      typedef const T& const_reference; 
+      typedef T value_type; 
+      template <class U> struct rebind { typedef allocator<U> other; };
+
+      allocator() noexcept; 
+      allocator(const allocator&) noexcept; 
+      template <class U> allocator(const allocator<U>&) noexcept; 
+      ~allocator();
+
+      pointer address(reference x) const noexcept; 
+      const_pointer address(const_reference x) const noexcept;
+
+      pointer allocate(size_type, allocator<void>::const_pointer hint = 0); 
+      void deallocate(pointer p, size_type n); 
+      size_type max_size() const noexcept;
+
+      template<class U, class... Args> 
+      void construct(U* p, Args&&... args); 
+      template <class U> 
+      void destroy(U* p);
+    };
+  }
+  ```
+
+  #### 20.6.9.1 allocator members
+
+  1.除析构函数外，default allocator的成员函数不得由于不同线程并发调用这些成员函数而导致数据竞争.
+  对这些allocate或deallocate特定存储单元的功能的调用应以单个总顺序发生,并且每个此类deallocation操作应在该顺序的下一次allocation(如果有)之前发生。
+
+  `pointer address(reference x) const noexcept;`
+
+  2.*返回值：* x引用的对象的真实地址,即使存在重载的operator&.
+
+  `const_pointer address(const_reference x) const noexcept;`
+
+  3.*返回值：* x引用的对象的真实地址,即使存在重载的operator&.
+
+  `pointer allocate(size_type n, allocator<void>::const_pointer hint = 0);`
+
+  4.[*Note:* 在容器成员函数中,相邻元素的地址通常是传递给hint参数的. *-end note*]
+
+  5.*返回值：* 指向 一个n*sizeof(T) 大小的数组的最初的元素,类型T的对象是适当对齐的.
+  由实现定义是否支持over-aligned类型.
+
+  6.*备注：* 存储是通过::operator new(std::size_t)获得的,但未指定何时和如何调用此函数.
+  hint的使用是未指定的,但如果实现需要的话,旨在帮助局部性.
+
+  7.*Throws:* 如果不能获得存储(storage),bad_alloc.
+
+  `void deallocate(pointer p, size_type n);`
+
+  8.*要求：* p应该是从allocate()中获得的指针值. n等于作为第一个参数传递给调用p的allocate的值.
+
+  9.*影响：* deallocate被p引用的内存空间.
+
+  10.*备注：* 使用 ::operator delete(void*), 但未指定何时调用.
+
+  `size_type max_size() const noexcept;`
+
+  11.*返回值：* 调用allocate(N,0)可能成功的最大值N.
+
+  `template <class U, class... Args> void construct(U* p, Args&&... args);`
+
+  12.*影响：* ::new((void*)p) U(std::forward<Args\>(args)...)
+
+  `template <class U> void destroy(U* p);`
+
+  13.*影响：* p->~U().
+
+  #### 20.6.9.2 allocator globals 
+
+  `template <class T1, class T2> bool operator==(const allocator<T1>&, const allocator<T2>&) noexcept;`
+
+  1.*返回值：* true.
+
+  `template <class T1, class T2> bool operator!=(const allocator<T1>&, const allocator<T2>&) noexcept;`
+
+  2.*返回值：* false.
+
+  ### 20.6.10 Raw storage iterator
+
+  1.提供raw_storage_iterator使算法将其结果保存到未初始化的内存中.
+  形式模板参数OutputIterator要求其operator*返回为其定义的operator&的对象并返回指向T的指针,并且还需要满足输出迭代器的要求.
+
+  ```
+  namespace std { 
+    template <class OutputIterator, class T> 
+    class raw_storage_iterator : public iterator<output_iterator_tag,void,void,void,void> {
+    public: 
+      explicit raw_storage_iterator(OutputIterator x);
+
+    raw_storage_iterator<OutputIterator,T>& operator*(); 
+    raw_storage_iterator<OutputIterator,T>& operator=(const T& element); 
+    raw_storage_iterator<OutputIterator,T>& operator++(); 
+    raw_storage_iterator<OutputIterator,T> operator++(int);
+    };
+  }
+  ```
+
+  `explicit raw_storage_iterator(OutputIterator x);`
+
+  2.*影响：* 初始化迭代器来指向x指向的相同值.
+
+  `raw_storage_iterator<OutputIterator,T>& operator*();`
+
+  3.*返回值：* *this.
+
+  `raw_storage_iterator<OutputIterator,T>& operator=(const T& element);`
+
+  4.*影响：* 在迭代器指向的地方从element构造一个值.
+
+  5.*返回值：* iterator的引用.
+
+  `raw_storage_iterator<OutputIterator,T>& operator++();`
+
+  6.*影响：* 前++:advance迭代器并返回对更新后的迭代器的引用.
+
+  `raw_storage_iterator<OutputIterator,T> operator++(int);`
+
+  7.*影响：* 后++:advance迭代器并返回对更新前的迭代器的引用.
+
+  ### 20.6.11 Temporary buffers
+
+  `template <class T> pair<T*, ptrdiff_t> get_temporary_buffer(ptrdiff_t n) noexcept;`
+
+  1.*影响：* 获得足以保存n个相邻T对象的存储空间的指针.由实现定义是否支持过度对齐(over-aligned)的类型.
+
+  2.*返回值：* 一个包含buffer地址和容量(以sizeof(T)为单位)的pair, 
+  或如果无法获得存储空间 || n<=0,一个0值pair.
+  
+  `template <class T> void return_temporary_buffer(T* p);`
+
+  3.*影响：* deallocate p指向的buffer.
+
+  4.*要求：* buffer需是事先通过get_temporary_buffer分配的.
+
+  ### 20.6.12 Specialized algorithms
+
+  1.在以下算法中,用作正式模板参数的所有迭代器都需要让其operator*返回其定义了operator&的对象并返回指向T的指针.
+  在uninitialized_copy算法中,需要正式的模板参数InputIterator才能满足输入迭代器的要求.
+  在以下所有所有算法中,形式模板参数ForwardIterator必须满足正向迭代器的要求,并且必须具有以下特性:不会因有效迭代器的递增,赋值,比较或解引用抛出异常.
+  在以下算法中,如果引发异常,则没有效果.
+
+  #### 20.6.12.1 addressof
+
+  `template <class T> T* addressof(T& r) noexcept;`
+
+  1.*返回值：* r引用的对象或函数的实际地址,即重载了operator&.
+
+  #### 20.6.12.2 uninitialized_copy
+
+  `template <class InputIterator, class ForwardIterator>`
+
+  `ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result);`
+
+  1.*影响：* 
+
+  ```
+  for (; first != last; ++result, ++first) 
+    ::new (static_cast<void*>(&*result)) typename iterator_traits<ForwardIterator>::value_type(*first); 
+  ```
+
+  2.*返回值：* result.
+
+  `template <class InputIterator, class Size, class ForwardIterator>`
+
+  `ForwardIterator uninitialized_copy_n(InputIterator first, Size n, ForwardIterator result);`
+
+  3.*影响：* 
+
+  ```
+  for ( ; n > 0; ++result, ++first, --n) { 
+    ::new (static_cast<void*>(&*result)) typename iterator_traits<ForwardIterator>::value_type(*first); 
+  } 
+  ```
+
+  4.*返回值：* result.
+
+  #### 20.6.12.3 uninitialized_fill
+
+  `template <class ForwardIterator, class T>`
+
+  `void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x);`
+
+  1.*影响：* 
+
+  ```
+  for (; first != last; ++first) 
+    ::new (static_cast<void*>(&*first)) typename iterator_traits<ForwardIterator>::value_type(x);
+  ```
+  
+  #### 20.6.12.4 uninitialized_fill_n
+
+  `template <class ForwardIterator, class Size, class T>`
+
+  `ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const T& x);`
+
+  1.*影响：*
+
+  ```
+  for (; n--; ++first) 
+    ::new (static_cast<void*>(&*first)) typename iterator_traits<ForwardIterator>::value_type(x); 
+  return first;
+  ```
+
+  ### 20.6.13 C library
+
+  1.Table 45.
+
+  2.内容与标准C库头文件<stdlib.h\>相同，但有以下更改.
+
+  3.函数scalloc(),malloc()和realloc()不会尝试通过调用::operator new()来分配存储空间.
+
+  4.函数free()不会通过调用::operator delete()来尝试deallocate存储空间.
+
+  5.allocation时,直接由malloc(),calloc()或realloc()申请的存储空间隐式声明为reachable;
+  deallocation时,结束其reachable,并且不需要因为undeclare_reachable()的调用而结束reachable.
+  [*Note:* 这使得现有的C库不受安全派生的指针的限制影响,但代价是为malloc()分配的对象提供少得多的垃圾回收和泄漏检测选项.它还允许malloc()通过单独的分配空间来实现,从而绕过常规的clarify_reachable()实现.
+  绝对不要将上述函数用作clarify_reachable()的替代方法,并且强烈建议新编写的代码将使用这些函数分配的内存视为使用了new运算符分配的内存. *-end note*]
+
+  6.Table 46.
+
+  7.内容和标准C库头文件<string.h\>相同,对memchr()的更改在21.7中指定.
+
+## 20.7 智能指针(Smart pointers)
+1. for align
+
+  ### 20.7.1 类模板 unique_ptr
+
+  556
+
+
+
+
 
 
 

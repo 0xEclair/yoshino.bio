@@ -2096,13 +2096,735 @@ export const meta = {
 
   ### 20.7.1 类模板 unique_ptr
 
-  556
+  1.*unique pointer*通过s指针拥有并管理另一对象.更确切地说,unique pointer是对象u,它保存指向第二个对象p的指针,
+  并且在u自身被销毁时(离开块作用域时)将释放p.在上下文中,u拥有p.
+
+  2.u释放p的机制称为p关联的deleter,该函数对象的正确调用会导致p适当的释放(通常是delete).
+
+  3.u.p表示u存储的指针,让u.d表示关联的deleter.根据要求,可以使用另一个指针和deleter reset(replace)u.p和u.d, 但必须在replace完成之前通过关联的deleter正确释放其拥有的对象.
+
+  4.另外, 可以根据请求将所有权转移到另一个unique pointer u2. 转移完成后, 保持下列后条件:
+   - u2.p等于转移前的u.p
+   - u.p等于nullptr
+   - 如果转移前的u.d保持某种状态, 此状态已转移给u2.d
+
+  与reset一样, u2必须通过转移前关联的deleter正确释放准备转移的对象, 然后才能认为所有权转移完成.
+  
+  [*Note:* deleter的状态从不被copy, 仅当所有权转移时move和swap. *-end note*]
+
+  5.从本小节中指定的unique_ptr模板实例化的每个类型为U的对象都具有上述唯一指针的严格所有权语义.
+  为了部分满足这些语义，每个这样的U是MoveConstructible和MoveAssignable, 但不是CopyConstructible或CopyAssignable. 
+  unique_ptr的模板参数T可能是不完整的类型.
+
+  6.[*Note:* unique_ptr的使用包括为动态分配的内存提供异常安全, 将动态分配的内存的所有权转移给函数以及从函数返回动态分配的内存. *-end note*]
+
+  ```
+  namespace std { 
+    template<class T> struct default_delete; 
+    template<class T> struct default_delete<T[]>;
+
+    template<class T, class D = default_delete<T>> class unique_ptr; 
+    template<class T, class D> class unique_ptr<T[], D>;
+
+    template<class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y) noexcept;
+
+    template<class T1, class D1, class T2, class D2> 
+    bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
+    template<class T1, class D1, class T2, class D2> 
+    bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y); 
+    template<class T1, class D1, class T2, class D2> 
+    bool operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y); 
+    template<class T1, class D1, class T2, class D2> 
+    bool operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y); 
+    template<class T1, class D1, class T2, class D2> 
+    bool operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y); 
+    template<class T1, class D1, class T2, class D2> 
+    bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);
+
+    template <class T, class D> 
+    bool operator==(const unique_ptr<T, D>& x, nullptr_t) noexcept; 
+    template <class T, class D> 
+    bool operator==(nullptr_t, const unique_ptr<T, D>& y) noexcept; 
+    template <class T, class D> 
+    bool operator!=(const unique_ptr<T, D>& x, nullptr_t) noexcept; 
+    template <class T, class D> 
+    bool operator!=(nullptr_t, const unique_ptr<T, D>& y) noexcept; 
+    template <class T, class D> 
+    bool operator<(const unique_ptr<T, D>& x, nullptr_t); 
+    template <class T, class D> 
+    bool operator<(nullptr_t, const unique_ptr<T, D>& y); 
+    template <class T, class D> 
+    bool operator<=(const unique_ptr<T, D>& x, nullptr_t); 
+    template <class T, class D> 
+    bool operator<=(nullptr_t, const unique_ptr<T, D>& y); 
+    template <class T, class D> 
+    bool operator>(const unique_ptr<T, D>& x, nullptr_t); 
+    template <class T, class D> 
+    bool operator>(nullptr_t, const unique_ptr<T, D>& y); 
+    template <class T, class D> 
+    bool operator>=(const unique_ptr<T, D>& x, nullptr_t); 
+    template <class T, class D> 
+    bool operator>=(nullptr_t, const unique_ptr<T, D>& y);
+  }
+  ```
+
+  #### 20.7.1.1 Default deleters
+
+  ##### 20.7.1.1.1 In general
+
+  1.类模板default_delete作为默认deleter为类模板unique_ptr服务.
+
+  2.default_deleted的模板参数T可能是未完成类型.
+
+  ##### 20.7.1.1.2 default_delete
+
+  ```
+  namespace std { 
+    template <class T> 
+    struct default_delete { 
+      constexpr default_delete() noexcept = default; 
+      template <class U> default_delete(const default_delete<U>&) noexcept; 
+      void operator()(T*) const; 
+    };
+  }
+  ```
+
+  `template <class U> default_delete(const default_delete<U>& other) noexcept;`
+
+  1.*影响：* 从另一个default_delete<U\>对象构造一个default_delete对象.
+
+  2.*备注：* 这个构造函数不参与重载决议, 除非U\*可隐式转换为T*.
+
+  `void operator()(T *ptr) const;`
+
+  3.*影响：* 对ptr调用delete.
+
+  4.*备注：* 如果T是一个未完成类型, 程序ill-formed.
+
+  ##### 20.7.1.1.3 default_delete<T[]\>
+
+  ```
+  namespace std { 
+    template <class T> 
+    struct default_delete<T[]> { 
+      constexpr default_delete() noexcept = default; 
+      void operator()(T*) const; 
+      template <class U> void operator()(U*) const = delete; 
+    }; 
+  }
+  ```
+
+  `void operator()(T* ptr) const;`
+
+  1.*影响：* 对ptr调用delete[].
+
+  2.*备注：* 如果T是一个未完成类型, 程序ill-formed.
+
+  #### 20.7.1.2 unique_ptr for single objects
+
+  ```
+  namespace std { 
+    template <class T, class D = default_delete<T>> 
+    class unique_ptr { 
+    public: 
+      typedef see below pointer; 
+      typedef T element_type; 
+      typedef D deleter_type;
+
+      // 20.7.1.2.1, constructors 
+      constexpr unique_ptr() noexcept; 
+      explicit unique_ptr(pointer p) noexcept; 
+      unique_ptr(pointer p, see below d1) noexcept; 
+      unique_ptr(pointer p, see below d2) noexcept; 
+      unique_ptr(unique_ptr&& u) noexcept; 
+      constexpr unique_ptr(nullptr_t) noexcept : unique_ptr() {
+
+       } 
+      template <class U, class E> 
+      unique_ptr(unique_ptr<U, E>&& u) noexcept; 
+      template <class U> 
+      unique_ptr(auto_ptr<U>&& u) noexcept;
+
+      // 20.7.1.2.2, destructor 
+      ~unique_ptr();
+
+      // 20.7.1.2.3, assignment 
+      unique_ptr& operator=(unique_ptr&& u) noexcept; 
+      template <class U, class E> unique_ptr& operator=(unique_ptr<U, E>&& u) noexcept; 
+      unique_ptr& operator=(nullptr_t) noexcept;
+
+      // 20.7.1.2.4, observers 
+      typename add_lvalue_reference<T>::type operator*() const; 
+      pointer operator->() const noexcept; 
+      pointer get() const noexcept; 
+      deleter_type& get_deleter() noexcept; 
+      const deleter_type& get_deleter() const noexcept; 
+      explicit operator bool() const noexcept;
+
+      // 20.7.1.2.5 modiﬁers 
+      pointer release() noexcept; 
+      void reset(pointer p = pointer()) noexcept; 
+      void swap(unique_ptr& u) noexcept;
+
+      // disable copy from lvalue 
+      unique_ptr(const unique_ptr&) = delete; 
+      unique_ptr& operator=(const unique_ptr&) = delete;
+    };
+  }
+  ```
+
+  1.模板参数D的默认类型是default_delete.
+  用户提供的模板参数D应为函数对象类型(20.8), 对函数的左值引用或对函数对象类型的左值引用, 
+  给定值d为类型D, 值ptr为unique_ptr::pointer,则表达式d(ptr)有效, 并具有针对该deleter合适地释放指针的作用.
+
+  2.如果deleter的类型D不是引用类型, D应满足Destructible(Table 24)的要求.
+
+  3.如果类型remove_reference<D\>::type::pointer 存在, 那么unique_ptr<T, D\>::pointer应与remove_reference<D\>::type::pointer同义.
+  否则, unique_ptr<T, D\>::pointer应与T*同义.
+  unique_ptr<T, D\>::pointer 应满足NullablePointer(17.6.3.3)的要求.
+
+  4.[*Example:* 给定分配器类型X(17.6.3.5), 并让A为allocator_traits<X\>的同义词, 类型A::pointer, A::const_pointer, A::void_pointer和A::const_void_pointer可以用作unique_ptr<T，D\>::pointer. *-end example*]
+
+  ##### 20.7.1.2.1 unique_ptr constructors
+
+  `constexpr unique_ptr() noexcept;`
+
+  1.*要求：* D应满足DefaultConstructible(Table 19),并且构造函数不应抛出异常.
+
+  2.*影响：* 构造一个unique_ptr对象, 其不用有任何内容, 值初始化存储的指针和deleter.
+
+  3.*后置条件：* get() == nullptr. get_deleter()返回对存储的deleter的引用.
+
+  4.*备注：* 如果使用指针类型或模板参数D的引用类型实例化此构造函数, 程序ill-formed.
+
+  `explicit unique_ptr(pointer p) noexcept;`
+
+  5.*要求：* D应满足DefaultConstructible(Table 19)的要求, 并且构造函数不应抛出异常.
+
+  6.*影响：* 构造一个unique_ptr对象, 其拥有p, 用p初始化存储的指针, 值初始化存储的deleter.
+
+  7.*后置条件：* get() == p. get_deleter()返回对存储的deleter的引用.
+
+  8.*备注：* 如果使用指针类型或模板参数D的引用类型实例化此构造函数, 程序ill-formed.
+
+  `unique_ptr(pointer p, see below d1) noexcept;`
+
+  `unique_ptr(pointer p, see below d2) noexcept;`
+
+  9.这些构造函数的签名(signature)依赖D是否是一个引用类型.
+  如果D是非引用类型A, 那么签名是:
+   - unique_ptr(pointer p, const A& d);
+   - unique_ptr(pointer p, A&& d);
+
+  10.如果D是左值引用类型A& , 那么签名是:
+   - unique_ptr(pointer p, A& d);
+   - unique_ptr(pointer p, A&& d);
+
+  11.如果D是左值引用类型const A&, 那么签名是:
+   - unique_ptr(pointer p, const A& d);
+   - unique_ptr(pointer p, const A&& d);
+
+  12.*要求：* 
+   - 如果D不是左值引用类型,那么
+    - 如果d是左值或const右值, 那么选择第一个构造函数. D应满足CopyConstructible(Table 21)的要求, 并且D的copy构造函数禁止抛出异常. 
+    这个unique_ptr持有d的copy.
+
+    - 否则, d是非const右值引用, 选择第二个构造函数. D应满足MoveConstructible(Table 20)的要求, 并且D的move构造函数禁止抛出异常.
+    这个unique_ptr持有从d移动构造的值.
+
+   - 否则, D是一个左值引用类型. d应和其中一个构造函数兼容. 如果d是一个右值, 选择第二个构造函数, 并且程序ill-formed.
+   [*Note:* 可以使用static_assert来诊断,以确保D不是引用类型.  *-end note*]
+   否则,d是一个左值, 选择第一个构造函数. D引用的类型不必是CopyConstructible或MoveConstructible.
+   这个unique_ptr保存一个引用左值d的D类型对象.[*Note:* D可能不是右值引用类型. *-end note*]
+
+  13.*影响：* 构造一个unique_ptr对象, 其持有p, 用p初始化存储的指针, 按如上所述初始化deleter.
+
+  14.*后置条件：* get() == p. get_deleter() 返回对存储的deleter的引用. 如果D是引用类型, 那么get_deleter()返回对左值d的引用.
+
+  [*Example:* 
+    D d; 
+
+    unique_ptr<int, D\> p1(new int, D());            // D must be MoveConstructible 
+    unique_ptr<int, D\> p2(new int, d);              // D must be Copyconstructible 
+    unique_ptr<int, D&\> p3(new int, d);             // p3 holds a reference to d 
+    unique_ptr<int, const D&\> p4(new int, D());     // error: rvalue deleter object combined 
+                                                     // with reference deleter type 
+   *-end example*]
+
+  `unique_ptr(unique_ptr&& u) noexcept;`
+
+  15.*要求：* 如果D不是引用类型, D应满足MoveConstructible(Table 20)的要求.从类型D的右值构造deleter不应引发异常.
+
+  16.*影响：* 通过从u转移所有权到*this来构造unique_ptr. 如果D是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
+  [*Note:* deleter构造函数可能用std::forward<D\>实现. *-end note*]
+
+  17.*后置条件：* 在构造之前get()返回u.get()的值.(get() yields the value u.get() yielded before the construction.)
+  get_deleter()返回对存储的deleter的引用, deleter从u.get_deleter()构造. 
+  如果D是引用类型, 那么get_deleter()和u.get_deleter()引用相同的左值deleter.
+
+  `template <class U, class E> unique_ptr(unique_ptr<U, E>&& u) noexcept;`
+
+  18.*要求：* 如果E不是引用类型, 从类型E的右值deleter的构造应well-formed, 并且不抛出异常.
+  E是引用类型, 并且从类型E的左值deleter的构造应well_formed, 并且不抛出异常.
+
+  19.*备注：* 这个构造函数不参与重载决议, 除非：
+   - unique_ptr<U, E\>::pointer可隐式转换为pointer.
+   - U不是数组类型
+   - D是引用类型, E是与D相同的类型, 或者D不是引用类型, 并且E可以隐式转换为D.
+
+  20.*影响：* 通过从u转移所有权到*this来构造unique_ptr. 如果E是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
+  [*Note:* deleter构造函数可能用std::forward<D\>实现. *-end note*]
+
+  21.*后置条件：* 在构造之前get()返回u.get()的值. get_deleter()返回对存储的deleter的引用, deleter从u.get_deleter()构造. 
+
+  `template <class U> unique_ptr(auto_ptr<U>&& u) noexcept;`
+
+  (C++17中移除)
+
+  ##### 20.7.1.2.2 unique_ptr destructor
+
+  `~unique_ptr();`
+
+  1.*要求：* 表达式get_deleter()(get())应well formed, 有良好定义的行为, 不抛出异常.
+  [*Note:* default_delete的使用要求T是完整的类型. *-end note*]
+
+  2.*影响：* 如果 get() == nullptr, 无影响. 否则, get_deleter()(get()).
+
+  ##### 20.7.1.2.3 unique_ptr assignment
+  
+  `unique_ptr& operator=(unique_ptr&& u) noexcept;`
+
+  1.*要求：* 如果D不是引用类型, D应满足MoveAssignable(Table 22)和类型D的右值deleter的assignment不会抛出异常.
+  否则, D是引用类型, remove_reference<D\>::type 应满足CopyAssignment要求和类型D的左值deleter的assignment不会抛出异常.
+
+  2.*影响：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
+
+  3.*返回值：* *this.
+
+  `template <class U, class E> unique_ptr& operator=(unique_ptr<U, E>&& u) noexcept;`
+
+  4.*要求：* 如果E不是引用类型, E类型的右值deleter的assignment应well-formed并且不抛出异常.
+  否则, E是引用类型, E类型左值deleter的assignment应well-formed并且不抛出异常.
+
+  5.*备注：* 这个运算符不参与重载决议, 除非:
+   - unique_ptr<U, E\>::pointer可隐式转换成pointer
+   - U不是数组类型
+
+  6.*影响：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
+
+  7.*返回值：* *this.
+
+  `unique_ptr& operator=(nullptr_t) noexcept;`
+
+  8.*影响：* reset().
+
+  9.*后置条件：* get() == nullptr.
+
+  10.*返回值：* *this.
+
+  ##### 20.7.1.2.4 unique_ptr observers
+
+  `typename add_lvalue_reference<T>::type operator*() const;`
+
+  1.*要求：* get() != nullptr.
+
+  2.*返回值：* *get().
+
+  `pointer operator->() const noexcept;`
+
+  3.*要求：* get() != nullptr.
+
+  4.*返回值：* get().
+
+  5.*Note:* 使用通常要求T是完整类型.
+
+  `pointer get() const noexcept;`
+
+  6.*返回值：* 存储的指针.
+
+  `deleter_type& get_deleter() noexcept;`
+  
+  `const deleter_type& get_deleter() const noexcept;`
+
+  7.*返回值：* 存储的deleter的引用.
+
+  `explicit operator bool() const noexcept;`
+
+  8.*返回值：* get() != nullptr.
+
+  ##### 20.7.1.2.5 unique_ptr modifiers
+
+  `pointer release() noexcept;`
+
+  1.*后置条件：* get() == nullptr.
+
+  2.*返回值：* get()值在release调用的开始处.
+  
+  (The value get() had at the start of the call to release.)
+
+  // 只是释放管理权, 需要手动调用delete.
+
+  `void reset(pointer p = pointer()) noexcept;`
+
+  3.*要求：* get_deleter()(get())应well formed, 有良好定义的行为, 禁止抛出异常.
+
+  4.*影响：* 用p对存储的指针赋值, old_p表示旧值且不等于nullptr, 调用get_deleter()(old_p).
+  [*Note:* 这些操作的顺序很重要, 因为对get_deleter()的调用可能会析构*this. *-end note*]
+
+  5.*后置条件：* get() == p.
+  [*Note:* 如果get_deleter()会析构\*this, 则此条件不成立, 因为this->get()不再是有效的表达式. *-end note*]
+
+  `void swap(unique_ptr& u) noexcept;`
+
+  6.*要求：* get_deleter()应可交换, 并且swap下不抛出异常.
+
+  7.*影响：* 交换*this和u中存储的指针和deleter.
+
+  #### 20.7.1.3 unique_ptr for array objects with a runtime length
+
+  ```
+  namespace std { 
+    template <class T, class D> 
+    class unique_ptr<T[], D> { 
+    public: 
+      typedef see below pointer; 
+      typedef T element_type; 
+      typedef D deleter_type;
+
+      // 20.7.1.3.1, constructors 
+      constexpr unique_ptr() noexcept; 
+      explicit unique_ptr(pointer p) noexcept; 
+      unique_ptr(pointer p, see below d) noexcept; 
+      unique_ptr(pointer p, see below d) noexcept; 
+      unique_ptr(unique_ptr&& u) noexcept; 
+      constexpr unique_ptr(nullptr_t) : unique_ptr() { }
+
+      // destructor 
+      ~unique_ptr();
+
+      // assignment 
+      unique_ptr& operator=(unique_ptr&& u) noexcept; 
+      unique_ptr& operator=(nullptr_t) noexcept;
+
+      // 20.7.1.3.2, observers 
+      T& operator[](size_t i) const; 
+      pointer get() const noexcept; 
+      deleter_type& get_deleter() noexcept; 
+      const deleter_type& get_deleter() const noexcept; 
+      explicit operator bool() const noexcept;
+
+      // 20.7.1.3.3 modiﬁers 
+      pointer release() noexcept; 
+      void reset(pointer p = pointer()) noexcept; 
+      void reset(nullptr_t) noexcept; 
+      template <class U> void reset(U) = delete; 
+      void swap(unique_ptr& u) noexcept;
+
+      // disable copy from lvalue 
+      unique_ptr(const unique_ptr&) = delete; 
+      unique_ptr& operator=(const unique_ptr&) = delete;
+    };
+  }
+  ```
+
+  1.数组类型的特化提供了稍微改变的接口.
+   - 在unique_ptr<T[], D\>的不同类型之间或者到unique_ptr的非数组形式或从非数组形式的unique_ptr转换使得程序ill-formed.
+   - 指向从T派生的指针被构造函数拒绝, 并reset.
+   - 不提供观察器operator*和operator->.
+   - 提供index访问 operator[].
+   - 默认deleter会调用delete[].
+  
+  2.下面仅对具有与主模板不同行为的成员函数提供描述.
+
+  3.模板参数T应是完整类型.
+
+  ##### 20.7.1.3.1 unique_ptr constructors
+
+  `explicit unique_ptr(pointer p) noexcept;`
+
+  `unique_ptr(pointer p, see below d) noexcept;`
+
+  `unique_ptr(pointer p, see below d) noexcept;`
+
+  这些构造函数表现得和主模板中一样, 除了它们不接受可转换为pointer的指针类型.
+  [*Note:* 一种实现技术是通过创建这些成员的private模板化的重载. *-end note*]
+
+  ##### 20.7.1.3.2 unique_ptr observers
+
+  `T& operator[](size_t i) const;`
+
+  1.*要求：* i < 存储的指针指向的数组中的元素数量.
+
+  2.*返回值：* get()[i].
+
+  ##### 20.7.1.3.3 unique_ptr modifiers
+
+  `void reset(pointer p = pointer()) noexcept;`
+
+  `void reset(nullptr_t p) noexcept;`
+
+  1.*影响：* 如果get() == nullptr, 无影响;否则, get_deleter()(get()).
+
+  2.*后置条件：* get() == p.
+
+  #### 20.7.1.4 unique_ptr specialized algorithms
+
+  `template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y) noexcept;`
+
+  1.*影响：* 调用x.swap(y)
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator==(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  2.*返回值：* x.get() == y.get()
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator!=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  3.*返回值：* x.get() != y.get()
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator<(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  4.*要求：* 令CT为common_type<unique_ptr<T1, D1\>::pointer, unique_ptr<T2, D2\>::pointer\>::type.
+  less<CT\>的特化应是一个函数对象类型(20.8), 该函数对象类型对指针值产生严格的弱排序(25.4).
+
+  5.*返回值：* less<CT\>()(x.get(), y.get())
+
+  6.*备注：* 如果unique_ptr<T1, D1\>::pointer 不可隐式转换成CT 或unique_ptr<T2, D2\>::pointer不可隐式转换成CT, 程序ill-formed.
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator<=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  7.*返回值：* !(y < x)
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator>(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  8.*返回值：* y < x
+
+  `template <class T1, class D1, class T2, class D2>`
+
+  `bool operator>=(const unique_ptr<T1, D1>& x, const unique_ptr<T2, D2>& y);`
+
+  9.*返回值：* !(x < y)
+
+  `template <class T, class D> bool operator==(const unique_ptr<T, D>& x, nullptr_t) noexcept;`
+
+  `template <class T, class D> bool operator==(nullptr_t, const unique_ptr<T, D>& x) noexcept;`
+
+  10.*返回值：* !x
+
+  `template <class T, class D> bool operator!=(const unique_ptr<T, D>& x, nullptr_t) noexcept;`
+
+  `template <class T, class D> bool operator!=(nullptr_t, const unique_ptr<T, D>& x) noexcept;`
+
+  11.*返回值：* (bool)x
+
+  `template <class T, class D> bool operator<(const unique_ptr<T, D>& x, nullptr_t);`
+
+  `template <class T, class D> bool operator<(nullptr_t, const unique_ptr<T, D>& x);`
+
+  12.*要求：* less<unique_ptr<T, D\>::pointer\>应是一个函数对象类型, 该函数对象类型对指针值产生严格的弱排序.
+
+  13.*返回值：* 第一个模板函数返回less<unique_ptr<T, D\>::pointer\>()(x.get(), nullptr).
+  第二个模板函数返回less<unique_ptr<T, D\>::pointer\>()(nullptr, x.get()).
+
+  `template <class T, class D> bool operator>(const unique_ptr<T, D>& x, nullptr_t);`
+
+  `template <class T, class D> bool operator>(nullptr_t, const unique_ptr<T, D>& x);`
+
+  14.*返回值：* 第一个模板函数返回 nullptr < x.
+  第二个模板函数返回 x < nullptr.
+
+  `template <class T, class D> bool operator<=(const unique_ptr<T, D>& x, nullptr_t);`
+
+  `template <class T, class D> bool operator<=(nullptr_t, const unique_ptr<T, D>& x);`
+
+  15.*返回值：* 第一个模板函数返回 !(nullptr < x).
+  第二个模板函数返回 !(x < nullptr).
+
+  `template <class T, class D> bool operator>=(const unique_ptr<T, D>& x, nullptr_t);`
+
+  `template <class T, class D> bool operator>=(nullptr_t, const unique_ptr<T, D>& x);`
+
+  16.*返回值：* 第一个模板函数返回 !(x < nullptr).
+  第二个模板函数返回 !(nullptr < x).
+
+  ### 20.7.2 Shared-ownership pointers
+
+  #### 20.7.2.1 Class bad_weak_ptr
+
+  ```
+  namespace std { 
+    class bad_weak_ptr: public std::exception { 
+    public: 
+      bad_weak_ptr() noexcept; 
+    }; 
+  } // namespace std 
+  ```
+
+  1.shared_ptr构造函数采用了weak_ptr抛出bad_weak_ptr类型的异常.
+
+  `bad_weak_ptr() noexcept;`
+
+  2.*后置条件：* what() 返回 "bad_weak_ptr".
+
+  #### 20.7.2.2 Class template shared_ptr
+
+  1.shared_ptr类模板存储一个通常由**new**获得的指针.
+  shared_ptr实现共享所有权的语义;最后一个某指针所有者有责任释放指针, 或以其他方式释放与存储的指针关联的资源.
+  如果不持有一个指针, shared_ptr对象empty.
+
+  ```
+  namespace std{
+    template<class T> class shared_ptr{
+    public:
+      typedef T element_type;
+
+      // 20.7.2.2.1, constructors: 
+      constexpr shared_ptr() noexcept; 
+      template<class Y> explicit shared_ptr(Y* p); 
+      template<class Y, class D> shared_ptr(Y* p, D d); 
+      template<class Y, class D, class A> shared_ptr(Y* p, D d, A a); 
+      template <class D> shared_ptr(nullptr_t p, D d); 
+      template <class D, class A> shared_ptr(nullptr_t p, D d, A a); 
+      template<class Y> shared_ptr(const shared_ptr<Y>& r, T *p) noexcept; 
+      shared_ptr(const shared_ptr& r) noexcept; 
+      template<class Y> shared_ptr(const shared_ptr<Y>& r) noexcept; 
+      shared_ptr(shared_ptr&& r) noexcept; 
+      template<class Y> shared_ptr(shared_ptr<Y>&& r) noexcept; 
+      template<class Y> explicit shared_ptr(const weak_ptr<Y>& r); 
+      template<class Y> shared_ptr(auto_ptr<Y>&& r); 
+      template <class Y, class D> shared_ptr(unique_ptr<Y, D>&& r); 
+      constexpr shared_ptr(nullptr_t) : shared_ptr() { }
+
+      // 20.7.2.2.2, destructor: 
+      ~shared_ptr();
+
+      // 20.7.2.2.3, assignment: 
+      shared_ptr& operator=(const shared_ptr& r) noexcept; 
+      template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r) noexcept; 
+      shared_ptr& operator=(shared_ptr&& r) noexcept; 
+      template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r) noexcept; 
+      template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r); 
+      template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);
+
+      // 20.7.2.2.4, modiﬁers: 
+      void swap(shared_ptr& r) noexcept; 
+      void reset() noexcept; 
+      template<class Y> void reset(Y* p); 
+      template<class Y, class D> void reset(Y* p, D d); 
+      template<class Y, class D, class A> void reset(Y* p, D d, A a);
+
+      // 20.7.2.2.5, observers: 
+      T* get() const noexcept; 
+      T& operator*() const noexcept; 
+      T* operator->() const noexcept;
+      long use_count() const noexcept; 
+      bool unique() const noexcept; 
+      explicit operator bool() const noexcept; 
+      template<class U> bool owner_before(shared_ptr<U> const& b) const; 
+      template<class U> bool owner_before(weak_ptr<U> const& b) const;
+    };
+
+    // 20.7.2.2.6, shared_ptr creation 
+    template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args); 
+    template<class T, class A, class... Args> 
+      shared_ptr<T> allocate_shared(const A& a, Args&&... args);
+
+    // 20.7.2.2.7, shared_ptr comparisons: 
+    template<class T, class U> 
+    bool operator==(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept; 
+    template<class T, class U> 
+    bool operator!=(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept; 
+    template<class T, class U> 
+    bool operator<(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept; 
+    template<class T, class U> 
+    bool operator>(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept; 
+    template<class T, class U> 
+    bool operator<=(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept; 
+    template<class T, class U> 
+    bool operator>=(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;
+
+    template <class T> bool operator==(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator==(nullptr_t, const shared_ptr<T>& b) noexcept; 
+    template <class T> bool operator!=(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator!=(nullptr_t, const shared_ptr<T>& b) noexcept; 
+    template <class T> bool operator<(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator<(nullptr_t, const shared_ptr<T>& b) noexcept; 
+    template <class T> bool operator<=(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator<=(nullptr_t, const shared_ptr<T>& b) noexcept; 
+    template <class T> bool operator>(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator>(nullptr_t, const shared_ptr<T>& b) noexcept; 
+    template <class T> bool operator>=(const shared_ptr<T>& a, nullptr_t) noexcept; 
+    template <class T> bool operator>=(nullptr_t, const shared_ptr<T>& b) noexcept;
+
+    // 20.7.2.2.8, shared_ptr specialized algorithms: 
+    template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>& b) noexcept;
+
+    // 20.7.2.2.9, shared_ptr casts:
+    template<class T, class U> 
+    shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) noexcept; 
+    template<class T, class U> 
+    shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) noexcept; 
+    template<class T, class U> 
+    shared_ptr<T> const_pointer_cast(const shared_ptr<U>& r) noexcept;
+
+    // 20.7.2.2.10, shared_ptr get_deleter: 
+    template<class D, class T> D* get_deleter(const shared_ptr<T>& p) noexcept;
+
+    // 20.7.2.2.11, shared_ptr I/O: 
+    template<class E, class T, class Y> 
+    basic_ostream<E, T>& operator<< (basic_ostream<E, T>& os, const shared_ptr<Y>& p); 
+  } // namespace std
+  ```
+
+  2.shared_ptr的特化应是CopyConstructible,CopyAssignable,和LessThanComparable, 以允许它们在标准容器中使用.
+  shared_ptr的特化应可转换为bool, 以允许它们在条件中的bool表达式和声明中使用.
+  模板参数T可以是未完成类型.
+
+  3.[*Example:* 
+    if(shared_ptr<X\> px = dynamic_pointer_cast<X\>(py)){
+      // 使用px
+    }
+   *-end example*]
+
+  4.为了确定是否存在数据竞争, 成员函数应仅访问和修改shared_ptr和weak_ptr对象本身, 而不能访问和修改它们所引用的对象. 
+  use_count()中的更改不会影响可能引起数据竞争的修改.
+
+  ##### 20.7.2.2.1 shared_ptr constructors
+
+  `constexpr shared_ptr() noexcept;`
+
+  1.*影响：* 构造一个empty shared_ptr对象.
+
+  2.*后置条件：* use_count() == 0 && get() == 0.
+
+  `template<class Y> explicit shared_ptr(Y* p);`
+
+  3.*要求：* p应可转换为T*. Y应是完整类型. 表达式delete p应well formed, 并且有良好定义行为, 并且不抛出异常.
+
+  4.*影响：* 构造一个持有指针p的shared_ptr对象.
+
+  5.*后置条件：* use_count() == 1 && get() == p.
+
+  6.*Throws:* bad_alloc, 或者当无法获得除内存以外的资源时, 实现定义的异常.
+
+  7.*异常安全：* 如果抛出异常, delete p被调用.
+
+  569
+
+
+[*Example:*  *-end example*]
+[*Note:*  *-end note*]
 
 
 
-
-
-
-
-
+## 翻译不严格，学习笔记而已，没版权。
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

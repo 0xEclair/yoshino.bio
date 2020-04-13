@@ -2818,7 +2818,83 @@ export const meta = {
 
   7.*异常安全：* 如果抛出异常, delete p被调用.
 
-  569
+  `template<class Y, class D> shared_ptr(Y* p, D d);`
+
+  `template<class Y, class D, class A> shared_ptr(Y* p, D d, A a);`
+
+  `template <class D> shared_ptr(nullptr_t p, D d);`
+
+  `template <class D, class A> shared_ptr(nullptr_t p, D d, A a);`
+
+  8.*要求：* p应可转换为T*. D应是CopyConstructible.
+  D的copy构造函数和析构函数禁止抛出异常. 表达式d(p) 应well formed,有良好定义的行为, 不抛出异常.
+  A应是一个allocator(17.6.3.5). A的copy构造函数和析构函数禁止抛出异常.
+
+  9.*影响：* 构造一个持有指针p和deleter d的shared_ptr对象.
+  第二个和第四个构造函数应使用a的copy来为内部使用分配内存.
+
+  10.*后置条件：* use_count() == 1 && get() == p.
+
+  11.*Throws:* bad_alloc, 或当无法获得除内存以外的资源时,实现定义的异常.
+
+  12.*异常安全：* 如果抛出异常, 调用d(p).
+
+  `template<class Y> shared_ptr(const shared_ptr<Y>& r, T *p) noexcept;`
+
+  13.*影响：* 构造存储p的shared_ptr对象, 和r共享所有权.
+
+  14.*后置条件：* get() == p && use_count() == r.use_count()
+
+  15.[*Note:* 为避免指针悬空的可能性, 此构造函数的用户必须确保p至少在r的所有权组被破坏之前保持有效. *-end note*]
+
+  16.[*Note:* 该构造函数允许创建一个带有非NULL存储指针的空shared_ptr实例. *-end note*]
+
+  `shared_ptr(const shared_ptr& r) noexcept;`
+
+  `template<class Y> shared_ptr(const shared_ptr<Y>& r) noexcept;`
+
+  17.*要求：* 第二个构造函数不参与重载决议, 除非Y*可隐式转换为T\*.
+
+  18.*影响：* 如果r empty,构造一个empty shared_ptr对象; 否则, 构造一个和r共享所有权的shared_ptr对象.
+
+  19.*后置条件：* get() == r.get() && use_count() == r.use_count()
+
+  `shared_ptr(shared_ptr&& r) noexcept;`
+
+  `template<class Y> shared_ptr(shared_ptr<Y>&& r) noexcept;`
+
+  20.*备注：* 第二个构造函数不参与重载决议, 除非Y*可隐式转换为T\*.
+
+  21.*影响：* 从r移动构造一个shared_ptr对象.
+
+  22.*后置条件：* *this应包含r的旧值. r为empty. r.get() == 0.
+
+  `template<class Y> explicit shared_ptr(const weak_ptr<Y>& r);`
+
+  23.*要求：* Y*可转换为T\*.
+
+  24.*影响：* 构造与r共享所有权的shared_ptr, 其存储r中存储的指针的copy.
+
+  25.*后置条件：* use_count() == r.use_count()
+
+  26.*Throws:* 当r.expired(), bad_weak_ptr
+
+  27.*异常安全：* 如果抛出异常, 此构造函数无影响.
+
+  `template<class Y> shared_ptr(auto_ptr<Y>&& r);`
+
+  C++17移除.
+
+  `template <class Y, class D> shared_ptr(unique_ptr<Y, D>&&r);`
+
+  33.*影响：* 当D不是引用类型时,等价于shared_ptr(r.release(), r.get_deleter());
+  否则shared_ptr(r.release(), ref(r.get_deleter()))
+
+  34.*异常安全：* 如果抛出函数, 此构造函数无影响.
+
+  ##### 20.7.2.2.2 shared_ptr destructor
+
+  571
 
 
 [*Example:*  *-end example*]

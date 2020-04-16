@@ -1,16 +1,11 @@
-import React, { useMemo } from 'react'
-import dynamic from 'next/dynamic'
+import React, { useEffect, useMemo, useState } from 'react'
 import Head from 'next/head'
-import { useRouter } from 'next/router'
-import { Spacer, Text, useTheme, Image } from '@zeit-ui/react'
 import Profile from './profile'
-import { msToString } from '../date-transform'
+import Contacts from './contacts'
+import { useRouter } from 'next/router'
+import { msToString } from '../data-transform'
+import { Spacer, Text, useTheme, Image } from '@zeit-ui/react'
 import BLOG from '../../blog.config'
-
-const ContactsWithNoSSR = dynamic(
-  () => import('./contacts'),
-  { ssr: false }
-)
 
 const getDate = date => {
   const d = new Date(date)
@@ -22,6 +17,8 @@ const getDate = date => {
 const Layout = ({ children, meta = {} }) => {
   const theme = useTheme()
   const { asPath } = useRouter()
+  const [showAfterRender, setShowAfterRender] = useState(false)
+  
   const inDetailPage = useMemo(() => meta && meta.title, [])
   const date = useMemo(() => getDate((meta || {}).date), [])
   const url = useMemo(() => {
@@ -30,6 +27,9 @@ const Layout = ({ children, meta = {} }) => {
   }, [asPath])
   const showViews = useMemo(() => BLOG.enableViews, [])
   
+  useEffect(() => setShowAfterRender(true), [])
+  
+  if (!showAfterRender) return null
   return (
     <section>
       <Head>
@@ -54,7 +54,7 @@ const Layout = ({ children, meta = {} }) => {
         {inDetailPage && <Spacer y={1} />}
         {children}
         <Spacer y={5} />
-        <ContactsWithNoSSR />
+        <Contacts />
       </div>
       
 
@@ -93,10 +93,12 @@ const Layout = ({ children, meta = {} }) => {
         }
         
         .date-box {
-          display: inline-flex;
+          display: flex;
+          width: fit-content;
           align-items: center;
           height: 30px;
           margin: -.5rem 0 0 0;
+          position: relative;
         }
         
         .date-box>:global(.date) {
@@ -105,14 +107,22 @@ const Layout = ({ children, meta = {} }) => {
         }
         
         .date-box :global(.image) {
+          position: absolute;
+          left: 100%;
+          top: 50%;
+          transform: translateY(-50%);
           display: inline-flex;
           align-items: center;
           margin: 0 0 0 10px;
         }
         
+        .date-box :global(img) {
+          object-fit: unset;
+        }
+        
         @media only screen and (max-width: 767px) {
           .container {
-            max-width: 95vw;
+            max-width: 91vw;
             min-height: 100vh;
           }
           
@@ -126,7 +136,11 @@ const Layout = ({ children, meta = {} }) => {
           
           .date-box {
             justify-content: center;
-            padding-left: 30px;
+            margin: 0 auto;
+          }
+          
+          .date-box :global(.image) {
+            display: none;
           }
         }
       `}</style>

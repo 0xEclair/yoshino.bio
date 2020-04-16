@@ -1,13 +1,15 @@
 import Head from 'next/head'
-import React, { useCallback, useState, useEffect, useMemo } from 'react'
-import { ZEITUIProvider, useTheme, CSSBaseline } from '@zeit-ui/react'
-import ThemeConfigProvider from 'lib/components/theme-config-provider'
-import { getDNSPrefetchValue } from 'lib/date-transform'
 import BLOG from '../blog.config'
+import React, { useCallback, useState, useEffect, useMemo } from 'react'
+import { getDNSPrefetchValue } from 'lib/data-transform'
+import ThemeConfigProvider from 'lib/components/theme-config-provider'
+import { ZEITUIProvider, useTheme, CSSBaseline } from '@zeit-ui/react'
+import useDomClean from 'lib/use-dom-clean'
 
 const Application = ({ Component, pageProps }) => {
   const theme = useTheme()
   const [themeType, setThemeType] = useState('light')
+  const domain = useMemo(() => getDNSPrefetchValue(BLOG.domain), [])
   const changeHandle = useCallback(isDark => {
     const next = isDark ? 'light' : 'dark'
     setThemeType(next)
@@ -15,16 +17,11 @@ const Application = ({ Component, pageProps }) => {
   
   useEffect(() => {
     if (typeof localStorage !== 'object') return null
-    const localType = localStorage.getItem('theme')
-    if (!['light', 'dark'].includes(localType)) return null
-    setThemeType(localType)
+    const themeType = localStorage.getItem('theme')
+    setThemeType(themeType === 'dark' ? 'dark' : 'light')
   }, [])
-
-  useEffect(() => {
-    localStorage.setItem('theme', themeType)
-  }, [themeType])
-
-  const domain = useMemo(() => getDNSPrefetchValue(BLOG.domain), [])
+  useEffect(() => localStorage.setItem('theme', themeType), [themeType])
+  useDomClean()
 
   return (
     <>
@@ -39,12 +36,13 @@ const Application = ({ Component, pageProps }) => {
       <meta property="og:type" content="website" />
       <meta name="generator" content="unix.bio" />
       <meta name="twitter:card" content="summary_large_image" />
-      <meta name="author" content={BLOG.anthor} />
+      <meta name="author" content={BLOG.author} />
       <meta name="twitter:creator" content={`@${BLOG.twitter}`} />
       <meta property="og:title" content={BLOG.title} />
       <meta property="og:url" content={BLOG.domain} />
       <meta property="og:image" content={`https:${domain}/assets/og-main.png`} />
       <meta property="twitter:image" content={`https:${domain}/assets/og-main.png`} />
+      <meta itemProp="image" property="og:image" content={`https:${domain}/assets/og-main.png`} />
       <meta name="viewport" content="initial-scale=1, maximum-scale=5, minimum-scale=1, viewport-fit=cover" />
     </Head>
     <ZEITUIProvider theme={{ type: themeType }}>
@@ -90,13 +88,13 @@ const Application = ({ Component, pageProps }) => {
           color: ${theme.palette.accents_3};
         }
         
-        html, body {
+        body {
           overflow-x: hidden;
         }
         
         @media only screen and (max-width: 767px) {
           html {
-            font-size: 14px;
+            font-size: 15px;
           }
         }
       `}</style>

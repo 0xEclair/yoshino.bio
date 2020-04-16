@@ -173,7 +173,7 @@ export const meta = {
 
   2.*要求：* T应该是MoveConstructible和MoveAssignable.
 
-  3.*影响:* 交换保存在两个位置的值.
+  3.*作用:* 交换保存在两个位置的值.
 
   `template<class T, size_t N>`
 
@@ -181,7 +181,7 @@ export const meta = {
 
   4.*要求：* 对于[0,N\]内的所有i, a[i\]应可与b[i\]交换.
 
-  5.*影响：* swap_ranges(a,a+N,b)
+  5.*作用：* swap_ranges(a,a+N,b)
 
   ### 20.2.3 forward/move helpers
 
@@ -320,21 +320,21 @@ export const meta = {
   2.*要求：* is_default_constructible<first_type\>::value 是 true and 
   is_default_constructible<second_type\>::value 是 true.
 
-  3.*影响：* 值初始化first和second.
+  3.*作用：* 值初始化first和second.
 
   `pair(const T1& x, const T2& y);`
 
   4.*要求：* is_copy_constructible<first_type\>::value 是 true and 
   is_copy_constructible<second_type\>::value 是 true. 
 
-  5.*影响:* 这个构造函数用x初始化first, 用y初始化second.
+  5.*作用:* 这个构造函数用x初始化first, 用y初始化second.
 
   `template<class U, class V> pair(U&& x, V&& y);`
 
   6.*要求：* is_constructible<first_type, U&&\>::value 是 true and 
   is_constructible<second_type, V&&\>::value 是 true. 
 
-  7.*影响：* 这个构造函数用std::forward<U\>(x)初始化first, 用std::forward<V\>(y)初始化second.
+  7.*作用：* 这个构造函数用std::forward<U\>(x)初始化first, 用std::forward<V\>(y)初始化second.
 
   8.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的, 这个构造函数不得参与重载决议.
 
@@ -343,7 +343,7 @@ export const meta = {
   9.*要求：* is_constructible<first_type, const U&\>::value 是 true and
   is_constructible<second_type, const V&\>::value 是 true.
 
-  10.*影响：*  从参数对应的成员中初始化.
+  10.*作用：*  从参数对应的成员中初始化.
 
   11.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的, 这个构造函数不得参与重载决议.
 
@@ -352,7 +352,7 @@ export const meta = {
   12.*要求：* is_constructible<first_type, U&&\>::value 是 true and 
   is_constructible<second_type, V&&\>::value 是 true. 
 
-  13.*影响：* 让std::forward<U\>(p.first)初始化first, std::forward<V\>(p.second)初始化second.
+  13.*作用：* 让std::forward<U\>(p.first)初始化first, std::forward<V\>(p.second)初始化second.
 
   14.*备注：* 如果U不是隐式可转换到first_type或V不是隐式可转换到second_type的, 这个构造函数不得参与重载决议.
 
@@ -363,7 +363,7 @@ export const meta = {
   15.*要求：* is_constructible<first_type, Args1&&...\>::value 是 true and 
   is_constructible<second_type, Args2&&...\>::value 是 true. 
 
-  16.*影响：* 让通过转发first_args获得的Args1...类型的参数初始化first,通过转发fsecond_args获得的Args2...类型的参数初始化second.
+  16.*作用：* 让通过转发first_args获得的Args1...类型的参数初始化first,通过转发fsecond_args获得的Args2...类型的参数初始化second.
   这里, 转发类型U的一个元素x在tuple对象内意味着调用std::forward<U\>(x).
   这个形式的构造函数, 第一和第二个参数分别在单独的tuple对象中提供, 称为分段构造.
 
@@ -372,7 +372,7 @@ export const meta = {
   17.*要求：*  is_copy_assignable<first_type\>::value 是 true and 
   is_copy_assignable<second_type\>::value 是 true. 
 
-  18.*影响：* 用p.first对first赋值, p.second对second.
+  18.*作用：* 用p.first对first赋值, p.second对second.
 
   19.*返回值：*  *this.
 
@@ -381,7 +381,7 @@ export const meta = {
   20.*要求：*  is_assignable<ﬁrst_type&, const U&\>::value 是 true and 
   is_assignable<second_type&, const V&\>::value 是 true. 
 
-  21.*影响：* 同上
+  21.*作用：* 同上
 
   22.*返回值:* 同上
 
@@ -397,7 +397,7 @@ export const meta = {
   24.*要求：* is_move_assignable<first_type\>::value is true and 
   is_move_assignable<second_type\>::value is true. 
 
-  25.*影响：* 用std::forward<first_type\>(p.first)对first赋值, std::forward<second_type\>(p.second)对second赋值.
+  25.*作用：* 用std::forward<first_type\>(p.first)对first赋值, std::forward<second_type\>(p.second)对second赋值.
 
   26.*返回值：* *this
 
@@ -406,7 +406,7 @@ export const meta = {
   27.*要求：*   is_assignable<first_type&, U&&\>::value is true and 
   is_assignable<second_type&, V&&\>::value is true.
 
-  28.*影响：* 用std::forward<U\>(p.first)对first赋值, std::forward<V\>(p.second)对second赋值.
+  28.*作用：* 用std::forward<U\>(p.first)对first赋值, std::forward<V\>(p.second)对second赋值.
 
   29.*返回值：* *this
 
@@ -421,7 +421,7 @@ export const meta = {
 
   31.*要求：* first和p.first可交换, second和p.second可交换.
 
-  32.*影响：* 交换first和p.first, second和p.second.
+  32.*作用：* 交换first和p.first, second和p.second.
 
   ### 20.3.3 特化算法(Specialized algorithms)
 
@@ -654,19 +654,19 @@ export const meta = {
   
   3.*要求：* 每个i, is_default_constructible<Ti\>::value 是true.
 
-  4.*影响：* 值初始化每个元素.
+  4.*作用：* 值初始化每个元素.
 
   `explicit tuple(const Types&...);`
 
   5.*要求：* 每个i, is_copy_constructible<Ti\>::value 是true.
 
-  6.*影响：* 使用相应的参数初始化每个元素.
+  6.*作用：* 使用相应的参数初始化每个元素.
 
   `template <class... UTypes> explicit tuple(UTypes&&... u); `
 
   7.*要求：* sizeof...(Types)==sizeof...(UTypes). is_constructible<Ti, Ui&&\>::value is true for all i.
 
-  8.*影响：* 用在std::forward<UTypes\>(u)中的相应的值初始化tuple中的每个元素.
+  8.*作用：* 用在std::forward<UTypes\>(u)中的相应的值初始化tuple中的每个元素.
 
   9.*备注：* 这个构造函数不参与重载决议, 除非每个UTypes中的类型可以隐式转换成在Types中对应的类型.
 
@@ -674,19 +674,19 @@ export const meta = {
 
   10.*要求：* 每个i, is_copy_constructible<Ti\>::value 是true.
 
-  11.*影响：* 用对应的u的元素初始化每个*this的元素 
+  11.*作用：* 用对应的u的元素初始化每个*this的元素 
 
   `tuple(tuple&& u) = default;`
 
   12.*要求：* 每个i, is_move_constructible<Ti\>::value 是true.
 
-  13.*影响：* For all i, initializes the ith element of *this with std::forward<Ti\>(get<i\>(u)). 
+  13.*作用：* For all i, initializes the ith element of *this with std::forward<Ti\>(get<i\>(u)). 
 
   `template <class... UTypes> tuple(const tuple<UTypes...>& u);`
 
   14.*要求：*  sizeof...(Types) == sizeof...(UTypes). is_constructible<Ti, const Ui&\>::value is true for all i.
 
-  15.*影响：* 用对应的u的元素构造每个*this的元素
+  15.*作用：* 用对应的u的元素构造每个*this的元素
 
   16.*备注：* 这个构造函数不参与重载决议, 除非每个i, const Ui&可以隐式转换到Ti.
 
@@ -694,7 +694,7 @@ export const meta = {
 
   17.*要求：*  sizeof...(Types)==sizeof...(UTypes). is_constructible<Ti, Ui&&\>::value is true for all i. 
 
-  18.*影响：*   对全部i, std::forward<Ui\>(get<i\>(u))用初始化*this的第i个元素.
+  18.*作用：*   对全部i, std::forward<Ui\>(get<i\>(u))用初始化*this的第i个元素.
 
   19.*备注：* 这个构造函数不参与重载决议, 除非UTypes的每个类型可以隐式转换从在Types中对应的类型.
 
@@ -703,7 +703,7 @@ export const meta = {
   20.*要求：* sizeof...(Types) == 2. 
   对第一个类型T0来说, is_constructible<T0, const U1&\>::value 是true, 对第二个类型T1来说, is_constructible<T1, const U2&\>::value 是true
 
-  21.*影响：* 用u.first构造第一个元素, u.second构造第二个元素.
+  21.*作用：* 用u.first构造第一个元素, u.second构造第二个元素.
 
   22.*备注：* 这个构造函数不参加重载决议, 除非const U1& 可隐式转换到T0, const U2& 可隐式转换到T1.
 
@@ -712,7 +712,7 @@ export const meta = {
   23.*要求：*  sizeof...(Types) == 2.
   对第一个类型T0来说, is_constructible<T0, U1&&\>::value 是true, 对第二个类型T1来说, is_constructible<T1, U2&&\>::value 是true. 
 
-  24.*影响：* 用std::forward<U1\>(u.first)初始化第一个元素, std::forward<U2\>(u.second)初始化第二个元素.
+  24.*作用：* 用std::forward<U1\>(u.first)初始化第一个元素, std::forward<U2\>(u.second)初始化第二个元素.
 
   25.*备注：* 这个构造函数不参与重载决议, 除非U1可隐式转换到T0, U2可隐式转换到T1.
 
@@ -739,7 +739,7 @@ export const meta = {
 
   26.*要求：* Alloc应该满足Allocator(17.6.3.5)的要求.
 
-  27.*影响：* 等价于前面的构造函数, 不同之处在于每个元素都是使用uses_allocator(?)构造的.
+  27.*作用：* 等价于前面的构造函数, 不同之处在于每个元素都是使用uses_allocator(?)构造的.
 
   #### 20.4.2.2 赋值(Assignment)
 
@@ -751,7 +751,7 @@ export const meta = {
 
   2.*要求：* 每个i, is_copy_assignable<Ti\>::value 是true.
 
-  3.*影响：* 令每个u的元素赋值给对应的*this的元素.
+  3.*作用：* 令每个u的元素赋值给对应的*this的元素.
 
   4.*返回值：* *this
 
@@ -767,7 +767,7 @@ export const meta = {
 
   6.*要求：* 每个i, is_move_assignable<Ti\>::value 是true.
 
-  7.*影响：* 对于全部的i,令std::forward<Ti\>(get<i\>(u))赋值给get<i\>(*this).
+  7.*作用：* 对于全部的i,令std::forward<Ti\>(get<i\>(u))赋值给get<i\>(*this).
 
   8.*返回值：* *this.
 
@@ -776,7 +776,7 @@ export const meta = {
   9.*要求：* sizeof...(Types) == sizeof...(UTypes).
   每个i, is_assignable<Ti&,const Ui&\>::value是true.
 
-  10.*影响：* 令每个u的元素赋值给对应的*this的元素.
+  10.*作用：* 令每个u的元素赋值给对应的*this的元素.
 
   11.*返回值：* *this
 
@@ -785,7 +785,7 @@ export const meta = {
   12.*要求：* 每个i, is_assignable<Ti&, Ui&&\>::value == true.
   sizeof...(Types) == sizeof...(UTypes). 
 
-  13.*影响：* 每个i, 令std::forward<Ui\>(get<i\>(u))赋值给get<i\>(*this).
+  13.*作用：* 每个i, 令std::forward<Ui\>(get<i\>(u))赋值给get<i\>(*this).
 
   14.*返回值：* *this.
 
@@ -795,7 +795,7 @@ export const meta = {
   对第一个类型T0来说, is_assignable<T0&, const U1&\>::value 是true.
   对第二个类型T1来说, is_assignable<T1&, const U2&\>::value 是true.
 
-  16.*影响：* 令u.first赋值给*this的第一个元素, u.second赋值给 *this的第二个元素
+  16.*作用：* 令u.first赋值给*this的第一个元素, u.second赋值给 *this的第二个元素
 
   17.*返回值：* *this
 
@@ -805,7 +805,7 @@ export const meta = {
   对第一个类型T0来说, is_assignable<T0&, U2&&\>::value 是true.
   对第二个类型T1来说, is_assignable<T1&, U2&&\>::value 是true.
 
-  19.*影响：* 令std::forward<U1\>(u.first)赋值给*this的第一个元素, 
+  19.*作用：* 令std::forward<U1\>(u.first)赋值给*this的第一个元素, 
   std::forward<U2\>(u.second)赋值给 *this的第二个元素.
 
   20.*返回值：* *this
@@ -824,7 +824,7 @@ export const meta = {
 
   2.*要求：* 每个*this里的元素应该和rhs对应的元素可交换
 
-  3.*影响:* 对*this的每个元素和rhs中相应的元素调用swap
+  3.*作用:* 对*this的每个元素和rhs中相应的元素调用swap
 
   4.*Throws:* 无除非一个逐元素swap调用抛出异常.
 
@@ -915,7 +915,7 @@ export const meta = {
 
   `typename tuple_element<I, tuple<Types...>>::type&& get(tuple<Types...>&& t) noexcept;`
 
-  3.*影响：* 等价于返回Equivalent to return std::forward<typename tuple_element<I, tuple<Types...\>\>::type&&\>(get<I\>(t));
+  3.*作用：* 等价于返回Equivalent to return std::forward<typename tuple_element<I, tuple<Types...\>\>::type&&\>(get<I\>(t));
 
   4.*Note:* 如果Types中的T是某个引用类型X&, 则返回类型为X&, 而不是X&&.
   但是, 如果元素类型为非引用类型T, 则返回类型为T&&.
@@ -947,7 +947,7 @@ export const meta = {
 
   2.*返回值：* 每个i, 如果get<i\>(t) == get<i\>(u), 返回true.对任意两个0长度的tuple e和f来说,e == f返回true.
 
-  3.*影响：* 从0开始按顺序执行基本比较.在第一个相等比较结果为false之后, 不执行任何比较或元素访问.
+  3.*作用：* 从0开始按顺序执行基本比较.在第一个相等比较结果为false之后, 不执行任何比较或元素访问.
 
   `template<class... TTypes, class... UTypes>`
 
@@ -956,7 +956,7 @@ export const meta = {
   4.*要求：* 每个i, 其中0 <= i和i < sizeof...（Types), get<i\>(t) < get<i\>(u)和get<i\>(u) < get<i\>(t)是有效表达式, 
   返回可转换为bool的类型. sizeof...(TTypes) == sizeof...(UTypes).
 
-  5.*影响：* t和u之前loxicographical比较的结果.结果定义如下：
+  5.*作用：* t和u之前loxicographical比较的结果.结果定义如下：
   (bool)(get<0\>(t) < get<0\>(u)) ||  (!(bool)(get<0\>(u) < get<0\>(t)) && ttail < utail.
   其中某个tuple r的rtail是一个包含除r的第一个元素以外的所有元素的tuple.对于任何两个零长度tuple e和f, e < f返回false.
 
@@ -983,7 +983,7 @@ export const meta = {
 
     `noexcept(x.swap(y))`
 
-  2.*影响：* x.swap(y).
+  2.*作用：* x.swap(y).
 
 ## 20.5 类模板 bitset
 1. for align
@@ -1095,11 +1095,11 @@ export const meta = {
 
   `constexpr bitset() noexcept;`
 
-  1.*影响：* 构造一个bitset<N\>, 所有bit初始化为0.
+  1.*作用：* 构造一个bitset<N\>, 所有bit初始化为0.
 
   `constexpr bitset(unsigned long long val) noexcept;`
 
-  2.*影响：* 构造一个bitset<N\>, 初始化其首（最低） M bit位置为对应 val 的位值, 
+  2.*作用：* 构造一个bitset<N\>, 初始化其首（最低） M bit位置为对应 val 的位值, 
   其中 M 是 unsigned long long 的位数和正在构造的 bitset 中的位数 N 的较小者.
   如果 M 小于 N, 则剩余bit位置被初始化为零.
 
@@ -1117,7 +1117,7 @@ export const meta = {
 
   4.*Throws:* 如果pos > str.size(),抛出 out_of_range.
 
-  5.*影响：* 确定初始化string的有效长度rlen, rlen=min(n,str.size() - pos).
+  5.*作用：* 确定初始化string的有效长度rlen, rlen=min(n,str.size() - pos).
 
     如果在pos开头的任何其他字符都不为0或1, 则该函数将引发无效参数. 
     该函数使用traits::eq()比较字符值.
@@ -1138,31 +1138,31 @@ export const meta = {
 
   ` charT zero = charT(’0’), charT one = charT(’1’));`
 
-  8.*影响：* 构造一个bitset<N\>对象就像bitset( n == basic_string<charT\>::npos ? basic_string<charT\>(str) : basic_string<charT\>(str, n), 0, n, zero, one)
+  8.*作用：* 构造一个bitset<N\>对象就像bitset( n == basic_string<charT\>::npos ? basic_string<charT\>(str) : basic_string<charT\>(str, n), 0, n, zero, one)
 
   ### 20.5.2 bitset members
 
   `bitset<N>& operator&=(const bitset<N>& rhs) noexcept;`
 
-  1.*影响：* 清除*this中的每个bit, 为此清零rhs中对应的bit, 其他位保持不变.
+  1.*作用：* 清除*this中的每个bit, 为此清零rhs中对应的bit, 其他位保持不变.
 
   2.*返回值：* *this.
 
   `bitset<N>& operator|=(const bitset<N>& rhs) noexcept;`
 
-  3.*影响：* set*this中的每个bit, 为此set rhs中对应的bit, 其他位保持不变.
+  3.*作用：* set*this中的每个bit, 为此set rhs中对应的bit, 其他位保持不变.
 
   4.*返回值：* *this.
 
   `bitset<N>& operator^=(const bitset<N>& rhs) noexcept;`
 
-  5.*影响：* 切换*this中的每个bit, 为此切换rhs中对应的bit, 其他位保持不变.
+  5.*作用：* 切换*this中的每个bit, 为此切换rhs中对应的bit, 其他位保持不变.
 
   6.*返回值：* *this.
 
   `bitset<N>& operator<<=(size_t pos) noexcept;`
 
-  7.*影响：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
+  7.*作用：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
   - 如果 I < pos,新值是0;
   - 如果 I >= pos,新值是 I - pos 处先前的值.
 
@@ -1170,7 +1170,7 @@ export const meta = {
 
   `bitset<N>& operator>>=(size_t pos) noexcept;`
 
-  9.*影响：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
+  9.*作用：* 用一个确定的值按如下方式替换在*this中I位置的每个bit：
   - 如果 pos >= N - I,新值是0;
   - 如果 pos < N -  I,新值是 I + pos 处先前的值.
 
@@ -1178,7 +1178,7 @@ export const meta = {
 
   `bitset<N>& set() noexcept;`
 
-  11.*影响：* 设置*this的所有bit.
+  11.*作用：* 设置*this的所有bit.
 
   12.*返回值：*  *this.
 
@@ -1188,13 +1188,13 @@ export const meta = {
 
   14.*Throws:* 如果pos不对应一个合理的bit位置, 抛出out_of_range.
 
-  15.*影响：* 在*this中位置pos的bit中保存一个新值.如果val为非零, 则保存的值为1, 否则为0.
+  15.*作用：* 在*this中位置pos的bit中保存一个新值.如果val为非零, 则保存的值为1, 否则为0.
 
   16.*返回值：* *this.
 
   `bitset<N>& reset() noexcept;`
 
-  17.*影响：* 重置*this的所有bit.
+  17.*作用：* 重置*this的所有bit.
 
   18.*返回值：* *this.
 
@@ -1204,19 +1204,19 @@ export const meta = {
 
   20.*Throws:* 如果pos不对应一个合理的bit位置, 抛出out_of_range.
 
-  21.*影响：* 重置*this中在pos位置的bit.
+  21.*作用：* 重置*this中在pos位置的bit.
 
   22.*返回值：* *this.
 
   `bitset<N> operator~() const noexcept;`
 
-  23.*影响：* 构造一个bitset<N\>对象x并且用*this初始化.
+  23.*作用：* 构造一个bitset<N\>对象x并且用*this初始化.
 
   24.*返回值：* x.flip().
 
   `bitset<N>& flip() noexcept;`
 
-  25.*影响：* 切换*this中所有bit.
+  25.*作用：* 切换*this中所有bit.
 
   26.*返回值：* *this.
 
@@ -1226,7 +1226,7 @@ export const meta = {
 
   28.*Throws:* 如果pos不对应一个合理的bit位置, 抛出out_of_range.
 
-  29.*影响：* 切换*this中在pos位置的bit.
+  29.*作用：* 切换*this中在pos位置的bit.
 
   30.*返回值：* *this.
 
@@ -1246,7 +1246,7 @@ export const meta = {
 
   `basic_string<charT, traits, Allocator> to_string(charT zero = charT(’0’), charT one = charT(’1’)) const; `
 
-  35.*影响：* 构造一个合适的string对象并且用长度N的的字符初始化.每个字符通过*this中对应的bit位的值确定.
+  35.*作用：* 构造一个合适的string对象并且用长度N的的字符初始化.每个字符通过*this中对应的bit位的值确定.
   字符位置N-1对应bit位置0.随后减少的字符位置对应于增加的bit位置.bit值0变成字符zero,bit值1变成字符one.
 
   36.*返回值：* 创建的对象.
@@ -1339,7 +1339,7 @@ export const meta = {
 
   4.一个格式化输入函数.
 
-  5.*影响：* 从is中提取最多N个字符.将这些字符保存在一个basic_string<charT, traits\>临时对象str中, 
+  5.*作用：* 从is中提取最多N个字符.将这些字符保存在一个basic_string<charT, traits\>临时对象str中, 
   然后计算表达式x = bitset<N\>(str).N个字符被提取并保存直到发生以下任一情况:
     - N个字符被提取并保存.
     - 输入队列读取到eof.
@@ -1631,7 +1631,7 @@ export const meta = {
 
   2.*要求：* p应该是安全派生的指针或null值.
 
-  3.*影响：* 如果p非null,被p引用的完整对象随后被声明为reachable.
+  3.*作用：* 如果p非null,被p引用的完整对象随后被声明为reachable.
 
   4.*Throws:* 如果系统无法分配跟踪声明为reachable的对象可能需要的其他内存,则可能抛出std::bad_alloc.
 
@@ -1680,7 +1680,7 @@ export const meta = {
 
   `void *align(std::size_t alignment, std::size_t size, void *&ptr, std::size_t& space);`
 
-  1.*影响：* 如果可以通过对齐带有长度space的ptr指向的buffer来对齐存储的size字节,
+  1.*作用：* 如果可以通过对齐带有长度space的ptr指向的buffer来对齐存储的size字节,
   该函数将ptr更新为指向此类存储的第一个可能的地址,并通过对齐所使用的字节数减少space.否则，该函数不做任何事.
 
   2.*要求：* 
@@ -1823,18 +1823,18 @@ export const meta = {
 
   `static void deallocate(Alloc& a, pointer p, size_type n);`
 
-  3.*影响：* 调用a.deallocate(p,n).
+  3.*作用：* 调用a.deallocate(p,n).
 
   4.*Throws:* Nothing.
 
   `template <class T, class... Args> static void construct(Alloc& a, T* p, Args&&... args);`
 
-  5.*影响：* 如果调用是良好的,调用a.construct(p,std::forward<Args\>(args)...);
+  5.*作用：* 如果调用是良好的,调用a.construct(p,std::forward<Args\>(args)...);
   否则,执行::new(static_cast<void*\>(p)) T(std::forward<Args\>(args)...).
 
   `template <class T> static void destroy(Alloc& a, T* p);`
 
-  6.*影响：* 如果调用是良好的,调用a.destroy(p);否则,执行p->~T().
+  6.*作用：* 如果调用是良好的,调用a.destroy(p);否则,执行p->~T().
 
   `static size_type max_size(Alloc& a);`
 
@@ -1920,7 +1920,7 @@ export const meta = {
 
   8.*要求：* p应该是从allocate()中获得的指针值. n等于作为第一个参数传递给调用p的allocate的值.
 
-  9.*影响：* deallocate被p引用的内存空间.
+  9.*作用：* deallocate被p引用的内存空间.
 
   10.*备注：* 使用 ::operator delete(void*), 但未指定何时调用.
 
@@ -1930,11 +1930,11 @@ export const meta = {
 
   `template <class U, class... Args> void construct(U* p, Args&&... args);`
 
-  12.*影响：* ::new((void*)p) U(std::forward<Args\>(args)...)
+  12.*作用：* ::new((void*)p) U(std::forward<Args\>(args)...)
 
   `template <class U> void destroy(U* p);`
 
-  13.*影响：* p->~U().
+  13.*作用：* p->~U().
 
   #### 20.6.9.2 allocator globals 
 
@@ -1968,7 +1968,7 @@ export const meta = {
 
   `explicit raw_storage_iterator(OutputIterator x);`
 
-  2.*影响：* 初始化迭代器来指向x指向的相同值.
+  2.*作用：* 初始化迭代器来指向x指向的相同值.
 
   `raw_storage_iterator<OutputIterator,T>& operator*();`
 
@@ -1976,30 +1976,30 @@ export const meta = {
 
   `raw_storage_iterator<OutputIterator,T>& operator=(const T& element);`
 
-  4.*影响：* 在迭代器指向的地方从element构造一个值.
+  4.*作用：* 在迭代器指向的地方从element构造一个值.
 
   5.*返回值：* iterator的引用.
 
   `raw_storage_iterator<OutputIterator,T>& operator++();`
 
-  6.*影响：* 前++:advance迭代器并返回对更新后的迭代器的引用.
+  6.*作用：* 前++:advance迭代器并返回对更新后的迭代器的引用.
 
   `raw_storage_iterator<OutputIterator,T> operator++(int);`
 
-  7.*影响：* 后++:advance迭代器并返回对更新前的迭代器的引用.
+  7.*作用：* 后++:advance迭代器并返回对更新前的迭代器的引用.
 
   ### 20.6.11 Temporary buffers
 
   `template <class T> pair<T*, ptrdiff_t> get_temporary_buffer(ptrdiff_t n) noexcept;`
 
-  1.*影响：* 获得足以保存n个相邻T对象的存储空间的指针.由实现定义是否支持过度对齐(over-aligned)的类型.
+  1.*作用：* 获得足以保存n个相邻T对象的存储空间的指针.由实现定义是否支持过度对齐(over-aligned)的类型.
 
   2.*返回值：* 一个包含buffer地址和容量(以sizeof(T)为单位)的pair, 
   或如果无法获得存储空间 || n<=0,一个0值pair.
   
   `template <class T> void return_temporary_buffer(T* p);`
 
-  3.*影响：* deallocate p指向的buffer.
+  3.*作用：* deallocate p指向的buffer.
 
   4.*要求：* buffer需是事先通过get_temporary_buffer分配的.
 
@@ -2022,7 +2022,7 @@ export const meta = {
 
   `ForwardIterator uninitialized_copy(InputIterator first, InputIterator last, ForwardIterator result);`
 
-  1.*影响：* 
+  1.*作用：* 
 
   ```
   for (; first != last; ++result, ++first) 
@@ -2035,7 +2035,7 @@ export const meta = {
 
   `ForwardIterator uninitialized_copy_n(InputIterator first, Size n, ForwardIterator result);`
 
-  3.*影响：* 
+  3.*作用：* 
 
   ```
   for ( ; n > 0; ++result, ++first, --n) { 
@@ -2051,7 +2051,7 @@ export const meta = {
 
   `void uninitialized_fill(ForwardIterator first, ForwardIterator last, const T& x);`
 
-  1.*影响：* 
+  1.*作用：* 
 
   ```
   for (; first != last; ++first) 
@@ -2064,7 +2064,7 @@ export const meta = {
 
   `ForwardIterator uninitialized_fill_n(ForwardIterator first, Size n, const T& x);`
 
-  1.*影响：*
+  1.*作用：*
 
   ```
   for (; n--; ++first) 
@@ -2084,7 +2084,7 @@ export const meta = {
 
   5.allocation时,直接由malloc(),calloc()或realloc()申请的存储空间隐式声明为reachable;
   deallocation时,结束其reachable,并且不需要因为undeclare_reachable()的调用而结束reachable.
-  [*Note:* 这使得现有的C库不受安全派生的指针的限制影响,但代价是为malloc()分配的对象提供少得多的垃圾回收和泄漏检测选项.它还允许malloc()通过单独的分配空间来实现,从而绕过常规的clarify_reachable()实现.
+  [*Note:* 这使得现有的C库不受安全派生的指针的限制作用,但代价是为malloc()分配的对象提供少得多的垃圾回收和泄漏检测选项.它还允许malloc()通过单独的分配空间来实现,从而绕过常规的clarify_reachable()实现.
   绝对不要将上述函数用作clarify_reachable()的替代方法,并且强烈建议新编写的代码将使用这些函数分配的内存视为使用了new运算符分配的内存. *-end note*]
 
   6.Table 46.
@@ -2191,13 +2191,13 @@ export const meta = {
 
   `template <class U> default_delete(const default_delete<U>& other) noexcept;`
 
-  1.*影响：* 从另一个default_delete<U\>对象构造一个default_delete对象.
+  1.*作用：* 从另一个default_delete<U\>对象构造一个default_delete对象.
 
   2.*备注：* 这个构造函数不参与重载决议, 除非U\*可隐式转换为T*.
 
   `void operator()(T *ptr) const;`
 
-  3.*影响：* 对ptr调用delete.
+  3.*作用：* 对ptr调用delete.
 
   4.*备注：* 如果T是一个未完成类型, 程序ill-formed.
 
@@ -2216,7 +2216,7 @@ export const meta = {
 
   `void operator()(T* ptr) const;`
 
-  1.*影响：* 对ptr调用delete[].
+  1.*作用：* 对ptr调用delete[].
 
   2.*备注：* 如果T是一个未完成类型, 程序ill-formed.
 
@@ -2291,7 +2291,7 @@ export const meta = {
 
   1.*要求：* D应满足DefaultConstructible(Table 19),并且构造函数不应抛出异常.
 
-  2.*影响：* 构造一个unique_ptr对象, 其不用有任何内容, 值初始化存储的指针和deleter.
+  2.*作用：* 构造一个unique_ptr对象, 其不用有任何内容, 值初始化存储的指针和deleter.
 
   3.*后置条件：* get() == nullptr. get_deleter()返回对存储的deleter的引用.
 
@@ -2301,7 +2301,7 @@ export const meta = {
 
   5.*要求：* D应满足DefaultConstructible(Table 19)的要求, 并且构造函数不应抛出异常.
 
-  6.*影响：* 构造一个unique_ptr对象, 其拥有p, 用p初始化存储的指针, 值初始化存储的deleter.
+  6.*作用：* 构造一个unique_ptr对象, 其拥有p, 用p初始化存储的指针, 值初始化存储的deleter.
 
   7.*后置条件：* get() == p. get_deleter()返回对存储的deleter的引用.
 
@@ -2337,7 +2337,7 @@ export const meta = {
    否则,d是一个左值, 选择第一个构造函数. D引用的类型不必是CopyConstructible或MoveConstructible.
    这个unique_ptr保存一个引用左值d的D类型对象.[*Note:* D可能不是右值引用类型. *-end note*]
 
-  13.*影响：* 构造一个unique_ptr对象, 其持有p, 用p初始化存储的指针, 按如上所述初始化deleter.
+  13.*作用：* 构造一个unique_ptr对象, 其持有p, 用p初始化存储的指针, 按如上所述初始化deleter.
 
   14.*后置条件：* get() == p. get_deleter() 返回对存储的deleter的引用. 如果D是引用类型, 那么get_deleter()返回对左值d的引用.
 
@@ -2355,7 +2355,7 @@ export const meta = {
 
   15.*要求：* 如果D不是引用类型, D应满足MoveConstructible(Table 20)的要求.从类型D的右值构造deleter不应引发异常.
 
-  16.*影响：* 通过从u转移所有权到*this来构造unique_ptr. 如果D是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
+  16.*作用：* 通过从u转移所有权到*this来构造unique_ptr. 如果D是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
   [*Note:* deleter构造函数可能用std::forward<D\>实现. *-end note*]
 
   17.*后置条件：* 在构造之前get()返回u.get()的值.(get() yields the value u.get() yielded before the construction.)
@@ -2372,7 +2372,7 @@ export const meta = {
    - U不是数组类型
    - D是引用类型, E是与D相同的类型, 或者D不是引用类型, 并且E可以隐式转换为D.
 
-  20.*影响：* 通过从u转移所有权到*this来构造unique_ptr. 如果E是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
+  20.*作用：* 通过从u转移所有权到*this来构造unique_ptr. 如果E是引用类型, 这个deleter从u的deleter copy构造;否则, 移动构造.
   [*Note:* deleter构造函数可能用std::forward<D\>实现. *-end note*]
 
   21.*后置条件：* 在构造之前get()返回u.get()的值. get_deleter()返回对存储的deleter的引用, deleter从u.get_deleter()构造. 
@@ -2388,7 +2388,7 @@ export const meta = {
   1.*要求：* 表达式get_deleter()(get())应well formed, 有良好定义的行为, 不抛出异常.
   [*Note:* default_delete的使用要求T是完整的类型. *-end note*]
 
-  2.*影响：* 如果 get() == nullptr, 无影响. 否则, get_deleter()(get()).
+  2.*作用：* 如果 get() == nullptr, 无作用. 否则, get_deleter()(get()).
 
   ##### 20.7.1.2.3 unique_ptr assignment
   
@@ -2397,7 +2397,7 @@ export const meta = {
   1.*要求：* 如果D不是引用类型, D应满足MoveAssignable(Table 22)和类型D的右值deleter的assignment不会抛出异常.
   否则, D是引用类型, remove_reference<D\>::type 应满足CopyAssignment要求和类型D的左值deleter的assignment不会抛出异常.
 
-  2.*影响：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
+  2.*作用：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
 
   3.*返回值：* *this.
 
@@ -2410,13 +2410,13 @@ export const meta = {
    - unique_ptr<U, E\>::pointer可隐式转换成pointer
    - U不是数组类型
 
-  6.*影响：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
+  6.*作用：* 将所有权从u转移到*this, 如同以调用reset(r.release())后调用get_deleter()到std::forward<E\>(r.get_deleter())的赋值.
 
   7.*返回值：* *this.
 
   `unique_ptr& operator=(nullptr_t) noexcept;`
 
-  8.*影响：* reset().
+  8.*作用：* reset().
 
   9.*后置条件：* get() == nullptr.
 
@@ -2468,7 +2468,7 @@ export const meta = {
 
   3.*要求：* get_deleter()(get())应well formed, 有良好定义的行为, 禁止抛出异常.
 
-  4.*影响：* 用p对存储的指针赋值, old_p表示旧值且不等于nullptr, 调用get_deleter()(old_p).
+  4.*作用：* 用p对存储的指针赋值, old_p表示旧值且不等于nullptr, 调用get_deleter()(old_p).
   [*Note:* 这些操作的顺序很重要, 因为对get_deleter()的调用可能会析构*this. *-end note*]
 
   5.*后置条件：* get() == p.
@@ -2478,7 +2478,7 @@ export const meta = {
 
   6.*要求：* get_deleter()应可交换, 并且swap下不抛出异常.
 
-  7.*影响：* 交换*this和u中存储的指针和deleter.
+  7.*作用：* 交换*this和u中存储的指针和deleter.
 
   #### 20.7.1.3 unique_ptr for array objects with a runtime length
 
@@ -2563,7 +2563,7 @@ export const meta = {
 
   `void reset(nullptr_t p) noexcept;`
 
-  1.*影响：* 如果get() == nullptr, 无影响;否则, get_deleter()(get()).
+  1.*作用：* 如果get() == nullptr, 无作用;否则, get_deleter()(get()).
 
   2.*后置条件：* get() == p.
 
@@ -2571,7 +2571,7 @@ export const meta = {
 
   `template <class T, class D> void swap(unique_ptr<T, D>& x, unique_ptr<T, D>& y) noexcept;`
 
-  1.*影响：* 调用x.swap(y)
+  1.*作用：* 调用x.swap(y)
 
   `template <class T1, class D1, class T2, class D2>`
 
@@ -2796,13 +2796,13 @@ export const meta = {
    *-end example*]
 
   4.为了确定是否存在数据竞争, 成员函数应仅访问和修改shared_ptr和weak_ptr对象本身, 而不能访问和修改它们所引用的对象. 
-  use_count()中的更改不会影响可能引起数据竞争的修改.
+  use_count()中的更改不会作用可能引起数据竞争的修改.
 
   ##### 20.7.2.2.1 shared_ptr constructors
 
   `constexpr shared_ptr() noexcept;`
 
-  1.*影响：* 构造一个empty shared_ptr对象.
+  1.*作用：* 构造一个empty shared_ptr对象.
 
   2.*后置条件：* use_count() == 0 && get() == 0.
 
@@ -2810,7 +2810,7 @@ export const meta = {
 
   3.*要求：* p应可转换为T*. Y应是完整类型. 表达式delete p应well formed, 并且有良好定义行为, 并且不抛出异常.
 
-  4.*影响：* 构造一个持有指针p的shared_ptr对象.
+  4.*作用：* 构造一个持有指针p的shared_ptr对象.
 
   5.*后置条件：* use_count() == 1 && get() == p.
 
@@ -2830,7 +2830,7 @@ export const meta = {
   D的copy构造函数和析构函数禁止抛出异常. 表达式d(p) 应well formed,有良好定义的行为, 不抛出异常.
   A应是一个allocator(17.6.3.5). A的copy构造函数和析构函数禁止抛出异常.
 
-  9.*影响：* 构造一个持有指针p和deleter d的shared_ptr对象.
+  9.*作用：* 构造一个持有指针p和deleter d的shared_ptr对象.
   第二个和第四个构造函数应使用a的copy来为内部使用分配内存.
 
   10.*后置条件：* use_count() == 1 && get() == p.
@@ -2841,7 +2841,7 @@ export const meta = {
 
   `template<class Y> shared_ptr(const shared_ptr<Y>& r, T *p) noexcept;`
 
-  13.*影响：* 构造存储p的shared_ptr对象, 和r共享所有权.
+  13.*作用：* 构造存储p的shared_ptr对象, 和r共享所有权.
 
   14.*后置条件：* get() == p && use_count() == r.use_count()
 
@@ -2855,7 +2855,7 @@ export const meta = {
 
   17.*要求：* 第二个构造函数不参与重载决议, 除非Y*可隐式转换为T\*.
 
-  18.*影响：* 如果r empty,构造一个empty shared_ptr对象; 否则, 构造一个和r共享所有权的shared_ptr对象.
+  18.*作用：* 如果r empty,构造一个empty shared_ptr对象; 否则, 构造一个和r共享所有权的shared_ptr对象.
 
   19.*后置条件：* get() == r.get() && use_count() == r.use_count()
 
@@ -2865,7 +2865,7 @@ export const meta = {
 
   20.*备注：* 第二个构造函数不参与重载决议, 除非Y*可隐式转换为T\*.
 
-  21.*影响：* 从r移动构造一个shared_ptr对象.
+  21.*作用：* 从r移动构造一个shared_ptr对象.
 
   22.*后置条件：* *this应包含r的旧值. r为empty. r.get() == 0.
 
@@ -2873,13 +2873,13 @@ export const meta = {
 
   23.*要求：* Y*可转换为T\*.
 
-  24.*影响：* 构造与r共享所有权的shared_ptr, 其存储r中存储的指针的copy.
+  24.*作用：* 构造与r共享所有权的shared_ptr, 其存储r中存储的指针的copy.
 
   25.*后置条件：* use_count() == r.use_count()
 
   26.*Throws:* 当r.expired(), bad_weak_ptr
 
-  27.*异常安全：* 如果抛出异常, 此构造函数无影响.
+  27.*异常安全：* 如果抛出异常, 此构造函数无作用.
 
   `template<class Y> shared_ptr(auto_ptr<Y>&& r);`
 
@@ -2887,17 +2887,143 @@ export const meta = {
 
   `template <class Y, class D> shared_ptr(unique_ptr<Y, D>&&r);`
 
-  33.*影响：* 当D不是引用类型时,等价于shared_ptr(r.release(), r.get_deleter());
+  33.*作用：* 当D不是引用类型时,等价于shared_ptr(r.release(), r.get_deleter());
   否则shared_ptr(r.release(), ref(r.get_deleter()))
 
-  34.*异常安全：* 如果抛出函数, 此构造函数无影响.
+  34.*异常安全：* 如果抛出异常, 此构造函数无作用.
 
   ##### 20.7.2.2.2 shared_ptr destructor
 
-  571
+  `~shared_ptr();`
+
+  1.*作用：* 
+   - 如果*this为空或和其他shared_ptr实例共享所有权(use_count() > 1), 没有副作用.
+   - 否则, 如果*this拥有对象(原文是object, 应该是pointer)p和deleter d, 调用d(p).
+   - 否则, *this 拥有指针p, 调用delete p.
+
+  2.[*Note:* 由于\*this的析构函数减少喝\*this共享所有权的实例数量减1, 在\*this被析构后, 与\*this共享所有权的所有shared_ptr实例将report一个use_count(), 该值比先前的值少1. *-end note*]
+
+  ##### 20.7.2.2.3 shared_ptr assignment
+
+  `shared_ptr& operator=(const shared_ptr& r) noexcept;`
+
+  `template<class Y> shared_ptr& operator=(const shared_ptr<Y>& r) noexcept;`
+
+  `template<class Y> shared_ptr& operator=(auto_ptr<Y>&& r);`
+
+  1.*作用：* 等效于shared_ptr(r).swap(*this).
+
+  2.*返回值：* *this
+
+  3.[*Note:* 由于临时对象的构造和析构导致的use count更新不是可观察到的副作用, 
+  因此, 实现可能会通过不同的方式满足作用(和隐式的保证), 而不会产生临时对象. 尤其是: 
+  ```
+  shared_ptr<int> p(new int);
+  shared_Ptr<void> q(p);
+  p=p;
+  q=p;
+  ```
+  两个赋值可能都是无操作的.*-end note*]
+
+  `shared_ptr& operator=(shared_ptr&& r) noexcept;`
+
+  `template<class Y> shared_ptr& operator=(shared_ptr<Y>&& r) noexcept;`
+
+  4.*作用：* 等效于shared_ptr(std::move(r)).swap(*this).
+
+  5.*返回值：* *this
+
+  `template <class Y, class D> shared_ptr& operator=(unique_ptr<Y, D>&& r);`
+
+  6.*作用：* 等效于shared_ptr(std::move(r)).swap(*this).
+
+  7.*返回值：* *this
+
+  ##### 20.7.2.2.4 shared_ptr modifiers
+
+  `void swap(shared_ptr& r) noexcept;`
+
+  1.*作用：* 交换*this和r的内容.
+
+  `void reset() noexcept;`
+
+  2.*作用：* 等效于shared_ptr().swap(*this)
+
+  `template<class Y> void reset(Y* p);`
+
+  3.*作用：* 等效于shared_ptr(p).swap(*this)
+
+  `template<class Y, class D> void reset(Y* p, D d);`
+
+  4.*作用：* 等效于shared_ptr(p, d).swap(*this)
+
+  `template<class Y, class D, class A> void reset(Y* p, D d, A a);`
+
+  5.*作用：* 等效于shared_ptr(p, d, a).swap(*this)
+
+  ##### 20.7.2.2.5 shared_ptr observers
+
+  `T* get() const noexcept;`
+
+  1.*返回值：* 存储的指针.
+
+  `T& operator*() const noexcept;`
+
+  2.*要求：* get() != 0.
+
+  3.*返回值：* *get().
+
+  4.*备注：* T是void时, 未指定是否此成员函数会被声明. 如果被声明, 未指定返回值, 除了函数的声明(尽管不一定是定义)必须格式正确.
+
+  `T* operator->() const noexcept;`
+
+  5.*要求：* get() != 0
+
+  6.*返回值：* get()
+
+  `long use_count() const noexcept;`
+
+  7.*返回值：* 与\*this共享所有权的shared_ptr对象的数量, 包括*this , 或当\*this为空时, 0.
+
+  8.[*Note:* use_count()不一定有效. *-end note*]
+
+  `bool unique() const noexcept;`
+
+  C++17弃用, 20移除.因为先前拥有者对被管理对象的访问可能未完成, 而因为新的共享拥有者可以同时引入.(析构函数和构造函数都可能在一定条件下立即实施, 导致use_count非1).
+
+  9.*返回值：* use_count() == 1.
+
+  10.[*Note:* unique()可能比use_count()快. 如果你正在使用unique()来实现copy-on-write, 当 get() == 0 时不依赖特定值. *-end note*]
+
+  `explicit operator bool() const noexcept;`
+
+  11.*返回值：* get() != 0.
+
+  `template<class U> bool owner_before(shared_ptr<U> const& b) const;`
+
+  `template<class U> bool owner_before(weak_ptr<U> const& b) const;`
+
+  12.*返回值：* 未指定的值:
+   - x.owner_before(y) 定义了像25.4中的严格弱排序.
+   - 在定义的对等关系下, owner_before, !a.owner_before(b) && !b.owner_before(a), 当且仅当两个shared_ptr或weak_ptr实例共享所有权或都为空时, 他们是等效的.
+
+  ##### 20.7.2.2.6 shared_ptr creation
+
+  `template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);`
+
+  `template<class T, class A, class... Args>`
+
+  `shared_ptr<T> allocate_shared(const A& a, Args&&... args);`
+
+  1.*要求：* 表达式::new(pv) T(std::forward<Args\>(args)...) well formed, 其中pv是类型void*和指向 持有T类型对象的内存合适的 指针.
+  A应是allocator(17.6.3.5).A的copy构造函数和析构函数禁止抛出异常.  
+
+  573
+
 
 
 [*Example:*  *-end example*]
+
 [*Note:*  *-end note*]
 
 

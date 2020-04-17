@@ -1684,7 +1684,7 @@ export const meta = {
   该函数将ptr更新为指向此类存储的第一个可能的地址,并通过对齐所使用的字节数减少space.否则，该函数不做任何事.
 
   2.*要求：* 
-   - 对齐方式应为基本对齐方式值或此实现中支持的扩展对齐方式值.
+   - 对齐方式应为基本对齐方式值或此实现中支持的扩展对齐方���值.
    - ptr应指向至少space字节的连续存储.
   
   3.*返回值：* 如果申请的对齐的buffer无法匹配可用空间,返回null.否则返回ptr的调整值.
@@ -3103,7 +3103,9 @@ export const meta = {
 
   4.[*Note:* 看似等效的表达式shared_ptr<T\>(static_cast<T*\>(r.get()))最终将导致尝试删除同一对象两次的未定义的行为. *-end note*]
 
-  573
+  `template<class T, class U> shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) noexcept;`
+
+  575
 
 
 

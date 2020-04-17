@@ -3101,7 +3101,7 @@ export const meta = {
 
   3.*后置条件：* w.get() == static_cast<T*\>(r.get()) 并且 w.use_count() == r.use_count(),其中w是返回值.
 
-  4.[*Note:* 看似等效的表达式shared_ptr<T\>(static_cast<T*\>(r.get()))最终将导致尝试删除同一对象两次的未定义的行为. *-end note*]
+  4.[*Note:* 看似等效的表达式shared_ptr<T\>(static_cast<T\*\>(r.get()))最终将导致尝试删除同一对象两次的未定义的行为. *-end note*]
 
   `template<class T, class U> shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) noexcept;`
 

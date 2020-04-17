@@ -3018,6 +3018,91 @@ export const meta = {
   1.*要求：* 表达式::new(pv) T(std::forward<Args\>(args)...) well formed, 其中pv是类型void*和指向 持有T类型对象的内存合适的 指针.
   A应是allocator(17.6.3.5).A的copy构造函数和析构函数禁止抛出异常.  
 
+  2.*作用：* 分配与类型T对象合适的内存并且在此内存通过placement new 表达式::new(pv) T(std::forward<Args\>(arg)...)构造对象.
+  模板allocate_shared使用a的copy来分配内存.
+  如果抛出异常, 此函数无作用.
+
+  3.*返回值：* shared_ptr实例, 该实例存储和拥有最新给构造的类型T对象的地址.
+
+  4.*后置条件：* get() != 0 && use_count() == 1
+
+  5.*Throws:* bad_alloc,或从A::allocate或T的构造函数抛出的异常.
+
+  6.*备注：* 建议实现,但不是必须的,执行不超过一个的内存分配.
+  [*Note:* 这提供了等效于侵入式智能指针的效率. *-end note*]
+
+  7.[*Note:* 这些函数通常会分配比sizeof(T)更多的内存,以允许内部记录结构(例如引用计数). *-end note*]
+
+  ##### 20.7.2.2.7 shared_ptr comparison
+
+  `template<class T, class U> bool operator==(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
+
+  1.*返回值：* a.get() == b.get()
+
+  `template<class T, class U> bool operator<(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
+
+  2.*返回值：* less<V\>()(a.get(), b.get()),其中V是T*和U\*的综合指针类型.
+
+  3.[*Note:* 定义比较运算符可以将shared_ptr对象用作关联容器中的key. *-end note*]
+
+  `template <class T> bool operator==(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator==(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  4.*返回值：* !a
+
+  `template <class T> bool operator!=(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator!=(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  5.*返回值：* (bool)a
+
+  `template <class T> bool operator<(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator<(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  6.*返回值：* 第一个模板函数返回less<T*\>()(a.get(), nullptr).
+  第二个模板函数返回less<T*\>()(nullptr, a.get()).
+
+  `template <class T> bool operator>(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator>(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  7.*返回值：* 第一个模板函数返回nullptr < a.
+  第二个模板函数返回a < nullptr.
+
+  `template <class T> bool operator<=(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator<=(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  8.*返回值：* 第一个模板函数返回 !(nullptr < a).
+  第二个模板函数返回 !(a < nullptr).
+
+  `template <class T> bool operator>=(const shared_ptr<T>& a, nullptr_t) noexcept;`
+
+  `template <class T> bool operator>=(nullptr_t, const shared_ptr<T>& a) noexcept;`
+
+  9.*返回值：* 第一个模板函数返回!(a < nullptr).
+  第二个模板函数返回!(nullptr < a).
+
+  ##### 20.7.2.2.8 shared_ptr specialized algorithms
+
+  `template<class T> void swap(shared_ptr<T>& a, shared_ptr<T>& b) noexcept;`
+
+  1.*作用：* 等效于a.swap(b).
+
+  ##### 20.7.2.2.9 shared_ptr cast
+
+  `template<class T, class U> shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) noexcept;`
+
+  1.*要求：* 表达式static_cast<T*\>(r.get())应well formed.
+
+  2.*返回值：* 如果r为empty,一个empty shared_ptr<T\>;否则,一个存储static_cast<T*\>(r.get())和与r共享所有权的shared_ptr<T\>对象.
+
+  3.*后置条件：* w.get() == static_cast<T*\>(r.get()) 并且 w.use_count() == r.use_count(),其中w是返回值.
+
+  4.[*Note:* 看似等效的表达式shared_ptr<T\>(static_cast<T*\>(r.get()))最终将导致尝试删除同一对象两次的未定义的行为. *-end note*]
+
   573
 
 

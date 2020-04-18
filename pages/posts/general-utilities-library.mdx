@@ -3009,7 +3009,9 @@ export const meta = {
 
   ##### 20.7.2.2.6 shared_ptr creation
 
-  `template<class T, class... Args> shared_ptr<T> make_shared(Args&&... args);`
+  `template<class T, class... Args> `
+  
+  `shared_ptr<T> make_shared(Args&&... args);`
 
   `template<class T, class A, class... Args>`
 
@@ -3035,11 +3037,15 @@ export const meta = {
 
   ##### 20.7.2.2.7 shared_ptr comparison
 
-  `template<class T, class U> bool operator==(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
+  `template<class T, class U> `
+  
+  `bool operator==(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
 
   1.*返回值：* a.get() == b.get()
 
-  `template<class T, class U> bool operator<(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
+  `template<class T, class U> `
+  
+  `bool operator<(const shared_ptr<T>& a, const shared_ptr<U>& b) noexcept;`
 
   2.*返回值：* less<V\>()(a.get(), b.get()),其中V是T*和U\*的综合指针类型.
 
@@ -3093,7 +3099,9 @@ export const meta = {
 
   ##### 20.7.2.2.9 shared_ptr cast
 
-  `template<class T, class U> shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) noexcept;`
+  `template<class T, class U>`
+  
+  `shared_ptr<T> static_pointer_cast(const shared_ptr<U>& r) noexcept;`
 
   1.*要求：* 表达式static_cast<T*\>(r.get())应well formed.
 
@@ -3103,9 +3111,161 @@ export const meta = {
 
   4.[*Note:* 看似等效的表达式shared_ptr<T\>(static_cast<T\*\>(r.get()))最终将导致尝试删除同一对象两次的未定义的行为. *-end note*]
 
-  `template<class T, class U> shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) noexcept;`
+  `template<class T, class U> `
+  
+  `shared_ptr<T> dynamic_pointer_cast(const shared_ptr<U>& r) noexcept;`
 
-  575
+  5.*要求：* 表达式dynamic_cast<T*\>(r.get())应well formed并且有良好行为.
+
+  6.*返回值：* 
+   
+   - 当dynamic_cast<T*\>(r.get())返回非0值,一个存储其copy并与r共享所有权的shared_ptr<T\>对象.
+   - 否则,一个empty shared_ptr<T\>对象.
+
+  7.*后置条件：* w.get() == dynamic_cast<T*\>(r.get()),其中w是返回值.
+
+  8.[*Note:* 看似等效的表达式shared_ptr<T\>(dynamic_cast<T*\>(r.get()))最终将导致尝试删除同一对象两次的未定义行为. *-end note*]
+  
+  `template<class T, class U> `
+  
+  `shared_ptr<T> const_pointer_cast(const shared_ptr<U>& r) noexcept;`
+
+  9.*要求：* 表达式const_cast<T*\>(r.get())应well formed.
+
+  10.*返回值：* 如果r为empty,一个empty shared_ptr<T\>;否则,一个存储const_cast<T*\>(r.get())并与r共享所有权的shared_ptr<T\>.
+
+  11.*后置条件：* w.get() == const_cast<T*\>(r.get()) 并且 w.use_count() == r.use_count(),其中w是返回值.
+
+  12.[*Note:* 看似等效的表达式shared_ptr<T\>(const_cast<T*\>(r.get()))最终将导致尝试删除同一对象两次的未定义行为. *-end note*]
+
+  ##### 20.7.2.2.10 get_deleter
+
+  `template<class D, class T> `
+  
+  `D* get_deleter(const shared_ptr<T>& p) noexcept;`
+
+  1.*返回值：* 如果p拥有无cv限定的deleter d,返回&d;否则返回0.
+  只要存在一个拥有d的shared_ptr实例,返回的指针就保持有效.
+  [*Note:* 未指定超过此时间指针是否保持有效.如果实现析构deleter直到所有共享p的所有权的weak_ptr实例被析构. *-end note*]
+
+  ##### 20.7.2.2.11 shared_ptr I/O
+
+  `template<class E, class T, class Y>`
+  
+  `basic_ostream<E, T>& operator<< (basic_ostream<E, T>& os, shared_ptr<Y> const& p);`
+
+  1.*作用：* os<<p.get().
+
+  2.*返回值：* os.
+
+  #### 20.7.2.3 Class template weak_ptr
+
+  1.weak_ptr类模板存储一个已经被shared_ptr管理的对象的弱引用.访问此对象,weak_ptr通过成员函数lock可转换为shared_ptr.
+
+  ```
+  namespace std { 
+    template<class T> 
+    class weak_ptr { 
+    public: 
+      typedef T element_type;
+
+      // 20.7.2.3.1, 
+      constructors constexpr weak_ptr() noexcept; 
+      template<class Y> weak_ptr(shared_ptr<Y> const& r) noexcept; weak_ptr(weak_ptr const& r) noexcept; template<class Y> weak_ptr(weak_ptr<Y> const& r) noexcept;
+
+      // 20.7.2.3.2, destructor 
+      ~weak_ptr();
+
+      // 20.7.2.3.3, assignment 
+      weak_ptr& operator=(weak_ptr const& r) noexcept; 
+      template<class Y> weak_ptr& operator=(weak_ptr<Y> const& r) noexcept; 
+      template<class Y> weak_ptr& operator=(shared_ptr<Y> const& r) noexcept;
+
+      // 20.7.2.3.4, modiﬁers 
+      void swap(weak_ptr& r) noexcept; 
+      void reset() noexcept;
+
+      // 20.7.2.3.5, observers 
+      long use_count() const noexcept; 
+      bool expired() const noexcept; 
+      shared_ptr<T> lock() const noexcept; 
+      template<class U> bool owner_before(shared_ptr<U> const& b); 
+      template<class U> bool owner_before(weak_ptr<U> const& b);
+    };
+
+    // 20.7.2.3.6, specialized algorithms 
+    template<class T> void swap(weak_ptr<T>& a, weak_ptr<T>& b) noexcept; 
+  } // namespace std
+  ```
+
+  2.weak_ptr特化应CopyConstructible和CopyAssignable,以允许在标准容器中使用.
+  weak_ptr的模板参数T可能是未完成类型.
+
+  ##### 20.7.2.3.1 weak_ptr constructors
+
+  `constexpr weak_ptr() noexcept;`
+
+  1.*作用：* 构造empty weak_ptr对象.
+
+  2.*后置条件：* use_count() == 0.
+
+  `weak_ptr(const weak_ptr& r) noexcept;`
+
+  `template<class Y> weak_ptr(const weak_ptr<Y>& r) noexcept;`
+
+  `template<class Y> weak_ptr(const shared_ptr<Y>& r) noexcept;`
+
+  3.*要求：* 第二和第三个构造函数不参与重载决议,除非Y*可隐式转换为T\*.
+
+  4.*作用：* 如果r为empty,构造empty weak_ptr对象;否则,构造一个与r共享所有权且存储r中指针的copy的weak_ptr对象.
+
+  5.*后置条件：* use_count() == r.use_count().
+
+  ##### 20.7.2.3.2 weak_ptr destructor
+
+  `~weak_ptr();`
+
+  1.*作用：* 析构weak_ptr对象但对其存储的指针指向的对象无作用.
+
+  ##### 20.7.2.3.3 weak_ptr assignment
+
+  `weak_ptr& operator=(const weak_ptr& r) noexcept;`
+
+  `template<class Y> weak_ptr& operator=(const weak_ptr<Y>& r) noexcept;`
+
+  `template<class Y> weak_ptr& operator=(const shared_ptr<Y>& r) noexcept;`
+
+  1.*作用：* 等效于weak_ptr(r).swap(*this).
+
+  2.*备注：* 实现可以通过不产生临时对象的不同方式满足作用(和隐含的保证).
+
+  ##### 20.7.2.3.4 weak_ptr modifiers
+
+  `void swap(weak_ptr& r) noexcept;`
+
+  1.*作用：* 交换*this和r的内容.
+
+  `void reset() noexcept;`
+
+  2.*作用：* 等效于weak_ptr().swap(*this).
+
+  ##### 20.7.2.3.5 weak_ptr observers
+
+  `long use_count() const noexcept;`
+
+  1.*返回值：* 如果*this empty,0;否则,共享\*this所有权的shared_ptr实例的个数.
+
+  2.[*Note:* use_count()不一定有效. *-end note*]
+
+  `bool expired() const noexcept;`
+
+  3.*返回值：* use_count() == 0.
+
+  4.[*Note:* expired()可能比use_count()快. *-end note*]
+
+  `shared_ptr<T> lock() const noexcept;`
+
+  
 
 
 

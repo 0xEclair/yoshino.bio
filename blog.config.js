@@ -1,6 +1,6 @@
 
 const BLOG = {
-  anthor: 'yoshino',
+  author: 'yoshino',
   title: 'yoshino',
   description: 'yoshino\'s blog',
   summary: 'blog',

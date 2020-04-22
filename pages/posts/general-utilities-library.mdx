@@ -3265,7 +3265,248 @@ export const meta = {
 
   `shared_ptr<T> lock() const noexcept;`
 
+  5.*返回值：* expired() ? shared_ptr<T\>() : shared_ptr<T\>(*this);
+
+  `template<class U> bool owner_before(shared_ptr<U> const& b);`
+
+  `template<class U> bool owner_before(weak_ptr<U> const& b);`
+
+  6.*返回值：* 一个未指定的值:
+   - x.owner_before(y)定义严格弱排序.
+   - 在owner_before,!a.owner_before(b) && !b.owner_before(a)定义的对等关系下,当且仅当两个shared_ptr或weak_ptr实例共享所有权或都为空时,它们才是等效的.
+
+  ##### 20.7.2.3.6 weak_ptr specialized algorithms
+
+  `template<class T> void swap(weak_ptr<T>& a, weak_ptr<T>& b) noexcept;`
+
+  1.*作用：* 等效于a.swap(b).
+
+  ##### 20.7.2.3.7 Class template owner_less
+
+  1.类模板owner_less允许对shared_ptr和weak_ptr进行基于所有权的混合比较.
+
+  ```
+  namespace std { 
+    template<class T> struct owner_less;
+
+    template<class T> struct owner_less<shared_ptr<T> > { 
+      typedef bool result_type; 
+      typedef shared_ptr<T> first_argument_type; 
+      typedef shared_ptr<T> second_argument_type; 
+      bool operator()(shared_ptr<T> const&, shared_ptr<T> const&) const; 
+      bool operator()(shared_ptr<T> const&, weak_ptr<T> const&) const; 
+      bool operator()(weak_ptr<T> const&, shared_ptr<T> const&) const; 
+    };
+
+    template<class T> struct owner_less<weak_ptr<T> > { 
+      typedef bool result_type; 
+      typedef weak_ptr<T> first_argument_type; 
+      typedef weak_ptr<T> second_argument_type; 
+      bool operator()(weak_ptr<T> const&, weak_ptr<T> const&) const; 
+      bool operator()(shared_ptr<T> const&, weak_ptr<T> const&) const; 
+      bool operator()(weak_ptr<T> const&, shared_ptr<T> const&) const; 
+    };
+  }
+  ```
+
+  2.operator()(x, y)应返回x.owner_before(y).
+  [*Note:* 
+  注意
+   - operator()定义严格弱排序.
+   - 在owner_before,!a.owner_before(b) && !b.owner_before(a)定义的对等关系下,当且仅当两个shared_ptr或weak_ptr实例共享所有权或都为空时,它们才是等效的.
+   *-end note*]
+
+  #### 20.7.2.4 Class template enable_shared_from_this
+
+  1.类T可以从enable_shared_from_this<T\>继承来获得shared_from_this成员函数,这些成员函数获得指向*this的shared_ptr实例.
+
+  2.[*Example:* 
+  ```
+  struct X: public enable_shared_from_this<X>{
+
+  };
+
+  int main(){
+    shared_ptr<X> p(new X);
+    shared_ptr<X> q = p->shared_from_this();
+    assert(p == q);
+    assert((!(p < q ) && !(q < p)); // p和q共享所有权.
+  }
+  ```
+  *-end example*]
+
+  ```
+  namespace std { 
+    template<class T> class enable_shared_from_this { 
+    protected: 
+      constexpr enable_shared_from_this() noexcept; 
+      enable_shared_from_this(enable_shared_from_this const&) noexcept; 
+      enable_shared_from_this& operator=(enable_shared_from_this const&) noexcept; 
+      ~enable_shared_from_this(); 
+    public: 
+      shared_ptr<T> shared_from_this(); 
+      shared_ptr<T const> shared_from_this() const; 
+    }; 
+  } // namespace std 
+  ```
+
+  3.enable_shared_from_this的模板参数T可能是未完成类型.
+
+  `constexpr enable_shared_from_this() noexcept;`
+
+  `enable_shared_from_this(const enable_shared_from_this<T>&) noexcept;`
+
+  4.*作用：* 构造enable_shared_from_this<T\>对象.
+
+  `enable_shared_from_this<T>& operator=(const enable_shared_from_this<T>&) noexcept;`
+
+  5.*返回值：* *this.
+
+  `~enable_shared_from_this();`
+
+  6.*作用：* 析构*this.
+
+  `shared_ptr<T> shared_from_this();`
+
+  `shared_ptr<T const> shared_from_this() const;`
+
+  7.*要求：* enable_shared_from_this<T\>应是T的可访问基类.*this应是类型T的对象t的子对象.至少应有一个拥有&t的shared_ptr实例p.
+
+  8.*返回值：* 与p共享所有权的shared_ptr<T\>对象r.
+
+  9.*后置条件：* r.get() == this.
+
+  10.[*Note:* 
+  ```
+  template<class T> class enable_shared_from_this { 
+  private: 
+    weak_ptr<T> __weak_this; 
+    protected: constexpr enable_shared_from_this() : __weak_this() { } 
+    enable_shared_from_this(enable_shared_from_this const &) { } 
+    enable_shared_from_this& operator=(enable_shared_from_this const &) { return *this; } 
+    ~enable_shared_from_this() { } 
+  public: 
+    shared_ptr<T> shared_from_this() { return shared_ptr<T>(__weak_this); } 
+    shared_ptr<T const> shared_from_this() const { return shared_ptr<T const>(__weak_this); } 
+  };
+  ```
+
+  11.创建unique指针的shared_ptr的构造函数可以检测到enable_shared_from_this基础的存在,并将新创建的shared_ptr分配给其__weak_this成员.
+  *-end note*]
+
+  #### 20.7.2.5 shared_ptr atomic access
   
+  1.如果仅通过本节中的函数进行访问,并且实例作为其第一个参数传递,则从多个线程并发访问shared_ptr对象不会引起数据竞争.
+
+  2.类型memory_order参数的意义可参考29.3.
+
+  `template<class T> bool atomic_is_lock_free(const shared_ptr<T>* p);`
+
+  3.*要求：* p不能是null.
+
+  4.*返回值：* 如果原子访问*p是lock-free,true;否则false.
+
+  5.*Throws:* 无.
+
+  `template<class T> shared_ptr<T> atomic_load(const shared_ptr<T>* p);`
+
+  6.*要求：* p不能是null.
+
+  7.*返回值：* atomic_load_explicit(p, memory_order_seq_cst).
+
+  8.*Throws:* 无.
+
+  `template<class T> shared_ptr<T> atomic_load_explicit(const shared_ptr<T>* p, memory_order mo);`
+
+  9.*要求：* p不能是null.
+
+  10.*要求：* mo不能是memory_order_release或memory_order_acq_rel.
+
+  11.*返回值：* *p.
+
+  12.*Throws:* 无.
+
+  `template<class T> void atomic_store(shared_ptr<T>* p, shared_ptr<T> r);`
+
+  13.*要求：* p不能是null.
+
+  14.*作用：* atomic_store_explicit(p, r, memory_order_seq_cst).
+
+  15.*Throws:* 无.
+
+  `template<class T> void atomic_store_explicit(shared_ptr<T>* p, shared_ptr<T> r, memory_order mo);`
+
+  16.*要求：* p不能是null.
+
+  17.*要求：* mo不能是memory_order_acquire或memory_order_acq_rel.
+
+  18.*作用：* p->swap(r).
+
+  19.*Throws:* 无.
+
+  `template<class T> shared_ptr<T> atomic_exchange(shared_ptr<T>* p, shared_ptr<T> r);`
+
+  20.*要求：* p不能是null.
+
+  21.*返回值：* atomic_exchange_explicit(p, r, memory_oder_seq_cst).
+
+  22.*Thwors:* 无.
+
+  `template<class T> shared_ptr<T> atomic_exchange_explicit(shared_ptr<T>* p, shared_ptr<T> r, memory_order mo);`
+
+  23.*要求：* p不能是null.
+
+  24.*作用：* p->swap(r).
+
+  25.*返回值：* *p先前的值.
+
+  26.*Throws:* 无.
+
+  `template<class T> bool atomic_compare_exchange_weak( shared_ptr<T>* p, shared_ptr<T>* v, shared_ptr<T> w);`
+
+  27.*要求：* p不能是null.
+
+  28.*返回值：* atomic_compare_exchange_weak_explicit(p, v, w, memory_order_seq_cst, memory_order_seq,cst).
+
+  29.*Throws:* 无.
+
+  `template<class T> bool atomic_compare_exchange_strong( shared_ptr<T>* p, shared_ptr<T>* v, shared_ptr<T> w);`
+
+  30.*返回值：* atomic_compare_exchange_strong_explicit(p, v, w,memory_order_seq_cst, memory_order_seq_cst).
+
+  `template<class T> bool atomic_compare_exchange_weak_explicit( shared_ptr<T>* p, shared_ptr<T>* v, shared_ptr<T> w, memory_order success, memory_order failure);`
+
+  `template<class T> bool atomic_compare_exchange_strong_explicit( shared_ptr<T>* p, shared_ptr<T>* v, shared_ptr<T> w, memory_order success, memory_order failure);`
+
+  31.*要求：* p不能是null.
+
+  32.*要求：* failure不能是memory_order_release,memory_order_acq_rel,或强于success.
+
+  33.*作用：* 如果*p等于\*v,则将w赋值给\*p并具有与success值相对应的同步语义;
+  否则,将\*p赋值给\*v并具有与failure值相对应的同步语义.
+
+  34.*返回值：* 如果*p曾等于\*v,true;否则false.
+
+  35.*Throws:* 无.
+
+  36.*备注：* 如果2个shared_ptr存储相同的指针值并共享所有权,它们对象等效.
+
+  37.*备注：* weak形式可能假失败.见29.6.
+
+  #### 20.7.2.6 Smart pointer hash support
+
+  `template<class T, class D> struct hash<unique_ptr<T, D>>;`
+
+  1.*要求：* 模板特化应满足类模板hash(20.8.12)的要求.对类型UP的对象p来说,其中UP是unique_ptr<T, D\>,hash<UP\>()(p)应求得和hash<typename UP::pointer\>()(p.get())同样的值.
+  hash<typename UP::pointer\>应well-formed.
+
+  `template <class T> struct hash<shared_ptr<T> >;`
+
+  2.*要求：* 模板特化应满足类模板hash(20.8.12)的要求.对shared_ptr<T\>对象p来说,hash<shared_ptr<T\>\>()(p)应求得和hash<T*\>()(p.get())一样的值.
+
+## 20.8 Function objects
+1. 
+
 
 
 

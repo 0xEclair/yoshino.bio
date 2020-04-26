@@ -3511,6 +3511,7 @@ export const meta = {
 这不仅使算法模板可以使用指向函数的指针,而且还可以使它们与任意函数对象一起使用.
 
 2. Header<functional\> 概要
+
   ```
   namespace std { 
     // D.8.1, base (deprecated): 
@@ -3676,15 +3677,11 @@ export const meta = {
 
 3. [*Example:* 
   如果C++程序希望对两个包含double的vector a和b进行逐元素加法,然后将结果放入a中,则可以执行以下操作:
-
   `transform(a.begin(), a.end(), b.begin(), a.begin(), plus<double>());`
-
   *-end example*]
 
 4. [*Example:* a的每个元素取反:
-
   `transform(a.begin(), a.end(), a.begin(), negate<double>());`
-
   *-end example*]
 
 5. 为了使adaptors和其他组件能够处理带有一个或两个参数的函数对象,要求带有一个参数的函数对象相应地提供typedefs argument_type和result_type,带有两个参数的函数对象相应地提供first_argument_type,second_argument_type和result_type.

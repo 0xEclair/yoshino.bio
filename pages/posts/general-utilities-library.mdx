@@ -3505,7 +3505,341 @@ export const meta = {
   2.*要求：* 模板特化应满足类模板hash(20.8.12)的要求.对shared_ptr<T\>对象p来说,hash<shared_ptr<T\>\>()(p)应求得和hash<T*\>()(p.get())一样的值.
 
 ## 20.8 Function objects
-1. 
+1. 函数对象类型是对象类型(3.9),可以是函数调用中的后缀表达式的类型(5.2.2,13.3.1.1).
+函数对象是函数对象类型的对象.
+在人们期望将指向函数的指针传递到算法模板的地方(第25条),接口被指定为接受函数对象.
+这不仅使算法模板可以使用指向函数的指针,而且还可以使它们与任意函数对象一起使用.
+
+2. Header<functional\> 概要
+  ```
+  namespace std { 
+    // D.8.1, base (deprecated): 
+    template <class Arg, class Result> struct unary_function; 
+    template <class Arg1, class Arg2, class Result> struct binary_function;
+
+    // 20.8.3, reference_wrapper: 
+    template <class T> class reference_wrapper;
+
+    template <class T> reference_wrapper<T> ref(T&) noexcept; 
+    template <class T> reference_wrapper<const T> cref(const T&) noexcept; 
+    template <class T> void ref(const T&&) = delete; 
+    template <class T> void cref(const T&&) = delete;
+
+    template <class T> reference_wrapper<T> ref(reference_wrapper<T>) noexcept; 
+    template <class T> reference_wrapper<const T> cref(reference_wrapper<T>) noexcept;
+
+
+    // 20.8.4, arithmetic operations: 
+    template <class T> struct plus; 
+    template <class T> struct minus; 
+    template <class T> struct multiplies; 
+    template <class T> struct divides; 
+    template <class T> struct modulus; 
+    template <class T> struct negate;
+
+    // 20.8.5, comparisons: 
+    template <class T> struct equal_to; 
+    template <class T> struct not_equal_to; 
+    template <class T> struct greater;
+    template <class T> struct less; 
+    template <class T> struct greater_equal; 
+    template <class T> struct less_equal;
+
+    // 20.8.6, logical operations: 
+    template <class T> struct logical_and; 
+    template <class T> struct logical_or; 
+    template <class T> struct logical_not;
+    
+    // 20.8.7, bitwise operations: 
+    template <class T> struct bit_and; 
+    template <class T> struct bit_or; 
+    template <class T> struct bit_xor;
+
+    // 20.8.8, negators: 
+    template <class Predicate> class unary_negate; 
+    template <class Predicate> unary_negate<Predicate> not1(const Predicate&); 
+    template <class Predicate> class binary_negate; 
+    template <class Predicate> binary_negate<Predicate> not2(const Predicate&);
+
+    // 20.8.9, bind: 
+    template<class T> struct is_bind_expression; 
+    template<class T> struct is_placeholder;
+
+    template<class F, class... BoundArgs> 
+    unspecified bind(F&&, BoundArgs&&...); 
+    template<class R, class F, class... BoundArgs> 
+    unspecified bind(F&&, BoundArgs&&...);
+
+    namespace placeholders { 
+      // M is the implementation-deﬁned number of placeholders 
+      extern unspecified _1; 
+      extern unspecified _2; 
+      . 
+      . 
+      . 
+      extern unspecified _M; 
+    }
+
+    // D.9, binders (deprecated): 
+    template <class Fn> class binder1st; 
+    template <class Fn, class T> binder1st<Fn> bind1st(const Fn&, const T&); 
+    template <class Fn> class binder2nd; 
+    template <class Fn, class T> binder2nd<Fn> bind2nd(const Fn&, const T&);
+
+    // D.8.2.1, adaptors (deprecated): 
+    template <class Arg, class Result> class pointer_to_unary_function; 
+    template <class Arg, class Result> 
+    pointer_to_unary_function<Arg,Result> ptr_fun(Result (*)(Arg)); 
+    template <class Arg1, class Arg2, class Result> 
+    class pointer_to_binary_function;
+    template <class Arg1, class Arg2, class Result> 
+      pointer_to_binary_function<Arg1,Arg2,Result> 
+        ptr_fun(Result (*)(Arg1,Arg2));
+
+    // D.8.2.2, adaptors (deprecated): 
+    template<class S, class T> class mem_fun_t; 
+    template<class S, class T, class A> class mem_fun1_t; 
+    template<class S, class T> mem_fun_t<S,T> mem_fun(S (T::*f)()); 
+    template<class S, class T, class A> mem_fun1_t<S,T,A> mem_fun(S (T::*f)(A)); 
+    template<class S, class T> class mem_fun_ref_t; 
+    template<class S, class T, class A> class mem_fun1_ref_t; 
+    template<class S, class T> mem_fun_ref_t<S,T> mem_fun_ref(S (T::*f)()); 
+    template<class S, class T, class A> mem_fun1_ref_t<S,T,A> mem_fun_ref(S (T::*f)(A));
+
+    template <class S, class T> class const_mem_fun_t; 
+    template <class S, class T, class A> class const_mem_fun1_t; 
+    template <class S, class T> const_mem_fun_t<S,T> mem_fun(S (T::*f)() const); 
+    template <class S, class T, class A> const_mem_fun1_t<S,T,A> mem_fun(S (T::*f)(A) const); 
+    template <class S, class T> class const_mem_fun_ref_t; 
+    template <class S, class T, class A> class const_mem_fun1_ref_t; 
+    template <class S, class T> const_mem_fun_ref_t<S,T> mem_fun_ref(S (T::*f)() const); 
+    template <class S, class T, class A> const_mem_fun1_ref_t<S,T,A> mem_fun_ref(S (T::*f)(A) const);
+
+    // 20.8.10, member function adaptors: 
+    template<class R, class T> unspecified mem_fn(R T::*); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...)); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) volatile); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const volatile); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) &); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const &); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) volatile &); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const volatile &); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) &&); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const &&); 
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) volatile &&);
+    template<class R, class T, class... Args> unspecified mem_fn(R (T::*)(Args...) const volatile &&);
+
+    // 20.8.11 polymorphic function wrappers: 
+    class bad_function_call; 
+    
+    template<class> class function; // undeﬁned 
+    template<class R, class... ArgTypes> class function<R(ArgTypes...)>;
+
+    template<class R, class... ArgTypes> 
+    void swap(function<R(ArgTypes...)>&, function<R(ArgTypes...)>&);
+
+    template<class R, class... ArgTypes> 
+    bool operator==(const function<R(ArgTypes...)>&, nullptr_t); 
+    template<class R, class... ArgTypes> 
+    bool operator==(nullptr_t, const function<R(ArgTypes...)>&); 
+    template<class R, class... ArgTypes> 
+    bool operator!=(const function<R(ArgTypes...)>&, nullptr_t); 
+    template<class R, class... ArgTypes> 
+    bool operator!=(nullptr_t, const function<R(ArgTypes...)>&);
+
+    // 20.8.12, hash function base template: 
+    template <class T> struct hash;
+
+    // Hash function specializations 
+    template <> struct hash<bool>; 
+    template <> struct hash<char>; 
+    template <> struct hash<signed char>; 
+    template <> struct hash<unsigned char>; 
+    template <> struct hash<char16_t>; 
+    template <> struct hash<char32_t>; 
+    template <> struct hash<wchar_t>; 
+    template <> struct hash<short>; 
+    template <> struct hash<unsigned short>; 
+    template <> struct hash<int>; 
+    template <> struct hash<unsigned int>; 
+    template <> struct hash<long>; 
+    template <> struct hash<long long>; 
+    template <> struct hash<unsigned long>; 
+    template <> struct hash<unsigned long long>;
+    template <> struct hash<float>; 
+    template <> struct hash<double>; 
+    template <> struct hash<long double>;
+    template<class T> struct hash<T*>;
+  } 
+  ```
+
+3. [*Example:* 
+  如果C++程序希望对两个包含double的vector a和b进行逐元素加法,然后将结果放入a中,则可以执行以下操作:
+
+  `transform(a.begin(), a.end(), b.begin(), a.begin(), plus<double>());`
+
+  *-end example*]
+
+4. [*Example:* a的每个元素取反:
+
+  `transform(a.begin(), a.end(), a.begin(), negate<double>());`
+
+  *-end example*]
+
+5. 为了使adaptors和其他组件能够处理带有一个或两个参数的函数对象,要求带有一个参数的函数对象相应地提供typedefs argument_type和result_type,带有两个参数的函数对象相应地提供first_argument_type,second_argument_type和result_type.
+
+  ### 20.8.1 Definitions
+
+  1.以下定义用于本条款:
+
+  2.call signature是返回类型的名字,后跟用括号括住的逗号分隔的零个或多个参数类型列表.
+
+  3.callable type是函数对象类型或指向成员的指针.
+
+  4.callable object是一个可调用类型的对象.
+
+  5.call wrapper type是一种包含可调用对象并支持转发到该对象的调用操作类型.
+
+  6.call wrapper是call wrapper类型的一个对象.
+
+  7.target object 是由一个call wrapper保留的可调用对象.
+
+  ### 20.8.2 Requirements
+
+  1.如下定义 INVOKE(f, t1, t2 ..., tN):
+   - (t1.*f)(t2, ..., tN),当f是某指向类成员函数的指针,t1是类型T的对象或类型T对象的引用或从T派生的类型对象t的引用时;
+   - ((*t1).*f)(t2, ..., tN),当f是指向类T的成员函数的指针,t1不是上一项中描述的类型之一;
+   - t1.*f,当 N == 1,f是指向类T的成员数据的指针,t1是类型T的对象或类型T对象的引用或从T派生的类型对象t的引用时;
+   - (*t1).*f,当 N == 1,f是指向类T的成员数据的指针,t1不是上一项中描述的类型之一;
+   - f(t1, t2, ..., tN),所有其他情况.
+
+  2.将INVOKE(f, t1, t2 ..., tN, R)定义为INVOKE(f, t1, t2, ..., tN)隐式转换为R.
+
+  3.如果call wrapper有个弱结果类型,那么其成员类型result_type是基于wrapper目标对象的类型T.
+   - 如果T指向函数类型,result_type应与T的返回值同义;
+   - 如果T指向成员函数,result_type应与T的返回值同义;
+   - 如果T是带有成员类型result_type的类,那么result_type应与T::result_type同义;
+   - 否则result_type将不被定义.
+
+  4.每个call wrapper应MoveConstructible.simple call wrapper是CopyConstructible和CopyAssignable的call wrapper,其copy构造函数,move构造函数和赋值运算符不会抛出异常.
+  转发call wrapper是可以使用任意参数列表调用的call wrapper,并将参数作为引用传递到wrapper的可调用对象.
+  该转发应确保右值参数作为右值引用传递,左值参数作为左值引用传递.
+  [*Note:* 
+
+  在典型的实现中,转发call wrapper具有以下形式的重载函数调用运算符:
+
+  ```
+  template<class... UnBoundArgs> 
+  R operator()(UnBoundArgs&&... unbound_args) cv-qual;
+  ```
+
+  *-end note*]
+
+  ### 20.8.3 Class template reference_wrapper
+
+  ```
+  namespace std { 
+    template <class T> class reference_wrapper { 
+    public : 
+      // types 
+      typedef T type; 
+      typedef see below result_type; // not always deﬁned 
+      typedef see below argument_type; // not always deﬁned 
+      typedef see below first_argument_type; // not always deﬁned 
+      typedef see below second_argument_type; // not always deﬁned
+
+      // construct/copy/destroy 
+      reference_wrapper(T&) noexcept; 
+      reference_wrapper(T&&) = delete; // do not bind to temporary objects 
+      reference_wrapper(const reference_wrapper<T>& x) noexcept;
+
+      // assignment 
+      reference_wrapper& operator=(const reference_wrapper<T>& x) noexcept;
+
+      // access 
+      operator T& () const noexcept; 
+      T& get() const noexcept;
+
+      // invocation template <class... ArgTypes> 
+      typename result_of<T&(ArgTypes&&...)>::type operator() (ArgTypes&&...) const;
+    };
+  } 
+  ```
+
+  1.reference_wrapper<T\>是对类型T的对象或函数引用的CopyConstructible和CopyAssignable wrapper.
+
+  2.reference_wrapper<T\>有weak result type.如果T是函数类型,result_type应与T的返回值同义.
+
+  3.reference_wrapper<T\>的模板实例应定义内嵌具名类型argument_type作为T1的同义,当且仅当T符合下列条件之一:
+   - 若T为接受一个A1类型参数的函数或指向函数指针,则argument_type为A1.
+   - 若T是不接收参数的指向类T0成员函数的指针,则argument_type为T0*,可能有cv限定.
+   - 若T是拥有成员类型T::argument_type的类,则T1为argument_type.
+
+  4.模板实例化reference_wrapper必须有两个名为first_argument_type和second_argument_type的嵌套类型分别定义为T1和T2的同义,只有类型T为以下任何一种时:
+   - 若T为接收两个参数,类型分别是T1和T2的函数类型或指向函数类型指针.
+   - 指向成员函数指针R  T0::f(T2) cv(可能有cv限定),T1是cv T0*.
+   - 若T是拥有拥有两个成员类型first_argument_type和second_argument_type的类;T1是T::first_argument_type,T2是T::second_argument_type.
+
+  (注:result_type,argument_tyope,first_argument_type,second_argument_type C++17 中弃用,C++20 中移除)
+  
+  #### 20.8.3.1 reference_wrapper construct/copy/destroy
+
+  `reference_wrapper(T& t) noexcept;`
+
+  1.*作用：* 构造存储引用t的reference_wrapper对象.
+
+  `reference_wrapper(const reference_wrapper<T>& x) noexcept;`
+
+  2.*作用：* 构造存储引用x.get()的reference_wrapper对象.
+
+  #### 20.8.3.2 reference_wrapper assignment
+
+  `reference_wrapper& operator=(const reference_wrapper<T>& x) noexcept;`
+
+  1.*后置条件：* *this存储x.get()的引用.
+
+  #### 20.8.3.3 reference_wrapper access
+
+  `operator T& () const noexcept;`
+
+  1.*返回值：* 存储的引用.
+
+  `T& get() const noexcept;`
+
+  2.*返回值：* 存储的引用.
+
+  #### 20.8.3.4 reference_wrapper invocation
+
+  `template <class... ArgTypes>`
+  
+  `typename result_of<T&(ArgTypes&&... )>::type`
+  
+    `operator()(ArgTypes&&... args) const;`
+
+  1.*返回值：* INVOKE(get(), std::forward<ArgTypes\>(args)...).
+
+  2.*备注：* 描述的operator()仅用于说明.不需要提供实际的reference_wrapper::operator()实现.允许实现通过多个重载运算符或其他方式支持reference_wrapper函数调用.
+
+  #### 20.8.3.5 reference_wrapper helper functions
+
+  #589
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

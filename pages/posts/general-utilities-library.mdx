@@ -3740,7 +3740,7 @@ export const meta = {
 
   ```
   namespace std { 
-    template <class T> class reference_wrapper { 
+    template <class T\> class reference_wrapper { 
     public : 
       // types 
       typedef T type; 
@@ -3761,7 +3761,7 @@ export const meta = {
       operator T& () const noexcept; 
       T& get() const noexcept;
 
-      // invocation template <class... ArgTypes> 
+      // invocation template <class... ArgTypes\> 
       typename result_of<T&(ArgTypes&&...)>::type operator() (ArgTypes&&...) const;
     };
   } 

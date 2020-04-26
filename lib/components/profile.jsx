@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Row, useTheme, User, Link } from '@zeit-ui/react'
 import NextLink from 'next/link'
 import ProfileLinks from './profile-links'
-import { Configs } from '../utils'
+import BLOG from '../../blog.config'
 
 const Profile = React.memo(({
 }) => {
@@ -20,7 +20,9 @@ const Profile = React.memo(({
       <Row align="bottom" className="user">
         <NextLink href="/" passHref>
           <Link pure>
-            <User src="/assets/avatar.png" name={Configs.author}>{Configs.summary}</User>
+            <User src="/assets/avatar.png" name={BLOG.author || ''}>
+              {BLOG.summary || ''}
+            </User>
           </Link>
         </NextLink>
       </Row>
@@ -33,8 +35,6 @@ const Profile = React.memo(({
         .profile :global(.user) {
           padding-left: 0;
           margin-bottom: ${theme.layout.gapQuarter};
-          max-width: 100%;
-          overflow: hidden;
         }
         
         @media only screen and (max-width: ${theme.layout.breakpointMobile}) {

@@ -3726,14 +3726,11 @@ export const meta = {
   转发call wrapper是可以使用任意参数列表调用的call wrapper,并将参数作为引用传递到wrapper的可调用对象.
   该转发应确保右值参数作为右值引用传递,左值参数作为左值引用传递.
   [*Note:* 
-
   在典型的实现中,转发call wrapper具有以下形式的重载函数调用运算符:
-
   ```
   template<class... UnBoundArgs\> 
   R operator()(UnBoundArgs&&... unbound_args) cv-qual;
   ```
-
   *-end note*]
 
   ### 20.8.3 Class template reference_wrapper

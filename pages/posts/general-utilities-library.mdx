@@ -3816,7 +3816,278 @@ export const meta = {
 
   #### 20.8.3.5 reference_wrapper helper functions
 
-  589
+  `template <class T> reference_wrapper<T> ref(T& t) noexcept;`
+
+  1.*返回值：* reference_wrapper<T\>(t).
+
+  `template <class T> reference_wrapper<T> ref(reference_wrapper<T>t) noexcept;`
+
+  2.*返回值：* ref(t.get()).
+
+  `template <class T> reference_wrapper<const T> cref(const T& t) noexcept;`
+
+  3.*返回值：* reference_wrapper<const T\>(t).
+
+  `template <class T> reference_wrapper<const T> cref(reference_wrapper<T> t) noexcept;`
+
+  4.*返回值：* cref(t.get()).
+
+  ### 20.8.4 Arithmetic operations
+
+  1.该库为语言中的所有算术运算符提供了基本的函数对象类(5.6,5.7).
+
+  ```
+  template <class T> struct plus { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  2.operator() returns x + y.
+
+  ```
+  template <class T> struct minus { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  3.operator() returns x - y.
+
+  ```
+  template <class T> struct multiplies { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  4.operator() returns x * y.
+
+  ```
+  template <class T> struct divides { 
+    T operator()(const T& x, const T& y) cons
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  5.operator() returns x / y.
+
+  ```
+  template <class T> struct modulus { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  6.operator() returns x % y.
+
+  ```
+  template <class T> struct negate { 
+    T operator()(const T& x) const; 
+    typedef T argument_type; 
+    typedef T result_type; 
+  }; 
+  ```
+
+  7.operator() returns -x.
+
+  ### 20.8.5 Comparisons
+
+  1.该库为语言中的所有比较运算符提供了基本的函数对象类(5.9,5.10).
+
+  ```
+  template <class T> struct equal_to { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  };
+  ```
+
+  2.operator() returns x == y.
+
+  ```
+  template <class T> struct not_equal_to { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  3.operator() returns x != y.
+
+  ```
+  template <class T> struct greater { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  4.operator() returns x > y.
+
+  ```
+  template <class T> struct less { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  5.operator() returns x < y.
+
+  ```
+  template <class T> struct greater_equal { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  6.operator() returns x >= y.  
+  
+  ```
+  template <class T> struct less_equal { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  7.operator() returns x <= y.
+
+  8.对于模板greater,less,greater_equal,less_equal的任何指针类型特化产生全序,即使内置运算符<, >, <= ,>=不这样.
+
+  (For templates greater, less, greater_equal, and less_equal, the specializations for any pointer type yield a total order, even if the built-in operators <, >, <=, >= do not.)
+
+  ### 20.8.6 Logical operations
+
+  1.该库为语言中的所有逻辑运算符提供了基本的函数对象类.
+
+  ```
+  template <class T> struct logical_and { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  2.operator() returns x && y.  
+  
+  ```
+  template <class T> struct logical_or { 
+    bool operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  3.operator() returns x || y.
+
+  ```
+  template <class T> struct logical_not { 
+    bool operator()(const T& x) const; 
+    typedef T first_argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  4.operator() returns !x.
+
+  ### 20.8.7 Bitwise operations
+
+  1.该库为语言中的所有位运算符提供了基本的函数对象类.
+
+  ```
+  template <class T> struct bit_and { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; }; 
+  ```
+
+  2.operator() returns x & y.
+
+  ```
+  template <class T> struct bit_or { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; }; 
+  ```
+
+  3.operator() returns x | y.
+
+  ```
+  template <class T> struct bit_xor { 
+    T operator()(const T& x, const T& y) const; 
+    typedef T first_argument_type; 
+    typedef T second_argument_type; 
+    typedef T result_type; }; 
+  ```
+
+  4.operator() returns x ^ y.
+
+  ### 20.8.8 Negators
+
+  1.Negators not1和not2分别采用一元和二进制谓词,并返回其补码(5.3.1).
+
+  ```
+  template <class Predicate> class unary_negate { 
+  public: 
+    explicit unary_negate(const Predicate& pred); 
+    bool operator()(const typename Predicate::argument_type& x) const; 
+    typedef typename Predicate::argument_type argument_type; 
+    typedef bool result_type; 
+  }; 
+  ```
+
+  2.operator() returns !pred(x).
+
+  `template <class Predicate> unary_negate<Predicate> not1(const Predicate& pred);`
+
+  3.*返回值：* unary_negate<Predicate\>(pred).
+
+  ```
+  template <class Predicate> class binary_negate { 
+  public: 
+    explicit binary_negate(const Predicate& pred); 
+    bool operator()(const typename Predicate::first_argument_type& x, 
+                    const typename Predicate::second_argument_type& y) const; 
+    typedef typename Predicate::first_argument_type first_argument_type; 
+    typedef typename Predicate::second_argument_type second_argument_type; 
+    typedef bool result_type;
+  };
+  ```
+
+  4.operator() returns !pred(x,y).
+
+  `template <class Predicate> binary_negate<Predicate> not2(const Predicate& pred);`
+
+  5.*返回值：* binary_negate<Predicate\>(pred).
+
+  593
+
+
+
+
 
 [*Example:*  *-end example*]
 

@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
+    "start": "npm run collect && next dev",
     "dev": "npm run collect && next dev",
     "now-build": "npm run collect && next build",
     "post": "node scripts/create.js",
@@ -10,9 +11,10 @@
     "export": "npm run now-build && next export"
   },
   "dependencies": {
-    "@zeit-ui/react": "^0.0.1-beta.40",
+    "@zeit-ui/react": "^1.0.0-rc.9",
+    "@zeit-ui/react-icons": "^1.2.1",
     "ms": "^2.1.2",
-    "next": "^9.3.4",
+    "next": "^9.3.6",
     "react": "16.13.0",
     "react-dom": "16.13.0"
   },

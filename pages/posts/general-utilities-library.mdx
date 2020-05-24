@@ -850,6 +850,29 @@ export const meta = {
   ```
   *-end example* ]
 
+  `template<class... Types>`
+
+  `tuple<Types&&...> forward_as_tuple(Types&&... t) noexcept;`
+
+  5.*作用：* 构造引用t中参数的tuple,这些参数可以被转发到一个函数.
+  由于返回值可能引用临时对象,程序应保证该返回值不会超过任何参数.
+
+  6.*返回值：* tuple<Types&& ...\>(std::forward<Types\>(t)...).
+
+  `template<class... Types>`
+  
+  `tuple<Types&...> tie(Types&... t) noexcept;`
+
+  7.*返回值：* tuple<Types&\>(t...). 当t中一个参数是ignore时,对相应参数的赋值都无作用.
+
+  8.[*Example:* tie()将tuples解压到变量中. ignore可以使用在不需要的元素上.
+  ```
+  int i; std::string s;
+  tie(i, ignore, s) = make_tuple(42,3.14,"C++");
+  // i == 42, s == "C++"
+  ```
+  *-end note*]
+
   `template <class... Tuples>`
 
   `tuple<CTypes...> tuple_cat(Tuples&&... tpls);`
@@ -4061,7 +4084,9 @@ export const meta = {
 
   2.operator() returns !pred(x).
 
-  `template <class Predicate> unary_negate<Predicate> not1(const Predicate& pred);`
+  `template <class Predicate>`
+  
+  `unary_negate<Predicate> not1(const Predicate& pred);`
 
   3.*返回值：* unary_negate<Predicate\>(pred).
 
@@ -4079,12 +4104,346 @@ export const meta = {
 
   4.operator() returns !pred(x,y).
 
-  `template <class Predicate> binary_negate<Predicate> not2(const Predicate& pred);`
+  `template <class Predicate>`
+  
+  `binary_negate<Predicate> not2(const Predicate& pred);`
 
   5.*返回值：* binary_negate<Predicate\>(pred).
 
-  593
+  ### 20.8.9 Function template bind
 
+  1.函数模板bind返回一个对象,该对象绑定一个作为参数传递给额外参数的可调用对象.
+
+  #### 20.8.9.1 Function object binders
+
+  1.该条款描述了可调用对象绑定参数的统一机制.
+
+  ##### 20.8.9.1.1 Class template is_bind_expression
+
+  ```
+  namespace std{
+    template<class T>
+    struct is_bind_expression :integral_constant<bool, see below>{
+
+    };
+  }
+  ```
+
+  1.is_bind_expression可用于检测由bind生成的函数对象.
+  bind使用is_bind_expression来检测子表达式.
+  Users应特化这个模板来指示将类型视为bind调用中的子表达式.
+
+  2.如果T是从bind,is_bind_expression<T\>返回的类型,那么T应public继承自integral_constant<bool,true\>,否则继承自integral_constant<bool,false\>.
+
+  3.is_placeholder可能被用于检测标准placeholders _1, _2... .
+  bind使用is_placeholder来检测placeholders.
+  Users应特化这个模板来指示一个placeholder类型.
+
+  4.如果T是类型std::placeholders::_J,is_placeholder<T\>应public继承自integral_constant<int, J\>,否则继承自integral_constant<int, 0\>.
+
+  ##### 20.8.9.1.2 Function template bind
+
+  1.如下:
+
+    - FD是类型decay<F\>::type,
+    
+    - fd是从std::forward<F\>(f)构造的左值FD,
+
+    - Ti是模板参数包BoundArgs的第i个类型,
+
+    - TiD是类型decay<Ti\>::type
+
+    - ti应是函数参数包bound_args的第i个参数,
+
+    - tid是std::forward<Ti\>(ti)构造的左值TiD,
+
+    - Uj是第j个forwarding call wrapper的UnBoundArgs&&...参数的推断类型,
+
+    - uj是第j个与Uj有关的参数.
+
+  `template<class F, class... BoundArgs>`
+  
+  `unspecified bind(F&& f, BoundArgs&&... bound_args);`
+
+  2.*要求：* is_constructible<FD, F\>::value应是true.
+  对每个在BoundArgs中的Ti,is_constructible<TiD, Ti\>::value应是true.
+  INVOKE(fd, w1, w2, ..., wN)对一些值w1, w2, ..., wN(N == sizeof...(bound_args))来说应是合理的表达式.
+
+  3.*返回值：* 具有弱结果类型的forwaing call wrapper g. g(u1, u2, ..., uM)应是INVOKE(fd, v1, v2, ..., vN, result_of<FD cv (V1, V2, ..., VN)\>::type),其中cv表示g的cv限定符和值和bound args v1, v2, ..., vN的类型像如下说的已确定.
+  当且仅当对应的FD或任何类型TiD构造时抛出异常,forwarding call wrapper的copy和move构造抛出异常.
+
+  4.*Throws:* 
+  无,除非fd或tid中某个值构造时抛出异常.
+
+  5.*备注：* 返回类型需满足MoveConstructible的要求.
+  如果所有的FD和TiD满足CopyConstructible的要求,那么返回类型需满足CopyConstructible的要求.
+  [*Note:* 这隐含所有的FD和TiD满足MoveConstructible. *-end note*]
+
+  `template<class R, class F, class... BoundArgs>`
+
+  `unspecified bind(F&& f, BoundArgs&&... bound_args);`
+
+  6.*要求：* 
+is_constructible<FD, F\>::value是true.对每个在BoundArgs中的Ti来说,is_constructible<TiD, Ti\>::value是true.
+  INVOKE(fd, w1, w2, ..., wN)对值w1, w2 , ..., wN(N == sizeof...(bound_args))来说应是合理的表达式.
+
+  7.*返回值：* 
+  具有和R同义的嵌套类型result_type的forwarding call wrapper g.
+  g(u1, u2, ..., uM)的作用应是INVOKE(fd, v1, v2, ..., vN, R),其中绑定参数v1, v2, ..., vN是值和类型如下确定.
+  当且仅当对应的FD或任何类型TiD构造时抛出异常,forwarding call wrapper的copy和move构造抛出异常.
+
+  8.*Throws:* 
+  无,除非fd或tid中某个值构造时抛出异常.
+
+  9.*备注：* 
+  返回类型需满足MoveConstructible的要求.
+  如果所有的FD和TiD满足CopyConstructible的要求,那么返回类型需满足CopyConstructible的要求.
+  [*Note:* 这隐含所有的FD和TiD满足MoveConstructible. *-end note*]
+
+  10.*bound arguments*v1, v2, ..., vN的值和相应的类型V1, V2, ..., VN取决于从bind调用派生的类型TiD和call wrapper g的cv限定符:
+    
+    - 如果TiD是reference_wrapper<T\>,参数值是tid.get(),类型Vi是T&;
+
+    - 如果is_bind_expression<TiD\>::value是true,参数值是tid(std::forward<Uj\>(uj)...),类型Vi是result_of<TiD cv (Uj...)\>::type;
+
+    - 如果is_placeholder<TiD\>::value的值j不是0,参数值是std::forward<Uj\>(uj),类型Vi是Uj&&;
+
+    - 否则,值是tid,类型Vi是TiD cv&.
+
+  ##### 20.8.9.1.3 Placeholders
+
+  ```
+  namespace std { 
+    namespace placeholders { 
+      // M is the implementation-deﬁned number of placeholders
+      extern unspecified _1; 
+      extern unspecified _2; 
+              . 
+              . 
+              . 
+      extern unspecified _M;
+    }
+  } 
+  ```
+
+  1.所有placeholders类型应是DefaultConstructible和CopyConstructible,并且它们的default构造函数和copy/move禁止抛出异常.
+  placeholder类型是否是CopyAssignable,由实现定义.CopyAssignable placeholders的copy赋值运算符禁止抛出异常.
+
+  ### 20.8.10 Function template mem_fn
+
+  ```
+  template<class R, class T> 
+  unspecified mem_fn(R T::* pm); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...)); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) volatile); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const volatile); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) &); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const &); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) volatile &); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const volatile &); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) &&); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const &&); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) volatile &&); 
+  template<class R, class T, class... Args> 
+  unspecified mem_fn(R (T::* pm)(Args...) const volatile &&); 
+  ```
+
+  1.*返回值：*
+  简单的call wrapper Fn,表达式fn(t, a2, ..., aN)等价于INVOKE(pm, t, a2, ..., aN).
+  当pm是指向成员函数的指针时,fn有和返回类型pm同义的嵌套类型result_type.
+
+  2.简单的call wrapper定义2个嵌套的类型,argument_type 和 result_type分别作为cv T*和Ret的同义,
+  当pm是指向具有cv限定符且无参数的成员函数的指针时,Ret是pm的返回类型.
+
+  3.简单的call wrapper应定义3个嵌套类型first_argument_type,second_argument_type和result_type分别作为cv T*,T1和Ret的同义,
+  当pm是指向具有cv限定符且带有1个类型T1的参数的成员函数的指针时,Ret是pm的返回类型.
+
+  4.*Throws:*
+  无.
+
+  ### 20.8.11 Polymorphic function wrappers
+
+  1.此条款描述了封装任意可调用对象的多态wrapper类.
+
+  #### 20.8.11.1 [Class bad_function_call](https://zh.cppreference.com/w/cpp/utility/functional/bad_function_call)
+
+  1.当function wrapper不含目标时,bad_function_call异常会被function::operator()抛出.
+
+  ```
+  namespace std{
+    class bad_function_call : public std::exception{
+    public:
+      // 20.8.11.1.1,constructor:
+      bad_function_call() noexcept;
+    };
+  }
+  ```
+
+  ##### 20.8.11.1.1 bad_function_call constructor
+
+  `bad_function_call() noexcept;`
+
+  1.*作用：*
+  构造bad_function_call对象.
+
+  #### 20.8.11.2 [Class template function](https://zh.cppreference.com/w/cpp/utility/functional/function)
+
+  ```
+  namespace std { 
+    template<class> class function; // undeﬁned
+
+    template<class R, class... ArgTypes> 
+    class function<R(ArgTypes...)> { 
+    public: 
+      typedef R result_type; 
+      typedef T1 argument_type;         // if sizeof...(ArgTypes) == 1 and 
+                                        // the type in ArgTypes is T1 
+      typedef T1 first_argument_type;   // iﬀ sizeof...(ArgTypes) == 2 and 
+                                        // ArgTypes contains T1 and T2 
+      typedef T2 second_argument_type;  // iﬀ sizeof...(ArgTypes) == 2 and 
+                                        // ArgTypes contains T1 and T2
+
+      // 20.8.11.2.1, construct/copy/destroy: 
+      function() noexcept; 
+      function(nullptr_t) noexcept; 
+      function(const function&); 
+      function(function&&); 
+      template<class F> function(F); 
+      template<class A> function(allocator_arg_t, const A&) noexcept; 
+      template<class A> function(allocator_arg_t, const A&, nullptr_t) noexcept; 
+      template<class A> function(allocator_arg_t, const A&, const function&); 
+      template<class A> function(allocator_arg_t, const A&, function&&); 
+      template<class F, class A> function(allocator_arg_t, const A&, F);
+      function& operator=(const function&); 
+      function& operator=(function&&); function& operator=(nullptr_t); 
+      template<class F> function& operator=(F&&); 
+      template<class F> function& operator=(reference_wrapper<F>) noexcept;
+
+      ~function();
+
+      // 20.8.11.2.2, function modiﬁers: 
+      void swap(function&) noexcept; 
+      template<class F, class A> void assign(F&&, const A&);
+
+      // 20.8.11.2.3, function capacity: 
+      explicit operator bool() const noexcept;
+
+      // 20.8.11.2.4, function invocation: 
+      R operator()(ArgTypes...) const;
+
+      // 20.8.11.2.5, function target access: 
+      const std::type_info& target_type() const noexcept; 
+      template <typename T> T* target() noexcept; 
+      template <typename T> const T* target() const noexcept;
+    };
+
+    // 20.8.11.2.6, Null pointer comparisons: 
+    template <class R, class... ArgTypes> 
+    bool operator==(const function<R(ArgTypes...)>&, nullptr_t) noexcept;
+
+    template <class R, class... ArgTypes> 
+    bool operator==(nullptr_t, const function<R(ArgTypes...)>&) noexcept;
+
+    template <class R, class... ArgTypes> 
+    bool operator!=(const function<R(ArgTypes...)>&, nullptr_t) noexcept;
+
+    template <class R, class... ArgTypes> 
+    bool operator!=(nullptr_t, const function<R(ArgTypes...)>&) noexcept;
+
+    // 20.8.11.2.7, specialized algorithms: 
+    template <class R, class... ArgTypes> 
+    void swap(function<R(ArgTypes...)>&, function<R(ArgTypes...)>&);
+
+    template<class R, class... ArgTypes, class Alloc> 
+    struct uses_allocator<function<R(ArgTypes...)>, Alloc> : true_type { };
+  }
+  ```
+
+  1.类模板function提供了广义函数指针的多态wrapper.
+  wrappers可以store,copy和调用任意可调用对象,该对象给定了调用签名,允许函数称为first-class对象.
+
+  2.如果表达式INVOKE(f,declval<ArgTypes\>()..., R)被视为未计算的操作符,则参数类型是ArgTypes且返回类型是R的可调用对象f是可调用的.
+
+  3.类模板function是可调用对象,它的调用签名是R(ArgTypes...).
+
+  ##### 20.8.11.2.1 function construcct/copy/destroy
+
+  1.当任一拥有allocator_arg_t为第一参数的**function**构造函数被调用,第二参数的类型必须符合Allocator的要求.
+  allocator参数的copy在必要时为构造函数对象的内部数据结构分配内存.
+
+  `function() noexcept;`
+
+  `template <class A> function(allocator_arg_t, const A& a) noexcept;`
+
+  2.*后置条件：*
+  !*this.
+
+  `function(nullptr_t) noexcept;`
+
+  `template <class A> function(allocator_arg_t, const A& a, nullptr_t) noexcept;`
+
+  3.*后置条件：*
+  !*this.
+
+  `function(const function& f);`
+  
+  `template <class A> function(allocator_arg_t, const A& a, const function& f);`
+
+  4.*后置条件：*
+  如果!f成立,!*this;否则,\*this指向(target)f.target()的copy.
+
+  5.*Throws:*
+  如果f的target是通过reference_wrapper或函数指针传递的可调用对象,则不应抛出异常.
+  否则,可能会抛出bad_alloc或存储的可调用对象的副本构造函数抛出的任何异常.
+  [*Note:* 鼓励实现避免在小型可调用对象上使用动态分配的内存,例如,其中f的target是仅包含指针或对象引用和成员函数指针的对象.(注:小对象优化) *-end note*]
+
+  `function(function&& f);`
+
+  `template <class A> function(allocator_arg_t, const A& a, function&& f);`
+
+  6.*作用：* 
+  如果!f,*this无target;否则,将f移动到 *this,使f成为未指定的有效状态.
+
+  `template<class F> function(F f);`
+
+  `template <class F, class A> function(allocator_arg_t, const A& a, F f);`
+
+  7.*要求：*
+  F应CopyConstructible.
+  对于参数类型ArgTypes和返回类型R,f应可调用.
+  A的copy和析构禁止抛出异常.
+
+  8.*后置条件：*
+  如果满足以下之一,!*this:
+
+   - f是NULL函数指针.
+
+   - f是NULL指向成员.
+
+   - f是类模板function实例并且!f.
+
+  9.否则,*this指向通过std::move(f)初始化的f的一个copy.
+  [*Note:* 鼓励实现避免在小型可调用对象上使用动态分配的内存,例如,其中f的目标是仅包含指针或对象引用和成员函数指针的对象. *-end note*]
+
+  10.*Throws:*
+  当f是函数指针或某个类型T的reference_wrapper<T\>时,禁止抛出异常.
+  否则,应抛出bad_alloc或F的copy/move构造抛出的异常.
+
+  `function& operator=(const function& f);`
+
+  11.599
 
 
 

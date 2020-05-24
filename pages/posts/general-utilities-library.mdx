@@ -4184,7 +4184,7 @@ export const meta = {
   `unspecified bind(F&& f, BoundArgs&&... bound_args);`
 
   6.*要求：* 
-is_constructible<FD, F\>::value是true.对每个在BoundArgs中的Ti来说,is_constructible<TiD, Ti\>::value是true.
+  is_constructible<FD, F\>::value是true.对每个在BoundArgs中的Ti来说,is_constructible<TiD, Ti\>::value是true.
   INVOKE(fd, w1, w2, ..., wN)对值w1, w2 , ..., wN(N == sizeof...(bound_args))来说应是合理的表达式.
 
   7.*返回值：* 
@@ -4428,11 +4428,11 @@ is_constructible<FD, F\>::value是true.对每个在BoundArgs中的Ti来说,is_co
   8.*后置条件：*
   如果满足以下之一,!*this:
 
-   - f是NULL函数指针.
+    - f是NULL函数指针.
 
-   - f是NULL指向成员.
+    - f是NULL指向成员.
 
-   - f是类模板function实例并且!f.
+    - f是类模板function实例并且!f.
 
   9.否则,*this指向通过std::move(f)初始化的f的一个copy.
   [*Note:* 鼓励实现避免在小型可调用对象上使用动态分配的内存,例如,其中f的目标是仅包含指针或对象引用和成员函数指针的对象. *-end note*]

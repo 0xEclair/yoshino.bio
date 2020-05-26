@@ -4443,10 +4443,149 @@ export const meta = {
 
   `function& operator=(const function& f);`
 
-  11 -> 599
+  11.*作用：* function(f).swap(*this).
+
+  12.*返回值：* *this.
+
+  `function& operator=(function&& f);`
+
+  13.*影响：* 用f的target替换*this的target.
+
+  14.*返回值：* *this.
+
+  `function& operator=(nullptr_t);`
+
+  15.*作用：* 如果*this!=NULL，析构this的target. 
+
+  16.*后置条件：* !(*this).
+
+  17.*返回值：* *this.
+
+  `template<class F> function& operator=(F&& f);`
+
+  18.*作用：* function(std::forward<F\>(f)).swap(*this).
+
+  19.*返回值：* *this.
+
+  `~function();`
+
+  22.*作用：* 如果*this!=NULL,析构this的target.
 
 
+  ##### 20.8.11.2.2 function modifiers
 
+  `void swap(function& other) noexcept;`
+
+  1.*作用：* 交换*this和other的target.
+
+  `template<class F, class A>`
+
+  `void assign(F&& f, const A& a);`
+
+  2.*作用：* function(allocator_arg, a, std::forward<F\>(f).swap(*this)).
+
+  ##### 20.8.11.2.3 function capacity
+
+  `explicit operator bool() const noexcept;`
+
+  1.*返回值：* 如果*this有target，true；否则false。
+
+  ##### 20.8.11.2.4 function invocation
+
+  `R operator()(ArgTypes... args) const`
+
+  1.*影响：* INVOKE(f, std::forward<ArgTypes\>(args)..., R)，其中f是*this的target对象。
+
+  2.*返回值：* 如果R是void，无；否则INVOKE(f, std::forward<ArgTypes\>(args)..., R)的返回值.
+
+  3.*Throws:* 如果!*this，bad_function_call；否则，抛出被包装的可调用对象。
+
+  ##### 20.8.11.2.5 function target access
+
+  `const std::type_info& target_type() const noexcept;`
+
+  1.*返回值：* 如果*this有T类型的target，typeid(T)；否则，typeid(void)。
+
+  `template<typename T> T* target() noexcept;`
+
+  `template<typename T> const T* target() const noexcept;`
+
+  2.*要求：* T应是一个ArgTypes和R可调用的类型。
+
+  3.*返回值：* 如果target_type() == typeid(T)，指向存储的函数target的指针；否则，空指针。
+
+  ##### 20.8.11.2.6 null pointer comparison operators
+
+  `template <class R, class... ArgTypes>`
+
+  `bool operator==(const function<R(ArgTypes...)>& f, nullptr_t) noexcept;`
+
+  `template <class R, class... ArgTypes>`
+
+  `bool operator==(nullptr_t, const function<R(ArgTypes...)>& f) noexcept;`
+
+  1.*返回值：* !f.
+
+  `template <class R, class... ArgTypes>`
+  
+  `bool operator!=(const function<R(ArgTypes...)>& f, nullptr_t) noexcept;`
+
+  `template <class R, class... ArgTypes>`
+  
+  `bool operator!=(nullptr_t, const function<R(ArgTypes...)>& f) noexcept;`
+
+  2.*返回值：* (bool)f.
+
+  ##### 20.8.11.2.7 specialized algorithms
+  
+  `template<class R, class... ArgTypes>`
+
+  `void swap(function<R(ArgTypes...)>& f1, function<R(ArgTypes...)>& f2);`
+
+  1.*作用：* f1.swap(f2).
+
+  ### 20.8.12 Class template hash
+
+  1.23.5中定义的unordered关联容器使用类模板hash的特化作为默认hash函数。
+  对所有对象类型Key，其拥有特化的hash<Key\>，实例化的hash<Key\>应：
+
+    - 满足Hash要求(17.6.3.4)，其中Key作为函数调用参数类型；DefaultConstructible要求；CopyAssignable要求，
+
+    - 左值是可交换的，
+
+    - 提供2个嵌套类型result_type 和 argument_type，其分别与size_t 和 Key同义，
+
+    - 满足 如果k1 == k2是true，h(k1) == h(k2)同样是true的要求，其中h是hash<Key\>的对象且k1和k2是Key的对象。
+
+    - 满足 表达式h(k)，其中h是hash<Key\>的对象，k是Key的对象，禁止抛出异常，除非hash<Key\>是用户定义的特化，它至少依赖一个用户定义的类型。
+
+  ```
+  template <> struct hash<bool>; 
+  template <> struct hash<char>; 
+  template <> struct hash<signed char>; 
+  template <> struct hash<unsigned char>; 
+  template <> struct hash<char16_t>; 
+  template <> struct hash<char32_t>; 
+  template <> struct hash<wchar_t>; 
+  template <> struct hash<short>; 
+  template <> struct hash<unsigned short>; 
+  template <> struct hash<int>; 
+  template <> struct hash<unsigned int>; 
+  template <> struct hash<long>; 
+  template <> struct hash<unsigned long>; 
+  template <> struct hash<long long>; 
+  template <> struct hash<unsigned long long>; 
+  template <> struct hash<float>; 
+  template <> struct hash<double>; 
+  template <> struct hash<long double>; 
+  template <class T> struct hash<T*>;
+  ```
+
+  2.*要求：* 模板特化需要满足类模板hash的要求(20.8.12)。
+
+## 20.9 Metaprogramming and type traits
+
+  601
 
 [*Example:*  *-end example*]
 

@@ -4585,7 +4585,30 @@ export const meta = {
 
 ## 20.9 Metaprogramming and type traits
 
-  601
+1. 本小节描述了C++程序（尤其是模板）使用的组件，以支持尽可能广泛的类型，优化模板代码使用，检测与类型相关的用户错误以及在编译时执行类型推断和转换。
+它包括类型分类特征，类型属性检查特征和类型转换。
+类型分类特征描述了所有可能的C++类型的完整分类法，并声明了给定类型所属的分类法。
+类型属性检查特征允许检查类型或类型组合的重要特征。
+类型转换允许对类型的某些属性进行操作。
+
+  ### 20.9.1 Requirements
+
+  1.UnaryTypeTrait描述类型的属性。
+  它应该是一个类模板，它带有一个模板类型参数，以及可选的其他有助于定义所描述属性的参数。
+  它应该是DefaultConstructible，CopyConstructible，
+  并且可以直接或间接地从其BaseCharacteristic公开且明确地派生，
+  该BaseCharacteristic是模板integral_constant（20.9.3）的特殊化，
+  其模板integral_constant的参数由所描述的特定属性的要求确定。
+  BaseCharacteristic的成员名称不得隐藏，并且在UnaryTypeTrait中应明确可用。
+
+  2.BinaryTypeTrait描述两种类型之间的关系。
+  它应该是一个类模板，它带有两个模板类型参数，以及可选的其他有助于定义所描述关系的参数。
+  它应是DefaultConstructible，CopyConstructible，并且可以直接或间接地从其BaseCharacteristic派生，该BaseCharacteristic是模板templateintegral_constant（20.9.3）的一种特殊形式，其参数由所描述的特定关系的需求确定。
+  BaseCharacteristic的成员名称不得隐藏，并且在BinaryTypeTrait中应明确可用。
+
+  3.TransformationTrait修改类型的属性。
+  它应该是一个类模板，它带有一个模板类型参数，以及（可选）其他有助于定义修改的参数。
+  它应定义一个嵌套的名为type的类型，该类型应为已修改类型的同义词。
 
 [*Example:*  *-end example*]
 

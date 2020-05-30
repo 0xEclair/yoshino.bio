@@ -4610,6 +4610,209 @@ export const meta = {
   它应该是一个类模板，它带有一个模板类型参数，以及（可选）其他有助于定义修改的参数。
   它应定义一个嵌套的名为type的类型，该类型应为已修改类型的同义词。
 
+  ### 20.9.2 Header <type_traits\> synopsis
+
+  ```
+  namespace std { 
+    // 20.9.3, helper class: 
+    template <class T, T v> struct integral_constant; 
+    typedef integral_constant<bool, true> true_type; 
+    typedef integral_constant<bool, false> false_type;
+
+    // 20.9.4.1, primary type categories: 
+    template <class T> struct is_void; 
+    template <class T> struct is_integral; 
+    template <class T> struct is_floating_point; 
+    template <class T> struct is_array; 
+    template <class T> struct is_pointer; 
+    template <class T> struct is_lvalue_reference; 
+    template <class T> struct is_rvalue_reference; 
+    template <class T> struct is_member_object_pointer; 
+    template <class T> struct is_member_function_pointer; 
+    template <class T> struct is_enum; 
+    template <class T> struct is_union; 
+    template <class T> struct is_class; 
+    template <class T> struct is_function;
+    
+    // 20.9.4.2, composite type categories: 
+    template <class T> struct is_reference; 
+    template <class T> struct is_arithmetic; 
+    template <class T> struct is_fundamental; 
+    template <class T> struct is_object; 
+    template <class T> struct is_scalar; 
+    template <class T> struct is_compound; 
+    template <class T> struct is_member_pointer;
+
+    // 20.9.4.3, type properties: 
+    template <class T> struct is_const; 
+    template <class T> struct is_volatile; 
+    template <class T> struct is_trivial; 
+    template <class T> struct is_trivially_copyable; 
+    template <class T> struct is_standard_layout; 
+    template <class T> struct is_pod; 
+    template <class T> struct is_literal_type; 
+    template <class T> struct is_empty; 
+    template <class T> struct is_polymorphic; 
+    template <class T> struct is_abstract;
+
+    template <class T> struct is_signed; 
+    template <class T> struct is_unsigned;
+
+    template <class T, class... Args> struct is_constructible; 
+    template <class T> struct is_default_constructible; 
+    template <class T> struct is_copy_constructible; 
+    template <class T> struct is_move_constructible;
+    template <class T, class U> struct is_assignable; 
+    template <class T> struct is_copy_assignable; 
+    template <class T> struct is_move_assignable;
+
+    template <class T> struct is_destructible;
+
+    template <class T, class... Args> struct is_trivially_constructible; 
+    template <class T> struct is_trivially_default_constructible; 
+    template <class T> struct is_trivially_copy_constructible; 
+    template <class T> struct is_trivially_move_constructible;
+
+    template <class T, class U> struct is_trivially_assignable; 
+    template <class T> struct is_trivially_copy_assignable; 
+    template <class T> struct is_trivially_move_assignable; 
+    template <class T> struct is_trivially_destructible;
+
+    template <class T, class... Args> struct is_nothrow_constructible; 
+    template <class T> struct is_nothrow_default_constructible; 
+    template <class T> struct is_nothrow_copy_constructible; 
+    template <class T> struct is_nothrow_move_constructible;
+
+    template <class T, class U> struct is_nothrow_assignable; 
+    template <class T> struct is_nothrow_copy_assignable; 
+    template <class T> struct is_nothrow_move_assignable;
+
+    template <class T> struct is_nothrow_destructible; 
+    template <class T> struct has_virtual_destructor;
+
+    // 20.9.5, type property queries: 
+    template <class T> struct alignment_of; 
+    template <class T> struct rank; 
+    template <class T, unsigned I = 0> struct extent;
+
+    // 20.9.6, type relations: 
+    template <class T, class U> struct is_same; 
+    template <class Base, class Derived> struct is_base_of; 
+    template <class From, class To> struct is_convertible;
+
+    // 20.9.7.1, const-volatile modiﬁcations: 
+    template <class T> struct remove_const; 
+    template <class T> struct remove_volatile; 
+    template <class T> struct remove_cv; 
+    template <class T> struct add_const; 
+    template <class T> struct add_volatile; 
+    template <class T> struct add_cv;
+
+    // 20.9.7.2, reference modiﬁcations: 
+    template <class T> struct remove_reference; 
+    template <class T> struct add_lvalue_reference; 
+    template <class T> struct add_rvalue_reference;
+
+    // 20.9.7.3, sign modiﬁcations: 
+    template <class T> struct make_signed; 
+    template <class T> struct make_unsigned;
+
+    // 20.9.7.4, array modiﬁcations: 
+    template <class T> struct remove_extent; 
+    template <class T> struct remove_all_extents;
+
+    // 20.9.7.5, pointer modiﬁcations: 
+    template <class T> struct remove_pointer; 
+    template <class T> struct add_pointer;
+
+    // 20.9.7.6, other transformations: 
+    template <std::size_t Len, std::size_t Align> struct aligned_storage; 
+    template <class T> struct decay; 
+    template <bool, class T = void> struct enable_if; 
+    template <bool, class T, class F> struct conditional; 
+    template <class... T> struct common_type; 
+    template <class T> struct underlying_type; 
+    template <class> class result_of; // not deﬁned 
+    template <class F, class... ArgTypes> class result_of<F(ArgTypes...)>; 
+  } // namespace std 
+  ```
+
+  1.为此小节中的类模板添加特化的程序行为是未定义的，除非另有说明。
+
+  ### 20.9.3 Helper classes
+
+  ```
+  namespace std {
+    template <class T, T v> 
+    struct integral_constant { 
+      static constexpr T value = v; 
+      typedef T value_type; 
+      typedef integral_constant<T,v> type; 
+      constexpr operator value_type() { return value; }
+    };
+    typedef integral_constant<bool, true> true_type; 
+    typedef integral_constant<bool, false> false_type;
+  }
+  ```
+
+  1.类模板integral_constant和它关联的typedefs true_type和false_type用作基类，以定义各种类型特征的接口。
+
+  ### 20.9.4 Unary type traits
+
+  1.这个子条款包含可能被用于编译期查询一个类型属性的模板。
+
+  2.如果相应条件是true，这些模板中的每一个都应是具有true_type的BaseCharacteristic的UnaryTypeTrait；否则是false_type。
+
+  #### 20.9.4.1 Primary type categories
+
+  1.主要类型类别与C++标准的3.9节中给出的描述相对应。
+
+  2.对于任何给定的类型T，将这些模板之一应用于T和cv限定的T的结果将产生相同的结果。
+
+  3.[*Note:* 对于任何给定的类型T，正好一个主要类型类别都有一个值成员，其值评估为true。 *-end note*]
+
+  Table 47 -- Primary type ategory predicates -> P605
+
+  #### 20.9.4.2 Composite type traits
+
+  1.这些模板提供了主要类型类别的便利组件，与3.9节中给出的描述相对应。
+
+  2.对于任何给定的类型T，将这些模板之一应用于T和cv限定的T的结果将产生相同的结果。
+
+  Table 48 -- Composite type category predicates -> P605
+
+  #### 20.9.4.3 Type properties
+
+  1.这些模板提供了对类型的某些更重要属性的访问。
+
+  2.此库是否定义这些模板的任何一个的全特化或者偏特化是未定义的。
+
+  3.对于此条款中所有类模板X，当且仅当X的语义要求参数是完整类型时，用一个类模板特化作为模板参数来实例化的那个模板可能导致模板参数的隐式实例化。
+
+  Table 49 -- Type property predicates -> 606
+
+  4.[*Example:* 
+  ```
+  is_const<const volatile int>::value // true 
+  is_const<const int*>::value // false 
+  is_const<const int&>::value // false 
+  is_const<int[3]>::value // false 
+  is_const<const int[3]>::value // true 
+  ```
+  *-end example*]
+
+  5.[*Example:* 
+  ```
+  remove_const<const volatile int>::type // volatile int
+  remove_const<const int* const>::type // const int* 
+  remove_const<const int&>::type // const int& 
+  remove_const<const int[3]>::type // int[3] 
+  ```
+  *-end example*]
+
+  611
+
+
 [*Example:*  *-end example*]
 
 [*Note:*  *-end note*]

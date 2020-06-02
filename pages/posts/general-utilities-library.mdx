@@ -4810,7 +4810,113 @@ export const meta = {
   ```
   *-end example*]
 
-  611
+  6.给定以下函数原型：
+  
+  `template<class T>`
+
+  `typename add_rvalue_reference<T>::type creaate();`
+
+  当且仅当下列变量定义对于某些虚拟变量t是well-formed，模板特化is_constructible<T, Args...\>的谓词条件才满足：
+
+    `T t(create<Args>()...);`
+
+  [*Note:* 这些标记永远不会被解释为函数声明。 *-end note*]
+  就像在与T和任何Arg不相关的上下文中一样，执行访问检查。
+  仅考虑变量初始化的即时上下文的有效性。
+  [*Note:* 初始化的评估可能会导致实例化类模板专业化和功能模板特化的作用，隐式定义函数的生成等。
+  此类副作用不在“即时范围内”并可能导致ill-formed。 *-end note*]
+
+  ### 20.9.5 Type property queries
+
+  1.该副小节包含可能用于编译期查询类型属性的模板。
+
+  Table 50 - Type property queries
+
+  `template <class T> struct alignment_of;`
+
+  alignof(T).
+  *要求：* alignof(T)是合理的表达式
+
+  `template <class T> struct rank;`
+
+  如果T是数组类型，返回对应的代表T维度的整型值，否则是0。
+
+  `template <class T, unsigned I = 0> struct extent;`
+
+  如果T不是数组类型，或如果它的rank小于等于I，或如果I为0，且T的类型为“U的未知边界数组”，返回0。
+  除此以外，返回T的第I个维度的边界，其中I的下标为从零开始。
+
+
+  2.[*Example:* 
+  ```
+  // the following assertions hold:
+  assert(rank<int>::value == 0);
+  assert(rank<int[2]>::value == 1);
+  assert(rank<int[][4]>::value == 2);
+  ```
+  *-end example*]
+
+  3.[*Example:* 
+  ```
+  // the following assertions hold:
+  assert(extent<int>::value == 0);
+  assert(extent<int[2]>::value == 2);
+  assert(extent<int[2][4]>::value == 2);
+  assert(extent<int[][4]>::value == 0);
+  assert((extent<int, 1>::value) == 0);
+  assert((extent<int[2], 1>::value) == 0);
+  assert((extent<int[2][4], 1>::value) == 4);
+  assert((extent<int[][4], 1>::value) == 4);
+  ```
+  *-end example*]
+
+  ### 20.9.6 Relationships between types
+
+  1.本小节包含可用于在编译时查询类型之间的关系的模板。
+
+  2.这些模板中的每一个都应为BinaryTypeTrait，且BaseCharacteristic为true_type。
+  对应条件为true，否则为false_type。
+
+  Table 51 - Type relationship predicates
+
+  3.[*Example:* 
+  ```
+  struct B {};
+  struct B1 : B {};
+  struct B2 : B {};
+  struct D : private B1, private B2 {};
+
+  is_base_of<B, D>::value // true
+  is_base_of<const B, D>::value // true
+  is_base_of<B, const D>::value // true
+  is_base_of<B, const B>::value // true
+  is_base_of<D, B>::value // false
+  is_base_of<B&, D&>::value // false
+  is_base_of<B[3], D[3]>::value // false
+  is_base_of<int, int>::value // false
+  ```
+  *-end example*]
+
+  4.给定以下函数原型：
+
+  `template <class T>`
+
+  `typename add_rvalue_reference<T>::type create();`
+
+  如果满足以下条件，则模板特化的谓词条件为：is_convertible<From, To\>
+  仅在以下代码中的返回表达式格式正确（包括任何隐式转换）的情况下返回函数的返回类型：
+
+  `To test() { return create<From>(); }`
+
+  [*Note:* 对于引用类型，void类型，数组类型和函数类型，此要求给出了明确的结果。 *-end note*]
+  就像在与“To”和“From”无关的上下文中一样，执行访问检查。
+  仅考虑返回语句的表达式的直接上下文的有效性（包括对返回类型的转换）。
+  [*Note:* 转换的评估可能会导致一些副作用，例如类模板专业化和函数模板专业化的实例化，隐式定义的函数的生成等。
+  这样的副作用不在“即时上下文”中，并可能导致程序ill-formed。 *-end note*]
+
+  ### 20.9.7 Transformations between types 
+
+  613
 
 
 [*Example:*  *-end example*]

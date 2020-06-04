@@ -5009,14 +5009,65 @@ export const meta = {
   ```
   *-end example*]
 
-## 20.10 Compile-time rational arithmetic
+<Spacer y={2} />
 
-1. for align
+### 20.10 Compile-time rational arithmetic
 
-  ### 20.10.1 In general
+<Spacer y={1} />
 
-  618
+#### 20.10.1 In general
 
+1.该副小节描述ratio库。它提供类模板ratio，ratio用分子和分母精确表示任何有限有理数，
+该比例由类型intmax_t的编译期常量表示。
+
+2.整个副小节，如果模板实参类型R1和R2不是ratio的特化，程序ill-formed.
+
+<Spacer y={1} />
+
+#### 20.10.2 Header <ratio\> synopsis
+
+```cpp
+namespace std { 
+  // 20.10.3, class template ratio 
+  template <intmax_t N, intmax_t D = 1> class ratio;
+
+  // 20.10.4, ratio arithmetic 
+  template <class R1, class R2> using ratio_add = see below; 
+  template <class R1, class R2> using ratio_subtract = see below; 
+  template <class R1, class R2> using ratio_multiply = see below; 
+  template <class R1, class R2> using ratio_divide = see below;
+
+  // 20.10.5, ratio comparison 
+  template <class R1, class R2> struct ratio_equal; 
+  template <class R1, class R2> struct ratio_not_equal; 
+  template <class R1, class R2> struct ratio_less;
+  template <class R1, class R2> struct ratio_less_equal; 
+  template <class R1, class R2> struct ratio_greater; 
+  template <class R1, class R2> struct ratio_greater_equal;
+
+  // 20.10.6, convenience SI typedefs 
+  typedef ratio<1, 1000000000000000000000000> yocto; // see below 
+  typedef ratio<1,    1000000000000000000000> zepto; // see below 
+  typedef ratio<1,       1000000000000000000> atto; 
+  typedef ratio<1,          1000000000000000> femto; 
+  typedef ratio<1,             1000000000000> pico; 
+  typedef ratio<1,                1000000000> nano; 
+  typedef ratio<1,                   1000000> micro; 
+  typedef ratio<1,                      1000> milli; 
+  typedef ratio<1,                       100> centi; 
+  typedef ratio<1,                        10> deci; 
+  typedef ratio<                       10, 1> deca; 
+  typedef ratio<                      100, 1> hecto; 
+  typedef ratio<                     1000, 1> kilo; 
+  typedef ratio<                  1000000, 1> mega; 
+  typedef ratio<               1000000000, 1> giga; 
+  typedef ratio<            1000000000000, 1> tera; 
+  typedef ratio<         1000000000000000, 1> peta; 
+  typedef ratio<      1000000000000000000, 1> exa; 
+  typedef ratio<   1000000000000000000000, 1> zetta; // see below 
+  typedef ratio<1000000000000000000000000, 1> yotta; // see below
+} 
+```
 
 
 

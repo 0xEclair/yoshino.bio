@@ -20,7 +20,7 @@ export const meta = {
 2. 头文件<utility\>定义在这个条款里描述的若干类型和函数模板.
 它也定义the template pair和大量用于pair对象操作的函数模板.
 
-  ```
+  ```cpp
   #include <initializer_list>
   namespace std {
     // 运算符：
@@ -166,7 +166,7 @@ export const meta = {
 
   1.*备注：* noexcept里的表达式等价于:
 
-  ```
+  ```cpp
   is_nothrow_move_constructible<T>::value &&
   is_nothrow_move_assignable<T>::value
   ```
@@ -196,7 +196,7 @@ export const meta = {
   3.如果第二个形式被一个左值引用实例化, 程序ill-formed.
 
   4.[*Example:* 
-  ```
+  ```cpp
     template <class T, class A1, class A2>
     shared_ptr<T> factory(A1&& a1, A2&& a2) { 
       return shared_ptr<T>(new T(std::forward<A1>(a1), std::forward<A2>(a2))); 
@@ -218,24 +218,24 @@ export const meta = {
     *-end note* \]
 
   6.[*Example:* 
-    ```
-    template <class T, class A1> 
-    shared_ptr<T> factory(A1&& a1) { 
-      return shared_ptr<T>(new T(std::forward<A1>(a1))); 
-    }
+  ```cpp
+  template <class T, class A1> 
+  shared_ptr<T> factory(A1&& a1) { 
+    return shared_ptr<T>(new T(std::forward<A1>(a1))); 
+  }
 
-    struct A { 
-      A(); 
-      A(const A&); // copies from lvalues 
-      A(A&&); // moves from rvalues 
-    };
+  struct A { 
+    A(); 
+    A(const A&); // copies from lvalues 
+    A(A&&); // moves from rvalues 
+  };
 
-    void g() { 
-      A a; 
-      shared_ptr<A> sp1 = factory<A>(a); // “a” binds to A(const A&) 
-      shared_ptr<A> sp1 = factory<A>(std::move(a)); // “a” binds to A(A&&)
-    }
-    ```
+  void g() { 
+    A a; 
+    shared_ptr<A> sp1 = factory<A>(a); // “a” binds to A(const A&) 
+    shared_ptr<A> sp1 = factory<A>(std::move(a)); // “a” binds to A(A&&)
+  }
+  ```
   7.In the ﬁrst call to factory, A1 is deduced as A&, so a is forwarded as a non-const lvalue. 
     This binds to theconstructor A(const A&), which copies the value from a. 
     In the second call to factory, because of the call std::move(a),A1 is deduced as A,so a is forwarded as an rvalue. 
@@ -263,10 +263,10 @@ export const meta = {
   3.*备注：* declval的模板参数T可能是未完成类型.
 
   [*Example:* 
-    ```
-    template <class To, class From> 
-    decltype(static_cast<To>(declval<From>())) convert(From&&);
-    ```
+  ```cpp
+  template <class To, class From> 
+  decltype(static_cast<To>(declval<From>())) convert(From&&);
+  ```
 
   声明一个函数模板convert,仅当From类型可以显式转换为To类型时, 该转换才参与重载.
   有关另一个示例, 请参见类模板common_type.
@@ -282,7 +282,7 @@ export const meta = {
 
   ### 20.3.2 类模板pair
 
-  ```
+  ```cpp
   // deﬁned in header <utility>
 
   namespace std { 
@@ -389,7 +389,7 @@ export const meta = {
 
   23.*备注：* noexcept里的表达式等价于
 
-  ```
+  ```cpp
   is_nothrow_move_assignable<T1>::value &&
   is_nothrow_move_assignable<T2>::value
   ```
@@ -414,7 +414,7 @@ export const meta = {
 
   30.*备注：* noexcept里的表达式等价于
 
-  ```
+  ```cpp
   noexcept(swap(first, p.first)) &&
   noexcept(swap(second, p.second))
   ```
@@ -474,7 +474,7 @@ export const meta = {
 
   4.*值：* 类型T2
 
-  ```
+  ```cpp
   template<size_t I, class T1, class T2> 
   typename tuple_element<I, std::pair<T1, T2> >::type& get(pair<T1, T2>&) noexcept; 
   template<size_t I, class T1, class T2> 
@@ -483,7 +483,7 @@ export const meta = {
 
   5.*返回值：* 如果 I == 0 返回p.first;如果 I == 1 返回p.second;否则程序ill-formed.
 
-  ```
+  ```cpp
   template<size_t I, class T1, class T2> 
   typename tuple_element<I, std::pair<T1, T2> >::type&& get(std::pair<T1, T2>&&) noexcept; 
   ```
@@ -511,7 +511,7 @@ export const meta = {
 
   2.头文件 <tuple\> 概要
 
-  ```
+  ```cpp
   namespace std {
     // 20.4.2, class template tuple:
     template <class... Types> class tuple;
@@ -579,7 +579,7 @@ export const meta = {
 
   ### 20.4.2 类模板tuple
 
-  ```
+  ```cpp
   namespace std { 
     template <class... Types> 
     class tuple { 
@@ -716,7 +716,7 @@ export const meta = {
 
   25.*备注：* 这个构造函数不参与重载决议, 除非U1可隐式转换到T0, U2可隐式转换到T1.
 
-  ```
+  ```cpp
   template <class Alloc> 
   tuple(allocator_arg_t, const Alloc& a); 
   template <class Alloc> 
@@ -759,7 +759,7 @@ export const meta = {
 
   5.*备注：* noexcept里的表达式等价于下面表达式的logical AND:
 
-  ```
+  ```cpp
   is_nothrow_move_assignable<Ti>::value 
   ```
 
@@ -816,7 +816,7 @@ export const meta = {
 
   1.*备注：* noexcept里的表达式等价于下面表达式的logical：
 
-  ```
+  ```cpp
   noexcept(swap(declval<Ti&>>(), declval<Ti&>())) 
   ```
 
@@ -842,7 +842,7 @@ export const meta = {
   3.*返回值：* tuple<VTypes...\>(std::forward<Types\>(t)...)
 
   4.[*Example:*
-  ```
+  ```cpp
   int i; float j;
   make_tuple(i,ref(i),cref(j))
   创建一个如下类型的tuple
@@ -866,7 +866,7 @@ export const meta = {
   7.*返回值：* tuple<Types&\>(t...). 当t中一个参数是ignore时,对相应参数的赋值都无作用.
 
   8.[*Example:* tie()将tuples解压到变量中. ignore可以使用在不需要的元素上.
-  ```
+  ```cpp
   int i; std::string s;
   tie(i, ignore, s) = make_tuple(42,3.14,"C++");
   // i == 42, s == "C++"
@@ -884,7 +884,7 @@ export const meta = {
 
   #### 20.4.2.5 Tuple helper classes
 
-  ```
+  ```cpp
   template <class... Types> 
   class tuple_size<tuple<Types...> > 
     : public integral_constant<size_t, sizeof...(Types)> { }; 
@@ -1013,7 +1013,7 @@ export const meta = {
 
   ### 头文件<bitset\> 概要
 
-  ```
+  ```cpp
   #include <string> 
   #include <iosfwd> // for istream, ostream 
   namespace std { 
@@ -1035,7 +1035,7 @@ export const meta = {
 
   1.头文件<bitset\>定义一个类模板和一些相关的函数, 用于表示和操作固定大小的位序列.
 
-  ```
+  ```cpp
   namespace std { 
     template<size_t N> class bitset { 
     public: 
@@ -1391,7 +1391,7 @@ export const meta = {
   管理容器和其他模板类型的内存管理, 并在单元化的内存缓冲区中构造多个对象.
   头文件定义模板unique_ptr, shared_ptr, weak_ptr和对这些类型的对象进行操作的各种模板函数(20.7).
 
-  ```
+  ```cpp
   namespace std { 
     
     // 20.6.3, pointer traits 
@@ -1593,7 +1593,7 @@ export const meta = {
 
   1.类模板pointer_traits为类似指针的类型的某些属性提供了统一的接口.
 
-  ```
+  ```cpp
   namespace std { 
     template <class Ptr> struct pointer_traits { 
       typedef Ptr pointer; 
@@ -1716,7 +1716,7 @@ export const meta = {
   
   ### 20.6.6 Allocator argument tag
 
-  ```
+  ```cpp
   namespace std { 
     struct allocator_arg_t { }; 
     constexpr allocator_arg_t allocator_arg = allocator_arg_t(); 
@@ -1753,7 +1753,7 @@ export const meta = {
   1.类模板allocator_traits提供所有alloc类型的统一接口.一个allocator不能是一个非类类型,但是,即使allocator_traits提供了所需的整个接口.
   [*Note:* 因此,创建一个派生自allocator的类总是可能的. *-end note*]
 
-  ```
+  ```cpp
   namespace std { 
     template <class Alloc> struct allocator_traits { 
       typedef Alloc allocator_type;
@@ -1869,7 +1869,7 @@ export const meta = {
 
   ### 20.6.9 The default allocator
 
-  ```
+  ```cpp
   namespace std {
     template <class T> class allocator; 
     
@@ -1974,7 +1974,7 @@ export const meta = {
   1.提供raw_storage_iterator使算法将其结果保存到未初始化的内存中.
   形式模板参数OutputIterator要求其operator*返回为其定义的operator&的对象并返回指向T的指针,并且还需要满足输出迭代器的要求.
 
-  ```
+  ```cpp
   namespace std { 
     template <class OutputIterator, class T> 
     class raw_storage_iterator : public iterator<output_iterator_tag,void,void,void,void> {
@@ -2047,7 +2047,7 @@ export const meta = {
 
   1.*作用：* 
 
-  ```
+  ```cpp
   for (; first != last; ++result, ++first) 
     ::new (static_cast<void*>(&*result)) typename iterator_traits<ForwardIterator>::value_type(*first); 
   ```
@@ -2060,7 +2060,7 @@ export const meta = {
 
   3.*作用：* 
 
-  ```
+  ```cpp
   for ( ; n > 0; ++result, ++first, --n) { 
     ::new (static_cast<void*>(&*result)) typename iterator_traits<ForwardIterator>::value_type(*first); 
   } 
@@ -2076,7 +2076,7 @@ export const meta = {
 
   1.*作用：* 
 
-  ```
+  ```cpp
   for (; first != last; ++first) 
     ::new (static_cast<void*>(&*first)) typename iterator_traits<ForwardIterator>::value_type(x);
   ```
@@ -2089,7 +2089,7 @@ export const meta = {
 
   1.*作用：*
 
-  ```
+  ```cpp
   for (; n--; ++first) 
     ::new (static_cast<void*>(&*first)) typename iterator_traits<ForwardIterator>::value_type(x); 
   return first;
@@ -2141,7 +2141,7 @@ export const meta = {
 
   6.[*Note:* unique_ptr的使用包括为动态分配的内存提供异常安全, 将动态分配的内存的所有权转移给函数以及从函数返回动态分配的内存. *-end note*]
 
-  ```
+  ```cpp
   namespace std { 
     template<class T> struct default_delete; 
     template<class T> struct default_delete<T[]>;
@@ -2201,7 +2201,7 @@ export const meta = {
 
   ##### 20.7.1.1.2 default_delete
 
-  ```
+  ```cpp
   namespace std { 
     template <class T> 
     struct default_delete { 
@@ -2226,7 +2226,7 @@ export const meta = {
 
   ##### 20.7.1.1.3 default_delete<T[]\>
 
-  ```
+  ```cpp
   namespace std { 
     template <class T> 
     struct default_delete<T[]> { 
@@ -2245,7 +2245,7 @@ export const meta = {
 
   #### 20.7.1.2 unique_ptr for single objects
 
-  ```
+  ```cpp
   namespace std { 
     template <class T, class D = default_delete<T>> 
     class unique_ptr { 
@@ -2505,7 +2505,7 @@ export const meta = {
 
   #### 20.7.1.3 unique_ptr for array objects with a runtime length
 
-  ```
+  ```cpp
   namespace std { 
     template <class T, class D> 
     class unique_ptr<T[], D> { 
@@ -2683,7 +2683,7 @@ export const meta = {
 
   #### 20.7.2.1 Class bad_weak_ptr
 
-  ```
+  ```cpp
   namespace std { 
     class bad_weak_ptr: public std::exception { 
     public: 
@@ -2704,7 +2704,7 @@ export const meta = {
   shared_ptr实现共享所有权的语义;最后一个某指针所有者有责任释放指针, 或以其他方式释放与存储的指针关联的资源.
   如果不持有一个指针, shared_ptr对象empty.
 
-  ```
+  ```cpp
   namespace std{
     template<class T> class shared_ptr{
     public:
@@ -2940,7 +2940,7 @@ export const meta = {
 
   3.[*Note:* 由于临时对象的构造和析构导致的use count更新不是可观察到的副作用, 
   因此, 实现可能会通过不同的方式满足作用(和隐式的保证), 而不会产生临时对象. 尤其是: 
-  ```
+  ```cpp
   shared_ptr<int> p(new int);
   shared_Ptr<void> q(p);
   p=p;
@@ -3185,7 +3185,7 @@ export const meta = {
 
   1.weak_ptr类模板存储一个已经被shared_ptr管理的对象的弱引用.访问此对象,weak_ptr通过成员函数lock可转换为shared_ptr.
 
-  ```
+  ```cpp
   namespace std { 
     template<class T> 
     class weak_ptr { 
@@ -3308,7 +3308,7 @@ export const meta = {
 
   1.类模板owner_less允许对shared_ptr和weak_ptr进行基于所有权的混合比较.
 
-  ```
+  ```cpp
   namespace std { 
     template<class T> struct owner_less;
 
@@ -3344,7 +3344,7 @@ export const meta = {
   1.类T可以从enable_shared_from_this<T\>继承来获得shared_from_this成员函数,这些成员函数获得指向*this的shared_ptr实例.
 
   2.[*Example:* 
-  ```
+  ```cpp
   struct X: public enable_shared_from_this<X>{
 
   };
@@ -3358,7 +3358,7 @@ export const meta = {
   ```
   *-end example*]
 
-  ```
+  ```cpp
   namespace std { 
     template<class T> class enable_shared_from_this { 
     protected: 
@@ -3400,7 +3400,7 @@ export const meta = {
   9.*后置条件：* r.get() == this.
 
   10.[*Note:* 
-  ```
+  ```cpp
   template<class T> class enable_shared_from_this { 
   private: 
     weak_ptr<T> __weak_this; 
@@ -3535,7 +3535,7 @@ export const meta = {
 
 2. Header<functional\> 概要
 
-  ```
+  ```cpp
   namespace std { 
     // D.8.1, base (deprecated): 
     template <class Arg, class Result> struct unary_function; 
@@ -3746,7 +3746,7 @@ export const meta = {
   该转发应确保右值参数作为右值引用传递,左值参数作为左值引用传递.
   [*Note:* 
   在典型的实现中,转发call wrapper具有以下形式的重载函数调用运算符:
-  ```
+  ```cpp
   template<class... UnBoundArgs\> 
   R operator()(UnBoundArgs&&... unbound_args) cv-qual;
   ```
@@ -3754,7 +3754,7 @@ export const meta = {
 
   ### 20.8.3 Class template reference_wrapper
 
-  ```
+  ```cpp
   namespace std { 
     template <class T> class reference_wrapper { 
     public : 
@@ -3859,7 +3859,7 @@ export const meta = {
 
   1.该库为语言中的所有算术运算符提供了基本的函数对象类(5.6,5.7).
 
-  ```
+  ```cpp
   template <class T> struct plus { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3870,7 +3870,7 @@ export const meta = {
 
   2.operator() returns x + y.
 
-  ```
+  ```cpp
   template <class T> struct minus { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3881,7 +3881,7 @@ export const meta = {
 
   3.operator() returns x - y.
 
-  ```
+  ```cpp
   template <class T> struct multiplies { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3892,7 +3892,7 @@ export const meta = {
 
   4.operator() returns x * y.
 
-  ```
+  ```cpp
   template <class T> struct divides { 
     T operator()(const T& x, const T& y) cons
     typedef T first_argument_type; 
@@ -3903,7 +3903,7 @@ export const meta = {
 
   5.operator() returns x / y.
 
-  ```
+  ```cpp
   template <class T> struct modulus { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3914,7 +3914,7 @@ export const meta = {
 
   6.operator() returns x % y.
 
-  ```
+  ```cpp
   template <class T> struct negate { 
     T operator()(const T& x) const; 
     typedef T argument_type; 
@@ -3928,7 +3928,7 @@ export const meta = {
 
   1.该库为语言中的所有比较运算符提供了基本的函数对象类(5.9,5.10).
 
-  ```
+  ```cpp
   template <class T> struct equal_to { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3939,7 +3939,7 @@ export const meta = {
 
   2.operator() returns x == y.
 
-  ```
+  ```cpp
   template <class T> struct not_equal_to { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3950,7 +3950,7 @@ export const meta = {
 
   3.operator() returns x != y.
 
-  ```
+  ```cpp
   template <class T> struct greater { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3961,7 +3961,7 @@ export const meta = {
 
   4.operator() returns x > y.
 
-  ```
+  ```cpp
   template <class T> struct less { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3972,7 +3972,7 @@ export const meta = {
 
   5.operator() returns x < y.
 
-  ```
+  ```cpp
   template <class T> struct greater_equal { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -3983,7 +3983,7 @@ export const meta = {
 
   6.operator() returns x >= y.  
   
-  ```
+  ```cpp
   template <class T> struct less_equal { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4002,7 +4002,7 @@ export const meta = {
 
   1.该库为语言中的所有逻辑运算符提供了基本的函数对象类.
 
-  ```
+  ```cpp
   template <class T> struct logical_and { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4013,7 +4013,7 @@ export const meta = {
 
   2.operator() returns x && y.  
   
-  ```
+  ```cpp
   template <class T> struct logical_or { 
     bool operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4024,7 +4024,7 @@ export const meta = {
 
   3.operator() returns x || y.
 
-  ```
+  ```cpp
   template <class T> struct logical_not { 
     bool operator()(const T& x) const; 
     typedef T first_argument_type; 
@@ -4038,7 +4038,7 @@ export const meta = {
 
   1.该库为语言中的所有位运算符提供了基本的函数对象类.
 
-  ```
+  ```cpp
   template <class T> struct bit_and { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4048,7 +4048,7 @@ export const meta = {
 
   2.operator() returns x & y.
 
-  ```
+  ```cpp
   template <class T> struct bit_or { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4058,7 +4058,7 @@ export const meta = {
 
   3.operator() returns x | y.
 
-  ```
+  ```cpp
   template <class T> struct bit_xor { 
     T operator()(const T& x, const T& y) const; 
     typedef T first_argument_type; 
@@ -4072,7 +4072,7 @@ export const meta = {
 
   1.Negators not1和not2分别采用一元和二进制谓词,并返回其补码(5.3.1).
 
-  ```
+  ```cpp
   template <class Predicate> class unary_negate { 
   public: 
     explicit unary_negate(const Predicate& pred); 
@@ -4090,7 +4090,7 @@ export const meta = {
 
   3.*返回值：* unary_negate<Predicate\>(pred).
 
-  ```
+  ```cpp
   template <class Predicate> class binary_negate { 
   public: 
     explicit binary_negate(const Predicate& pred); 
@@ -4120,7 +4120,7 @@ export const meta = {
 
   ##### 20.8.9.1.1 Class template is_bind_expression
 
-  ```
+  ```cpp
   namespace std{
     template<class T>
     struct is_bind_expression :integral_constant<bool, see below>{
@@ -4212,7 +4212,7 @@ export const meta = {
 
   ##### 20.8.9.1.3 Placeholders
 
-  ```
+  ```cpp
   namespace std { 
     namespace placeholders { 
       // M is the implementation-deﬁned number of placeholders
@@ -4231,7 +4231,7 @@ export const meta = {
 
   ### 20.8.10 Function template mem_fn
 
-  ```
+  ```cpp
   template<class R, class T> 
   unspecified mem_fn(R T::* pm); 
   template<class R, class T, class... Args> 
@@ -4281,7 +4281,7 @@ export const meta = {
 
   1.当function wrapper不含目标时,bad_function_call异常会被function::operator()抛出.
 
-  ```
+  ```cpp
   namespace std{
     class bad_function_call : public std::exception{
     public:
@@ -4300,7 +4300,7 @@ export const meta = {
 
   #### 20.8.11.2 [Class template function](https://zh.cppreference.com/w/cpp/utility/functional/function)
 
-  ```
+  ```cpp
   namespace std { 
     template<class> class function; // undeﬁned
 
@@ -4559,7 +4559,7 @@ export const meta = {
 
     - 满足 表达式h(k)，其中h是hash<Key\>的对象，k是Key的对象，禁止抛出异常，除非hash<Key\>是用户定义的特化，它至少依赖一个用户定义的类型。
 
-  ```
+  ```cpp
   template <> struct hash<bool>; 
   template <> struct hash<char>; 
   template <> struct hash<signed char>; 
@@ -4612,7 +4612,7 @@ export const meta = {
 
   ### 20.9.2 Header <type_traits\> synopsis
 
-  ```
+  ```cpp
   namespace std { 
     // 20.9.3, helper class: 
     template <class T, T v> struct integral_constant; 
@@ -4741,7 +4741,7 @@ export const meta = {
 
   ### 20.9.3 Helper classes
 
-  ```
+  ```cpp
   namespace std {
     template <class T, T v> 
     struct integral_constant { 
@@ -4792,7 +4792,7 @@ export const meta = {
   Table 49 -- Type property predicates -> 606
 
   4.[*Example:* 
-  ```
+  ```cpp
   is_const<const volatile int>::value // true 
   is_const<const int*>::value // false 
   is_const<const int&>::value // false 
@@ -4802,7 +4802,7 @@ export const meta = {
   *-end example*]
 
   5.[*Example:* 
-  ```
+  ```cpp
   remove_const<const volatile int>::type // volatile int
   remove_const<const int* const>::type // const int* 
   remove_const<const int&>::type // const int& 
@@ -4848,7 +4848,7 @@ export const meta = {
 
 
   2.[*Example:* 
-  ```
+  ```cpp
   // the following assertions hold:
   assert(rank<int>::value == 0);
   assert(rank<int[2]>::value == 1);
@@ -4857,7 +4857,7 @@ export const meta = {
   *-end example*]
 
   3.[*Example:* 
-  ```
+  ```cpp
   // the following assertions hold:
   assert(extent<int>::value == 0);
   assert(extent<int[2]>::value == 2);
@@ -4880,7 +4880,7 @@ export const meta = {
   Table 51 - Type relationship predicates
 
   3.[*Example:* 
-  ```
+  ```cpp
   struct B {};
   struct B1 : B {};
   struct B2 : B {};
@@ -4929,7 +4929,7 @@ export const meta = {
   Table 55 - Array modifications
 
   1.[*Example:* 
-  ```
+  ```cpp
   // the following assertions hold: 
   assert((is_same<remove_extent<int>::type, int>::value)); 
   assert((is_same<remove_extent<int[2]>::type, int>::value)); 
@@ -4939,7 +4939,7 @@ export const meta = {
   *-end example*]
 
   2.[*Example:* 
-  ```
+  ```cpp
   // the following assertions hold: 
   assert((is_same<remove_all_extents<int>::type, int>::value)); 
   assert((is_same<remove_all_extents<int[2]>::type, int>::value)); 
@@ -4953,7 +4953,7 @@ export const meta = {
   Table 57 - Other transformations
 
   1.[*Note:* 一个aligned_storage的典型实现：
-  ```
+  ```cpp
   template <std::size_t Len, std::size_t Alignment> 
   struct aligned_storage { 
     typedef struct { 
@@ -4966,7 +4966,7 @@ export const meta = {
   2.由实现定义，是否支持任何扩展的对齐方式。
 
   3.嵌套类型定义common_type::type应如下定义：
-  ```
+  ```cpp
   template <class ...T> struct common_type;
 
   template <class T> 
@@ -4986,7 +4986,7 @@ export const meta = {
   ```
 
   4.[*Example:* 
-  ```
+  ```cpp
   typedef bool (&PF1)(); 
   typedef short (*PF2)(long);
 

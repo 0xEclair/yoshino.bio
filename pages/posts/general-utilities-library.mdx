@@ -5069,6 +5069,40 @@ namespace std {
 } 
 ```
 
+<Spacer y={1}/>
+
+#### 20.10.3 Class template ratio
+
+```cpp
+namespace std { 
+  template <intmax_t N, intmax_t D = 1> 
+  class ratio { 
+  public: 
+    typedef ratio<num, den> type; 
+    static constexpr intmax_t num; 
+    static constexpr intmax_t den; 
+  }; 
+} 
+```
+
+1.如果模板实参D是0或类型intmax_t不能表示模板实参N和D之一的绝对值，程序ill-formed。
+[*Note:* 这些规则确保了避免无限比率，并且对于任何负输入，其绝对值都存在一个可表示为正的值。
+在二进制补码表示中，这排除了最大的负值。 *-end note*]
+
+2.静态数据成员num和den符合下列值，其中gcd代表N和D的绝对值的最大公约数。
+
+  - num = sign(N) * sign(D) * abs(N) / gcd.
+
+  - den = abs(D) / gcd.
+
+<Spacer y={1} />
+
+#### 20.10.4 Arithmetic on ratios
+
+1.别名模板ratio_ass,ratio_subtract,ratio_multiply,ratio_divide中的每一个都表示对两个比率R1和R2进行算数运算的结果。
+如Table58所示，计算X和Y（在没有算术溢出的情况下），每个别名表示ratio<U,V\>，其中U与ratio<X,Y>::num相同，V与ratio<X,Y\>::den相同。
+
+2.620
 
 
 [*Example:*  *-end example*]

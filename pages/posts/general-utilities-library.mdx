@@ -5360,8 +5360,38 @@ public:
 
 `static constexpr Rep zero();`
 
-625
+2.*返回值：* Rep(0)。
 
+<Spacer y={0.25} />
+
+[*Note:* 使用Rep(0)而不是Rep()是因为Rep()可能有一些其他的意义，比如未初始化的值。 *-end note*]
+
+3.*备注：*  The value returned shall be the additive identity.
+
+`static constexpr Rep min();`
+
+4.*返回值：* numeric_limits<Rep\>::lowest()。
+
+5.*备注：* 返回值应小于等于zero()。
+
+`static constexpr Rep max();`
+
+6.*返回值：* numeric_limits<Rep\>::max()。
+
+7.*备注：* 返回值应大于zero()。
+
+<Spacer y={0.5} />
+
+##### 20.11.4.3 Specializations of common_type
+
+```cpp
+template <class Rep1, class Period1, class Rep2, class Period2> 
+struct common_type<chrono::duration<Rep1, Period1>, chrono::duration<Rep2, Period2>> { 
+  typedef chrono::duration<typename common_type<Rep1, Rep2>::type, see below> type; 
+};
+```
+
+1.
 
 
 [*Example:*  *-end example*]

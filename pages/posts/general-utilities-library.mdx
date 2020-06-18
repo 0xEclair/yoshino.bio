@@ -5511,7 +5511,28 @@ duration<double, ratio<1, 30>> d2;  // holds a count with a tick period of 1/30 
 
 3.*后置条件：* count() == static_cast<rep\>(r)。
 
-p627
+`template <class Rep2, class Period2> constexpr duration(const duration<Rep2, Period2>& d);`
+
+4.*备注：* 这个构造函数不参与重载决议，除非tread_as_floating_point<rep\>::value为true或ratio_divide<Period2, period\>::den是1且treat_as_floating_point<Rep2\>::value为false.
+
+<Spacer y={0.25} />
+
+[*Note:* 此要求当基于整数的duration类型转换时，防止隐式截断错误。这种结构很容易导致duration的值产生歧义。 *-end note*]
+
+<Spacer y={0.25} />
+
+[*Example:* 
+```cpp
+duration<int, milli> ms(3);
+duration<int, micro> us = ms; // OK
+duration<int, milli> ms2 = us; // error 
+```
+*-end example*]
+
+5.*作用：* 构造duration对象，该对象从duration_cast<duration\>(d).count()构造rep_。
+
+(remark: 即要么时长使用浮点计次，要么 Period2 能被周期整除)
+
 
 [*Example:*  *-end example*]
 

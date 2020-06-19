@@ -5748,7 +5748,34 @@ CR(A,B)表示common_type<A, B\>::type。
 
 ##### 20.11.5.7 duration_cast
 
+`template <class ToDuration, class Rep, class Period>`
+
+`constexpr ToDuration duration_cast(const duration<Rep, Period>& d);`
+
+1.*备注：* 此函数禁止参与重载决议，除非ToDuration是duration实例。
+
+2.*返回值：* 令 CF 为ratio_divide<Period, typename ToDuration::period\>,且CR为common_type<typename ToDuration::rep, Rep, intmax_t\>::type。
+
+  - 如果CF::num == 1且CF::den == 1,返回ToDuration(static_cast<typename ToDuration::rep\>(d.count()))
+
+  - 否则，如果CF::num != 1且CF::den == 1,返回Toduration(static_cast<typename ToDuration::rep\>(static_cast<CR\>(d.count()) * static_cast<CR\>(CF::num)))
+
+  - 否则，如果CF::num == 1且CF::den != 1,返回ToDuration(static_cast<typename ToDuration::rep\>(static_cast<CR\>(d.count()) / static_cast<CR\>(CF::den)))
+
+  - 否则，返回ToDuration(static_cast<typename ToDuration::rep\>(static_cast<CR\>(d.count()) * static_cast<CR\>(CF::num) / static_cast<CR\>(CF::den)))
+
+<Spacer y={0.1} />
+
+*Notes:* 此函数不使用任何隐式转换；所有转换都有static_cast完成。
+当在编译时知道一个或多个参数为1时，它将避免乘法和除法。
+Intermediate computations are carried out in the widest representation and only converted to the destination representation at the ﬁnal step.
+
+<Spacer y={1} />
+
+#### 20.11.6 Class template time_point
+
 p631
+
 
 
 [*Example:*  *-end example*]

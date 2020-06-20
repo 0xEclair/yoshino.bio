@@ -1,0 +1,180 @@
+import Layout from 'lib/components/layout'
+import {Spacer,Display,Row,Col,Text} from '@zeit-ui/react'
+
+export const meta = {
+  title: '如何深入理解c++11的右值引用',
+  date: '2020-06-20T15:06:31.512Z',
+  description: '',
+}
+
+<!--export function deep_copy(){
+  return (
+    <div>
+      <Display caption="深拷贝">
+
+        ```cpp
+        struct copy_t{
+          copy_t(const copy_t& cp){           
+            auto len = strlen(cp.data);
+            data = new char[len+1];
+            memcpy(data,cp.data,len);data[len] = '\0';
+          }
+          char* data;
+        };
+        ```
+        
+      </Display>
+    </div>
+  );
+} -->
+
+网上关于c++11的右值引用，还是很抽象，没办法直观的告诉使用者这里发生了什么。
+这篇文章主要解释右值引用来源和相关一些语法行为具体做了什么。
+
+<Spacer y={2} />
+
+
+## 深浅拷贝
+
+因为值语义的关系，c++11之前，类的copy-constructor普遍是深拷贝。
+当需要浅拷贝时，需要手动选择调用的constructor（bool类型或是额外的参数）来指导编译器怎么构造。
+
+<Row gap={0.8}>
+  <Display caption="深拷贝">
+
+  ```cpp
+  struct copy_t{
+    copy_t(const copy_t& cp){           
+      auto len = strlen(cp.data);
+      data = new char[len+1];
+      memcpy(data,cp.data,len);
+      data[len] = '\0';
+    }
+    char* data;
+  };
+  ```
+
+  </Display>
+
+  <Display caption={<p>浅拷贝</p>}>
+
+  ```cpp
+  struct move_t{};
+
+  struct copy_t{
+    copy_t(copy_t& cp,move_t){           
+      data = cp.data;
+      // 不需要`cp.data = NULL;`
+    }
+    char* data;
+  };
+  ```
+
+  </Display>
+</Row>
+
+## Move语义
+
+首先明确一个前提：右值引用和左值引用一样，生成的是相应对象的引用，别名。
+**右值引用所引用的对象也在栈上**。
+
+<Row gap={0.8}>
+  <Display width="300px" caption="右值引用">
+
+  ```cpp
+  struct move_ref{
+    move_ref() = default;
+    move_ref(move_ref&&){ }
+  }
+  ```
+
+  </Display>
+
+  <Display caption="一些用例">
+
+  ```cpp
+  move_ref common_var{};
+  move_ref&  lvalue_ref = common_var;
+  move_ref&& rvalue_ref_1 = std::move(lvalue_ref);
+  move_ref&& rvalue_ref_2 = move_ref();
+  ```
+
+  </Display>
+</Row>
+
+`common_var`是正常的变量，调用trival constructor。
+
+`lvalue_ref`是`common_var`的一个左值引用，别名，普通使用上相当于解了引用的指针，**没有调用constructor**。
+
+`rvalue_ref_1`比较抽象，右值引用和std::move()结合。这里也是网上文章没有提到的地方：这样写是不合理的。
+先分析rvalue_ref_1这条语句：
+
+  1. 调用std::move()：产生一个临时变量，它是lvalue_ref的右值引用。
+
+  2. 将产生的临时对象的地址赋值给rvalue_ref_1。
+
+正常理解是这样的，1-2可能会被编译器优化，甚至不会调用std::move()，编译器行为和lvalue_ref相同。
+**没有调用constructor**，变量和语句2产生的没有不同，没有其他概念。
+
+`rvalue_ref_2`是一种模糊（不合理）的写法。因为copy elision的存在，上述语句和`move_ref temp_value = move_ref();`等价：
+
+  1. 调用move_ref::move_ref()，生成一个临时对象（**调用trivial constructor**）。
+
+  2. 将产生的临时对象的地址赋值给rvalue_ref_2。
+
+  3. 和单纯的move_ref()相比，不会调用move_ref::~move_ref()。正常的临时对象是会销毁的。
+
+
+语句3-4是一般文章中出现次数较多的案例，它们会告诉你**可以**这样写。但是，这样写是不对的。
+
+`std::move()`是配合浅拷贝产生的，如果需要转让所有权，请这样写`move_ref common = std::move(common_var)`。
+这样编译器就会调用move constructor，才能转让相关所有权（具体看move constructor实现）。
+
+<Spacer />
+
+### 合理使用std::move()
+
+<Display  caption="函数没有提供ref版本，需要指导编译器调用move constructor">
+
+```cpp
+const char* words[] = {"one", "two", "three"};
+std::string a = "valid";
+a.reserve(100);
+// accumulate()没有任何接收ref的版本，需要std::move()告诉编译器调用move constructor
+std::string result = accumulate(cbegin(words), cend(words), std::move(a), 
+   [](std::string& a, const auto& b){
+      a.append(b); 
+      return std::move(a);
+   });
+```
+
+</Display>
+
+<Display width="500px" caption="使用只有move constructor的类">
+
+```cpp
+std::unique_ptr<Type> some_variable{};
+ 
+  // 某个函数内，该函数接收unique_ptr的无cv-ref
+  {
+    // 该容器是某个类的成员变量
+    std::vector<std::unique_ptr<Type>> container;
+
+    // 转让所有权到容器里
+    container.push_back(std::move(some_variable));
+  }
+```
+
+</Display>
+
+<Spacer />
+
+### 本文小结
+
+1. 右值引用和左值引用一样，不调用constructor，引用的对象也在栈上。
+
+2. 正常使用右值引用是在写move constructor的实现时。除非你是库作者，对于左右值需要不同的实现。
+
+3. std::move()需要配合move constructor使用，指导编译器调用move constructor。
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

@@ -7,27 +7,6 @@ export const meta = {
   description: '',
 }
 
-<!--export function deep_copy(){
-  return (
-    <div>
-      <Display caption="深拷贝">
-
-        ```cpp
-        struct copy_t{
-          copy_t(const copy_t& cp){           
-            auto len = strlen(cp.data);
-            data = new char[len+1];
-            memcpy(data,cp.data,len);data[len] = '\0';
-          }
-          char* data;
-        };
-        ```
-        
-      </Display>
-    </div>
-  );
-} -->
-
 网上关于c++11的右值引用，还是很抽象，没办法直观的告诉使用者这里发生了什么。
 这篇文章主要解释右值引用来源和相关一些语法行为具体做了什么。
 
@@ -109,9 +88,11 @@ export const meta = {
 `rvalue_ref_1`比较抽象，右值引用和std::move()结合。这里也是网上文章没有提到的地方：这样写是不合理的。
 先分析rvalue_ref_1这条语句：
 
-  1. 调用std::move()：产生一个临时变量，它是lvalue_ref的右值引用。
+  1. 调用std::move()：产生一个lvalue_ref的右值引用临时变量。
 
-  2. 将产生的临时对象的地址赋值给rvalue_ref_1。
+  2. 将产生的临时对象的的值赋值给rvalue_ref_1。
+
+  3. 实际上产生的临时对象就是lvalue_ref(common_var)的地址，别名。
 
 正常理解是这样的，1-2可能会被编译器优化，甚至不会调用std::move()，编译器行为和lvalue_ref相同。
 **没有调用constructor**，变量和语句2产生的没有不同，没有其他概念。

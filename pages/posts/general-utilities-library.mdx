@@ -6055,6 +6055,142 @@ public:
 2.内容与标准C库头文件<time.h\>相同。
 函数asctime，ctime，gmtime和localtime不需要避免数据竞争（17.6.5.9）。
 
+<Spacer y={2} />
+
+### 20.12
+
+<Spacer y={1} />
+
+#### 20.12.1 Header <scoped_allocator\> synopsis
+
+```cpp
+// scoped allocator adaptor 
+template <class OuterAlloc, class... InnerAlloc> 
+class scoped_allocator_adaptor; 
+template <class OuterA1, class OuterA2, class... InnerAllocs> 
+bool operator==(const scoped_allocator_adaptor<OuterA1, InnerAllocs...>& a, 
+                const scoped_allocator_adaptor<OuterA2, InnerAllocs...>& b) noexcept; 
+template <class OuterA1, class OuterA2, class... InnerAllocs> 
+bool operator!=(const scoped_allocator_adaptor<OuterA1, InnerAllocs...>& a, 
+                const scoped_allocator_adaptor<OuterA2, InnerAllocs...>& b) noexcept;
+```
+
+1.类模板scoped_allocator_adaptor是一个allocator模板，
+它指定容器要使用的内存资源（外部allocator）（就像其他任何分配器一样），还指定一个内部分配器资源，该资源将传递给容器内每个元素的构造函数。
+该adaptor用一个外部和零个或多个内部allocator类型实例化。
+如果仅使用一种adaptor类型实例化，则内部allocator将成为scoped_allocator_adaptor本身，从而为容器和容器中的每个元素使用相同的分配器资源，
+如果元素本身是容器，则它们的每个元素都是递归的。
+如果使用多个adaptor实例化，则第一个allocator是容器使用的外部allocator，第二个分配器传递给容器元素的构造函数，
+如果元素本身是容器，则第三个allocator传递给容器元素的元素，依此类推。
+如果容器嵌套的深度大于allocator的数量，则对于单个剩余的递归，最后一次allocator将重复使用，就像在单allocator的情况下一样。
+
+```cpp
+namespace std { 
+  template <class OuterAlloc, class... InnerAllocs> 
+  class scoped_allocator_adaptor : public OuterAlloc { 
+  private: 
+    typedef allocator_traits<OuterAlloc> OuterTraits; // exposition only 
+    scoped_allocator_adaptor<InnerAllocs...> inner; // exposition only 
+  public: 
+    typedef OuterAlloc outer_allocator_type; 
+    typedef see below inner_allocator_type;
+
+    typedef typename OuterTraits::value_type value_type; 
+    typedef typename OuterTraits::size_type size_type; 
+    typedef typename OuterTraits::difference_type difference_type; 
+    typedef typename OuterTraits::pointer pointer; 
+    typedef typename OuterTraits::const_pointer const_pointer; 
+    typedef typename OuterTraits::void_pointer void_pointer; 
+    typedef typename OuterTraits::const_void_pointer const_void_pointer;
+
+    typedef see below propagate_on_container_copy_assignment; 
+    typedef see below propagate_on_container_move_assignment; 
+    typedef see below propagate_on_container_swap;
+
+    template <class Tp> struct rebind { 
+      typedef scoped_allocator_adaptor< OuterTraits::template rebind_alloc<Tp>, InnerAllocs...> other; 
+    };
+
+    scoped_allocator_adaptor();
+    template <class OuterA2> 
+    scoped_allocator_adaptor(OuterA2&& outerAlloc, const InnerAllocs&... innerAllocs) noexcept;
+
+    scoped_allocator_adaptor(const scoped_allocator_adaptor& other) noexcept;
+    scoped_allocator_adaptor(scoped_allocator_adaptor&& other) noexcept;
+
+    template <class OuterA2> 
+    scoped_allocator_adaptor( const scoped_allocator_adaptor<OuterA2, InnerAllocs...>& other) noexcept; 
+    template <class OuterA2> 
+    scoped_allocator_adaptor( const scoped_allocator_adaptor<OuterA2, InnerAllocs...>&& other) noexcept;
+
+    ~scoped_allocator_adaptor();
+
+    inner_allocator_type& inner_allocator() noexcept; 
+    const inner_allocator_type& inner_allocator() const noexcept; 
+    outer_allocator_type& outer_allocator() noexcept; 
+    const outer_allocator_type& outer_allocator() const noexcept;
+
+    pointer allocate(size_type n); 
+    pointer allocate(size_type n, const_void_pointer hint); 
+    void deallocate(pointer p, size_type n); 
+    size_type max_size() const;
+
+    template <class T, class... Args> void construct(T* p, Args&& args);
+    template <class T1, class T2, class... Args1, class... Args2> 
+      void construct(pair<T1, T2>* p, 
+                    piecewise_construct_t, tuple<Args1...> x, tuple<Args2...> y); 
+    template <class T1, class T2> 
+      void construct(pair<T1, T2>* p); 
+    template <class T1, class T2, class U, class V> 
+      void construct(pair<T1, T2>* p, U&& x, V&& y); 
+    template <class T1, class T2, class U, class V> 
+      void construct(pair<T1, T2>* p, const pair<U, V>& x); 
+    template <class T1, class T2, class U, class V> 
+      void construct(pair<T1, T2>* p, pair<U, V>&& x);
+
+    template <class T> void destroy(T* p);
+
+    scoped_allocator_adaptor select_on_container_copy_construction() const;
+  };
+
+  template <class OuterA1, class OuterA2, class... InnerAllocs> 
+  bool operator==(const scoped_allocator_adaptor<OuterA1, InnerAllocs...>& a, 
+                  const scoped_allocator_adaptor<OuterA2, InnerAllocs...>& b) noexcept; 
+  template <class OuterA1, class OuterA2, class... InnerAllocs> 
+  bool operator!=(const scoped_allocator_adaptor<OuterA1, InnerAllocs...>& a, 
+                  const scoped_allocator_adaptor<OuterA2, InnerAllocs...>& b) noexcept;
+}
+```
+
+<Spacer y={1} />
+
+#### 20.12.2 Scoped allocator adaptor member types
+
+`typedef see below inner_allocator_type;`
+
+1.*类型：* 如果sizeof...(InnerAlloc)是0，scoped_allocator_adaptor<OuterAlloc\>；
+否则，scoped_allocator_adaptor<InnerAllocs...\>。
+
+`typedef see below propagate_on_container_copy_assignment;`
+
+2.*类型：* 如果对OuterAlloc和InnerAllocs...里每个A来说，allocator_traits<A\>::propagate_on_container_copy_assignment::value是true，true_type；
+否则，false_type。
+
+`typedef see below propagate_on_container_move_assignment;`
+
+3.*类型：* 如果对OuterAlloc和InnerAllocs...里每个A来说，allocator_traits<A\>::propagate_on_container_copy_assignment::value是true，true_type；
+否则，false_type。
+
+`typedef see below propagate_on_container_swap;`
+
+4.*类型：* 如果对OuterAlloc和InnerAllocas...里每个A来说allocator_traits<A\>::propagate_on_container_swap::value是true，true_type；
+否则，false_type。
+
+<Spacer y={1} />
+
+#### 20.12.3 Scoped allocator adaptor constructors
+
+p638
 
 [*Example:*  *-end example*]
 

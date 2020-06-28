@@ -6190,7 +6190,52 @@ namespace std {
 
 #### 20.12.3 Scoped allocator adaptor constructors
 
-p638
+`scoped_allocator_adaptor();`
+
+1.*作用：* 值初始化OuterAlloc基类和内部allocator对象。
+
+```cpp
+template <class OuterA2> 
+  scoped_allocator_adaptor(OuterA2&& outerAlloc, 
+                           const InnerAllocs&... innerAllocs) noexcept;
+```
+
+2.*要求：* OuterAlloc应从OuterA2可构造。
+
+3.*作用：* 用std::forward<OuterA2\>(outerAlloc)初始化OuterAlloc基类，innerAllocs...初始化inner
+（因此在adaptor内从参数列表用对应的allocator递归初始化每个allocator）。
+
+`scoped_allocator_adaptor(const scoped_allocator_adaptor& other) noexcept;`
+
+4.*作用：* 从other用对应的allocator初始化在adaptor内的allocator。
+
+`scoped_allocator_adaptor(scoped_allocator_adaptor&& other) noexcept;`
+
+5.*作用：* 从other用对应的allocator移动构造adaptor内的每个allocator。
+
+```cpp
+template <class OuterA2> 
+  scoped_allocator_adaptor(const scoped_allocator_adaptor<OuterA2, 
+                           InnerAllocs...>& other) noexcept;
+```
+
+6.*要求：* OuterAlloc应从OuterA2可构造。
+
+7.*作用：* 从other中用对应的allocator初始化在adaptor内的每个allocator。
+
+```cpp
+template <class OuterA2> 
+  scoped_allocator_adaptor(const scoped_allocator_adaptor<OuterA2, 
+                           InnerAllocs...>&& other) noexcept;
+```
+
+8.*要求：* OuterAlloc应从OuterA2可构造。
+
+9.*作用：* 从other中用对应的右值allocator初始化在adaptor内的每个allocator。
+
+<Spacer y={1} />
+
+pass.
 
 [*Example:*  *-end example*]
 

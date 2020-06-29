@@ -12,6 +12,38 @@ export const meta = {
 
 <Spacer y={2} />
 
+<!--<Row gap={0.8}>
+  <Col>
+    <Display caption="深拷贝">
+
+    ```cpp
+      printf("hello,world");
+    ```
+
+    </Display>
+  </Col>
+
+    <Col>
+    <Display caption="深拷贝">
+
+    ```cpp
+      printf("hello,world");
+    ```
+
+    </Display>
+  </Col>
+</Row> 
+
+export const DeepCopy = ({children}) => <Display>{children}</Display>
+
+<DeepCopy>
+
+```cpp
+printf("helloworld");
+```
+
+</DeepCopy>-->
+
 
 ## 深浅拷贝
 
@@ -55,7 +87,6 @@ export const meta = {
 ## Move语义
 
 首先明确一个前提：右值引用和左值引用一样，生成的是相应对象的引用，别名。
-**右值引用所引用的对象也在栈上**。
 
 <Row gap={0.8}>
   <Display width="300px" caption="右值引用">
@@ -104,6 +135,8 @@ export const meta = {
   2. 将产生的临时对象的地址赋值给rvalue_ref_2。
 
   3. 和单纯的move_ref()相比，不会调用move_ref::~move_ref()。正常的临时对象是会销毁的。
+
+  此时，**右值引用所引用的对象在栈上**。
 
 
 语句3-4是一般文章中出现次数较多的案例，它们会告诉你**可以**这样写。但是，这样写是不对的。

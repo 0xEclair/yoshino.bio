@@ -1,0 +1,141 @@
+import Layout from 'lib/components/layout'
+import {Spacer} from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Strings Library',
+  date: '2020-06-29T05:49:21.666Z',
+  description: '',
+}
+
+<Spacer y={2} />
+
+### 21.1 General
+
+1.此节描述了控制任何非数组POD类型序列的组件。
+在本节这样的类型被称为*char-like type*，char-like type的对象被称为char-like object或简略地称为characters。
+
+2.下列子小节描述character traits class，string class和null-terminated sequence utilities。
+
+<Spacer y={2} />
+
+### 21.2 Character traits
+
+1.此小节定义表示*character traits*类的要求，并且定义类模板char_traits<CharT\>，
+以及它的4种特化，char_traits<char\>，char_traits<char16_t\>，char_traits<char32_t\>，char_traits<wchar_t\>，它们满足这些要求。
+
+2.大多数在条款21.3和27中描述的类需要相关类型集合和实现它们语义解释的函数。
+这些类型和函数在每个模板中使用的模板参数traits中作为成员类型和成员函数集合提供。
+此小节定义这些成员保证的语义。
+
+3.要专门设置这些模板以生成string或iostream类来处理特定字符容器类型CharT，
+该类及其相关的character traits类Traits作为一对参数传递给string或iostream模板，作为形式参数charT和traits。
+Traits::char_type和CharT相同。
+
+4.此小节详述结构体模板，char_traits<charT\>，以及它的4个显式特化，char_traits<char\>，char_traits<char16_t\>，char_traits<char32_t\>，char_traits<wchar_t\>，
+这些均出现在头文件<string\>中并且满足下面的要求。
+
+<Spacer y={1} />
+
+#### 21.2.1 Character traits requirements
+
+1.Table 62中，X表示Traits类，用于定义字符容器类型CharT的类型和函数；c和d表示类型CharT的值；p和q表示类型const CharT*的值；
+s表示类型CharT*的值；i和j表示类型std::size_t的值；e和f表示类型X::int_type的值；pos表示类型X::pos_type的值；state表示类型X::state_type的值；
+r表示类型CharT的左值。Traits上的运算符禁止抛出异常。
+
+Table 62.
+
+2.结构体模板`template<class charT> struct char_traits;`应在<string\>中作为显式特化的基础被提供。
+
+<Spacer y={1} />
+
+#### 21.2.2 traits typedefs
+
+`typedef CHAR_T char_type;`
+
+1.类型char_type用于引用21.3和27中定义的库的视线中的字符容器类型。
+
+`typedef INT_T int_type;`
+
+2.*要求：* 对于某个字符容器类型char_type，相关的容器类型INT_T应是一个类型或类，
+它可以表示从相应的char_type值转换的所有有效字符，以及文件尾值eof()。
+类型int_type表示一个字符容器类型，该类型可以保存文件结束以用作iostream类成员函数的返回类型。
+
+`typedef implementation-defined off_type;`
+
+`typedef implementation-defined pos_type;`
+
+3.*要求：* 27.2.2和27.3中off_type和pos_type的要求。
+
+`typedef STATE_T state_type;`
+
+4.*要求：* state_type应满足CopyAssignable，CopyConstructible和DefaultConstructilbe类型的要求。
+
+<Spacer y={1} />
+
+#### 21.2.3 char_traits specializations
+
+```cpp
+namespace std { 
+  template<> struct char_traits<char>; 
+  template<> struct char_traits<char16_t>; 
+  template<> struct char_traits<char32_t>; 
+  template<> struct char_traits<wchar_t>; 
+}
+```
+
+1.头文件<string\>应定义char_traits的4种特化：char_traits<char\>，char_traits<char16_t\>，char_traits<char32_t\>，char_traits<wchar_t\>。
+
+2.这些特化的成员所需要求在21.2.1中给出。
+
+<spacer y={0.5} />
+
+##### 21.2.3.1 struct char_traits<char\>
+
+```cpp
+namespace std { 
+  template<> struct char_traits<char> { 
+    typedef char char_type; 
+    typedef int int_type; 
+    typedef streamoff off_type; 
+    typedef streampos pos_type; 
+    typedef mbstate_t state_type;
+
+    static void assign(char_type& c1, const char_type& c2) noexcept; 
+    static constexpr bool eq(char_type c1, char_type c2) noexcept; 
+    static constexpr bool lt(char_type c1, char_type c2) noexcept;
+
+    static int compare(const char_type* s1, const char_type* s2, size_t n); 
+    static size_t length(const char_type* s); 
+    static const char_type* find(const char_type* s, size_t n, const char_type& a); 
+    static char_type* move(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* copy(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* assign(char_type* s, size_t n, char_type a);
+
+    static constexpr int_type not_eof(int_type c) noexcept; 
+    static constexpr char_type to_char_type(int_type c) noexcept; 
+    static constexpr int_type to_int_type(char_type c) noexcept; 
+    static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept; 
+    static constexpr int_type eof() noexcept;
+  };
+} 
+```
+
+1.int_type，pos_type，off_type，state_type定义的类型应分别是int，streampos，streamoff，mbstate_t。
+
+2.类型streampos应是满足pos_type要求的实现定义的类型。
+
+3.类型streamoff应是满足off_type要求的实现定义的类型。
+
+4.类型mbstate_t定义在<cwchar\>且可以表示在实现定义的一组受支持的多字节字符编码规则中可能发生的任何转换状态。
+
+5.assign的2个参数应与内置运算符=相同。对类型unsigned char来说，eq和lt的2个参数应与内置运算符==和<相同。
+
+6.成员函数 eof() 应返回EOF。
+
+p648
+
+[*Example:*  *-end example*]
+
+[*Note:*  *-end note*]
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

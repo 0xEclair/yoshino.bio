@@ -132,10 +132,176 @@ namespace std {
 
 6.成员函数 eof() 应返回EOF。
 
-p648
+<Spacer y={0.5} />
+
+##### 24.2.3.2 struct char_traits<char16_t\>
+
+```cpp
+namespace std { 
+  template<> struct char_traits<char16_t> { 
+    using char_type = char16_t; 
+    using int_type = uint_least16_t; 
+    using off_type = streamoff; 
+    using pos_type = u16streampos; 
+    using state_type = mbstate_t;
+
+    static constexpr void assign(char_type& c1, const char_type& c2) noexcept; 
+    static constexpr bool eq(char_type c1, char_type c2) noexcept; 
+    static constexpr bool lt(char_type c1, char_type c2) noexcept;
+
+    static constexpr int compare(const char_type* s1, const char_type* s2, size_t n); 
+    static constexpr size_t length(const char_type* s); 
+    static constexpr const char_type* find(const char_type* s, size_t n, const char_type& a); 
+    static char_type* move(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* copy(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* assign(char_type* s, size_t n, char_type a);
+    static constexpr int_type not_eof(int_type c) noexcept; 
+    static constexpr char_type to_char_type(int_type c) noexcept; 
+    static constexpr int_type to_int_type(char_type c) noexcept; 
+    static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept; 
+    static constexpr int_type eof() noexcept;
+  };
+}
+```
+
+1.类型u16streampos应是满足pos_type要求的由实现定义的类型。
+
+2.有两个参数的成员**assign**,**eq**和**lt**必须分别与内置运算符=，==和<相同地定义。
+
+3.成员eof()应返回不能再合理的UTF-16编码单元中展示的由实现定义的常量。
+
+<Spacer y={0.5}/>
+
+##### 24.2.3.3 struct char_traits<char32_t\>
+
+```cpp
+namespace std { 
+  template<> struct char_traits<char32_t> { 
+    using char_type = char32_t; 
+    using int_type = uint_least32_t; 
+    using off_type = streamoff; 
+    using pos_type = u32streampos; 
+    using state_type = mbstate_t;
+
+    static constexpr void assign(char_type& c1, const char_type& c2) noexcept; 
+    static constexpr bool eq(char_type c1, char_type c2) noexcept; 
+    static constexpr bool lt(char_type c1, char_type c2) noexcept;
+
+    static constexpr int compare(const char_type* s1, const char_type* s2, size_t n); 
+    static constexpr size_t length(const char_type* s); 
+    static constexpr const char_type* find(const char_type* s, size_t n, const char_type& a); 
+    static char_type* move(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* copy(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* assign(char_type* s, size_t n, char_type a);
+
+    static constexpr int_type not_eof(int_type c) noexcept; 
+    static constexpr char_type to_char_type(int_type c) noexcept; 
+    static constexpr int_type to_int_type(char_type c) noexcept; 
+    static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept; 
+    static constexpr int_type eof() noexcept;
+  };
+} 
+```
+
+1.类型u16streampos应是满足pos_type要求的由实现定义的类型。
+
+2.有两个参数的成员**assign**,**eq**和**lt**必须分别与内置运算符=，==和<相同地定义。
+
+3.成员eof()应返回不能再合理的UTF-16编码单元中展示的由实现定义的常量。
+
+<Spacer y={0.5} />
+
+##### 24.2.3.4 struct char_traits<wchar_t\>
+
+```cpp
+namespace std { 
+  template<> struct char_traits<wchar_t> { 
+    using char_type = wchar_t; 
+    using int_type = wint_t; 
+    using off_type = streamoff; 
+    using pos_type = wstreampos; 
+    using state_type = mbstate_t;
+
+    static constexpr void assign(char_type& c1, const char_type& c2) noexcept; 
+    static constexpr bool eq(char_type c1, char_type c2) noexcept; 
+    static constexpr bool lt(char_type c1, char_type c2) noexcept;
+
+    static constexpr int compare(const char_type* s1, const char_type* s2, size_t n); 
+    static constexpr size_t length(const char_type* s); 
+    static constexpr const char_type* find(const char_type* s, size_t n, const char_type& a); 
+    static char_type* move(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* copy(char_type* s1, const char_type* s2, size_t n); 
+    static char_type* assign(char_type* s, size_t n, char_type a);
+
+    static constexpr int_type not_eof(int_type c) noexcept; 
+    static constexpr char_type to_char_type(int_type c) noexcept; 
+    static constexpr int_type to_int_type(char_type c) noexcept; 
+    static constexpr bool eq_int_type(int_type c1, int_type c2) noexcept; 
+    static constexpr int_type eof() noexcept;
+  };
+}
+```
+
+1.定义的类型int_type，pos_type和state_type应分别是wint_t，wstreampos，和mbstate_t。
+
+2.wstreampos应是满足pos_type要求的由实现定义的类型。
+
+3.类型mbstate_t定义在<cwchar\>且可以表示在实现定义的一组受支持的多字节字符编码规则中可能发生的任何转换状态。
+
+4.有两个参数的成员**assign**,**eq**和**lt**必须分别与内置运算符=，==和<相同地定义。
+
+5.成员eof()应返回不能再合理的UTF-16编码单元中展示的由实现定义的常量。
+
+<Spacer y={2} />
+
+### 24.3 String classes
+
+1.头文件<string\>定义用于操作**char-like**变长序列对象的**basic_string**类模板
+和4种类型定义名字，string，u16string，u32string和wstring，
+这4种分别是特化，basic_string<char\>，basic_string<char16_t\>，basic_string<char32_t\>和basic_string<wchar_t\>。
+
+<Spacer y={1} />
+
+#### 24.3.1 Header <string\> synopsis
+
+p673
+
+<Spacer y={1} />
+
+#### 24.3.2 Class template basic_string
+
+1.类模板basic_string描述可以存储序列的对象，该序列由不同数量的任意char型对象组成，序列的第一个元素位于index 0。
+如果从上下文可以清楚地知道所持有的char型对象类型，则此序列也被称为“string”。
+此条款的其余部分，basic_string对象中的char型对象类型由charT指定。
+
+2.basic_string的成员函数使用通过模板参数传递的Allocator的一个对象来申请和释放所包含的char型对象的空间。
+
+3.一个basic_string是连续容器。
+
+4.所有例子中，size() <= capacity()。
+
+5.此条款描述的函数可以上报二种error，每个都和exception类型有关：
+
+  - length 错误和length_error类型的错误关联（22.2.5）；
+
+  - out-of-range 错误和out_of_range类型的错误关联
+
+<Spacer y={0.5} />
+
+##### 24.3.2.1 basic_string general requirements
+
+1.如果某个操作会导致size()超过max_size()，该操作应抛出length_error异常对象。
+
+2.如果basic_string某个成员函数或操作抛出异常，该函数或操作应没有其他作用。
+
+p681
+
+
 
 [*Example:*  *-end example*]
 
 [*Note:*  *-end note*]
+
+17 draft
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

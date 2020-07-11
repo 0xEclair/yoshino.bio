@@ -294,7 +294,70 @@ p673
 
 2.如果basic_string某个成员函数或操作抛出异常，该函数或操作应没有其他作用。
 
-p681
+3.每个basic_string<charT,traits,Allocator\>特化中，类型allocator_traits<Allocator\>::value_type应命名与charT相同的类型。
+每个basic_string<charT,traits,Allocator\>类型的对象应根据需要使用Allocator对象来申请和释放包含的charT对象的空间。
+使用的Allocator对象应如26.2.1所述获得。
+每个basic_string<charT,traits,Allocator\>特化中，类型traits应满足character traits要求（24.2），并且类型traits::char_type应命名与charT相同的类型。
+
+4.在下列basic_string对象使用中，basic_string序列元素的引用，指针和迭代器引用可能不合法：
+
+  - 作为某些标准库函数的参数，并将对非const basic_string的引用作为参数。
+
+  - 调用非const成员函数，除了operator[]，at，front，back，begin，rbegin，end和rend。
+
+<Spacer y={0.5} />
+
+##### basic_string constructors and assignment operators
+
+`explicit basic_string(const Allocator& a) noexcept;`
+
+1.*作用：* 构造basic_string对象。此函数的后置条件在table55中指出。
+
+`basic_string(const basic_string& str);`
+
+`basic_string(basic_string&& str) noexcept;`
+
+2.*作用：* 构造table56中指出的basic_string对象。第二个形式中，str处于有效状态，具有未指定的值。
+
+`basic_string(const basic_string& str, size_type pos, const Allocator& a = Allocator());`
+
+`basic_string(const basic_string& str, size_type pos, size_type n, const Allocator& a = Allocator());`
+
+3.*Throw:* 如果pos > str.size()，out_of_range。
+
+4.*作用：* 构造basic_string对象。
+在第一形式中，确定初始string值有效长度rlen为str.size() - pos；
+在第二形式中，确定初始string值有效长度rlen为str.size() - pos和n的较小值；table57中指出。
+
+`template<class T> basic_string(const T& t, size_type pos,` 
+
+`                               size_type n, const Allocator& a = Allocator());`
+
+5.*作用：* 创建一个变量，sv，就像basic_string_view<charT,traits\> sv=t；其行为和**basic_string(sv.substr(pos,n), a);**一样。
+
+6.*备注：* 此构造函数禁止参与重载决议，除非is_convertible_v<const T&, basic_string_view<charT, traits\>\>是true。
+
+`explicit basic_string(basic_string_view<charT, traits> sv, `
+`                      const Allocator& a = Allocator());`
+
+7.*作用：* 与basic_string(sv.data(), sv.size(), a)一样。
+
+`basic_string(const charT* s, size_type n, const Allocator& a = Allocator());`
+
+8.*要求：* s指向指向charT的最少n个元素的数组。
+
+9.*作用：* 构造basic_string对象。从首元素由s指定的长度为n的charT数组中指定它的初始string值，在table58中指出。
+
+`basic_string(const charT* s, const Allocator& a = Allocator());`
+
+10.*要求：* s指向指向charT的最少traits::length(s)+1个元素的数组。
+
+11.*作用：* 构造basic_string对象。从首元素由s指定的长度为traits::length(s)的charT数组中指定它的初始string值，在table58中指出。
+
+p682
+
+
+
 
 
 

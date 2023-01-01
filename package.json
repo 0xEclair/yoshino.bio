@@ -15,13 +15,13 @@
     "@zeit-ui/react-icons": "^1.2.2",
     "@zeit-ui/react-prism": "^1.0.0",
     "ms": "^2.1.2",
-    "next": "^9.4.0",
+    "next": "^9.5.5",
     "react": "16.13.0",
     "react-dom": "16.13.0"
   },
   "devDependencies": {
     "@mapbox/rehype-prism": "^0.4.0",
-    "@mdx-js/loader": "^1.5.7",
+    "@mdx-js/loader": "^1.6.22",
     "@next/mdx": "^9.4.0",
     "@types/react": "^16.9.23",
     "@types/react-dom": "^16.9.5",
@@ -30,6 +30,6 @@
     "fs-extra": "^8.1.0",
     "prompt-sync": "^4.2.0",
     "rehype-join-line": "^1.0.2",
-    "styled-jsx": "^3.2.4"
+    "styled-jsx": "^5.1.1"
   }
 }

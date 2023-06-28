@@ -1,5 +1,5 @@
 import Layout from 'lib/components/layout'
-import {Spacer,Display,Row,Col,Text} from '@geist-ui/react'
+import {Spacer,Display,Grid} from '@geist-ui/react'
 
 export const meta = {
   title: '如何深入理解c++11的右值引用',
@@ -12,105 +12,78 @@ export const meta = {
 
 <Spacer y={2} />
 
-<!--<Row gap={0.8}>
-  <Col>
-    <Display caption="深拷贝">
-
-    ```cpp
-      printf("hello,world");
-    ```
-
-    </Display>
-  </Col>
-
-    <Col>
-    <Display caption="深拷贝">
-
-    ```cpp
-      printf("hello,world");
-    ```
-
-    </Display>
-  </Col>
-</Row> 
-
-export const DeepCopy = ({children}) => <Display>{children}</Display>
-
-<DeepCopy>
-
-```cpp
-printf("helloworld");
-```
-
-</DeepCopy>-->
-
-
 ## 深浅拷贝
 
 因为值语义的关系，c++11之前，类的copy-constructor普遍是深拷贝。
 当需要浅拷贝时，需要手动选择调用的constructor（bool类型或是额外的参数）来指导编译器怎么构造。
 
-<Row gap={0.8}>
-  <Display caption="深拷贝">
+<Grid.Container gap={0.8}>
+  <Grid xs={6}>
+    <Display caption={<p>深拷贝</p>}>
+      ```cpp
+      struct copy_t{
+        copy_t(const copy_t& cp){
+          auto len = strlen(cp.data);
+          data = new char[len+1];
+          memcpy(data,cp.data,len);
+          data[len] = '\0';
+        }
+        char* data;
+      };
+      ```
+    </Display>
+  </Grid>
 
-  ```cpp
-  struct copy_t{
-    copy_t(const copy_t& cp){           
-      auto len = strlen(cp.data);
-      data = new char[len+1];
-      memcpy(data,cp.data,len);
-      data[len] = '\0';
-    }
-    char* data;
-  };
-  ```
+  <Grid xs={6}>
+    <Display caption={<p>浅拷贝</p>}>
 
-  </Display>
+      ```cpp
+      struct move_t{};
 
-  <Display caption={<p>浅拷贝</p>}>
+      struct copy_t{
+        copy_t(copy_t& cp,move_t) {
+          data = cp.data;
+          // 不需要`cp.data = NULL;`
+        }
+        char* data;
+      };
+      ```
 
-  ```cpp
-  struct move_t{};
-
-  struct copy_t{
-    copy_t(copy_t& cp,move_t){           
-      data = cp.data;
-      // 不需要`cp.data = NULL;`
-    }
-    char* data;
-  };
-  ```
-
-  </Display>
-</Row>
+    </Display>
+  </Grid>
+</Grid.Container>
 
 ## Move语义
 
 首先明确一个前提：右值引用和左值引用一样，生成的是相应对象的引用，别名。
 
-<Row gap={0.8}>
-  <Display width="300px" caption="右值引用">
+<Grid.Container gap={0.8}>
+  <Grid>
+    <Display width="300px" caption="右值引用">
 
-  ```cpp
-  struct move_ref{
-    move_ref() = default;
-    move_ref(move_ref&&){ }
-  }
-  ```
+      ```cpp
+      struct move_ref{
+      move_ref() = default;
+      move_ref(move_ref&&){ }
+    }
+      ```
 
-  </Display>
+    </Display>
+  </Grid>
 
-  <Display caption="一些用例">
+  <Grid>
+    <Display caption="一些用例">
 
-  ```cpp
-  move_ref common_var{};
-  move_ref&  lvalue_ref = common_var;
-  move_ref&& rvalue_ref_1 = std::move(lvalue_ref);
-  move_ref&& rvalue_ref_2 = move_ref();
-  ```
+      ```cpp
+      move_ref common_var{};
+      move_ref&  lvalue_ref = common_var;
+      move_ref&& rvalue_ref_1 = std::move(lvalue_ref);
+      move_ref&& rvalue_ref_2 = move_ref();
+      ```
 
-  </Display>
-</Row>
+    </Display>
+  </Grid>
+</Grid.Container>
 
 `common_var`是正常的变量，调用trival constructor。
 

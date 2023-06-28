@@ -2,9 +2,6 @@
   "name": "unix.bio",
   "version": "0.1.0",
   "private": true,
-  "engines": {
-    "node": "18.x"
-  },
   "scripts": {
     "start": "npm run collect && next dev",
     "dev": "npm run collect && next dev",

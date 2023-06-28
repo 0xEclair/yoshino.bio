@@ -14,9 +14,9 @@ const BLOG = {
   },
   
   email: '',
-  github: 'eclair-lumiere',
+  github: '0xEclair',
   twitter: '',
-  domain: 'yoshino.studio',
+  domain: '',
   
   googleAnalytics: '',
   cn: true,

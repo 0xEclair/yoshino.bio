@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react'
 import ms from 'ms'
-import { useTheme, Row, Text, Col, Spacer } from '@zeit-ui/react'
+import { useTheme, Row, Text, Col, Spacer } from '@geist-ui/react'
 import Link from 'next/link'
 import BLOG from '../../blog.config'
 import { msToString } from '../date-transform'

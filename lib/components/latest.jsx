@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { useTheme, Row } from '@zeit-ui/react'
+import { useTheme, Row } from '@geist-ui/react'
 import Link from 'next/link'
 import BLOG from '../../blog.config'
 import metadata from 'lib/data/metadata'

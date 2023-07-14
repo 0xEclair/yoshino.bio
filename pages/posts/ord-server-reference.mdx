@@ -38,32 +38,57 @@ Homepage
 
 区块时间
 
-#### /clock
+## 铭文
 
 #### /content/:inscription_id
+
+指定铭文内容
 
 #### /input/:block/:transaction/:input
 
 #### /inscription/:inscription_id
 
+指定铭文信息
+
 #### /inscriptions
 
+最新铭文
+
 #### /inscriptions/:from
+
+从from开始的铭文
 
 #### /ordinal/:sat
 
 #### /output/:output
 
+指定output数据
+
 #### /preview/:inscription_id
+
+预览铭文内容
 
 #### /range/:start/:end
 
-#### /search
+sat range信息
 
 #### /search/:hash
 
-#### /status
+查询各类hash，会重定向
 
 #### /tx/:txid
+
+查询交易
+
+## Other
+
+#### /clock
+
+屏保时钟
+
+#### /status
+
+服务器状态
+
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>

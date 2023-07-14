@@ -1,0 +1,69 @@
+import Layout from 'lib/components/layout'
+import { Spacer } from '@zeit-ui/react'
+
+export const meta = {
+  title: 'Ord Server API Reference',
+  date: '2023-07-14T21:37:17.672Z',
+  description: '',
+}
+
+### /
+
+Homepage
+
+## 区块
+
+
+#### /block/:hash
+
+区块信息
+
+#### /blockcount
+
+区块数
+
+#### /blockheight
+
+区块高度
+
+#### /blockhash
+
+最新区块hash
+
+#### /blockhash/:height
+
+指定高度的区块的哈希
+
+#### /blocktime
+
+区块时间
+
+#### /clock
+
+#### /content/:inscription_id
+
+#### /input/:block/:transaction/:input
+
+#### /inscription/:inscription_id
+
+#### /inscriptions
+
+#### /inscriptions/:from
+
+#### /ordinal/:sat
+
+#### /output/:output
+
+#### /preview/:inscription_id
+
+#### /range/:start/:end
+
+#### /search
+
+#### /search/:hash
+
+#### /status
+
+#### /tx/:txid
+
+export default ({ children }) => <Layout meta={meta}>{children}</Layout>

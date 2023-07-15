@@ -1,5 +1,5 @@
 import Layout from 'lib/components/layout'
-import { Spacer } from '@zeit-ui/react'
+import { Divider, Spacer, Text } from '@zeit-ui/react'
 
 export const meta = {
   title: 'Ord Server API Reference',
@@ -7,88 +7,111 @@ export const meta = {
   description: '',
 }
 
-### /
+#### /
 
-Homepage
+<Text small style={{textIndent: "8px"}}>Homepage</Text>
+<Spacer y={0.5} />
 
-## 区块
-
+<Divider volume={5}>区块</Divider>
 
 #### /block/:hash
 
-区块信息
+<Text small style={{textIndent: "8px"}}>区块信息</Text>
+<Spacer y={0.5} />
 
 #### /blockcount
 
-区块数
+<Text small style={{textIndent: "8px"}}>区块数</Text>
+<Spacer y={0.5} />
 
 #### /blockheight
 
-区块高度
+<Text small style={{textIndent: "8px"}}>区块高度</Text>
+<Spacer y={0.5} />
 
 #### /blockhash
 
-最新区块hash
+<Text small style={{textIndent: "8px"}}>最新区块hash</Text>
+<Spacer y={0.5} />
 
 #### /blockhash/:height
 
-指定高度的区块的哈希
+<Text small style={{textIndent: "8px"}}>指定高度的区块hash</Text>
+<Spacer y={0.5} />
 
 #### /blocktime
 
-区块时间
+<Text small style={{textIndent: "8px"}}>区块时间</Text>
+<Spacer y={0.5} />
 
-## 铭文
+<Divider volume={5}>铭文</Divider>
 
 #### /content/:inscription_id
 
-指定铭文内容
+<Text small style={{textIndent: "8px"}}>指定铭文内容</Text>
+<Spacer y={0.5} />
 
 #### /input/:block/:transaction/:input
 
+<Text small style={{textIndent: "8px"}}>placeholer</Text>
+<Spacer y={0.5} />
+
 #### /inscription/:inscription_id
 
-指定铭文信息
+<Text small style={{textIndent: "8px"}}>指定铭文信息</Text>
+<Spacer y={0.5} />
 
 #### /inscriptions
 
-最新铭文
+<Text small style={{textIndent: "8px"}}>最新铭文</Text>
+<Spacer y={0.5} />
 
 #### /inscriptions/:from
 
-从from开始的铭文
+<Text small style={{textIndent: "8px"}}>从from开始的铭文</Text>
+<Spacer y={0.5} />
 
 #### /ordinal/:sat
 
+<Text small style={{textIndent: "8px"}}>placeholer</Text>
+<Spacer y={0.5} />
+
 #### /output/:output
 
-指定output数据
+<Text small style={{textIndent: "8px"}}>指定output数据</Text>
+<Spacer y={0.5} />
 
 #### /preview/:inscription_id
 
-预览铭文内容
+<Text small style={{textIndent: "8px"}}>预览铭文内容</Text>
+<Spacer y={0.5} />
 
 #### /range/:start/:end
 
-sat range信息
+<Text small style={{textIndent: "8px"}}>sat的range信息</Text>
+<Spacer y={0.5} />
 
 #### /search/:hash
 
-查询各类hash，会重定向
+
+<Text small style={{textIndent: "8px"}}>查询各类hash，会重定向</Text>
+<Spacer y={0.5} />
 
 #### /tx/:txid
 
-查询交易
+<Text small style={{textIndent: "8px"}}>查询交易</Text>
+<Spacer y={0.5} />
 
-## Other
+<Divider volume={5}>其他</Divider>
 
 #### /clock
 
-屏保时钟
+<Text small style={{textIndent: "8px"}}>屏保时钟</Text>
+<Spacer y={0.5} />
 
 #### /status
 
-服务器状态
-
+<Text small style={{textIndent: "8px"}}>服务器状态</Text>
+<Spacer y={0.5} />
 
 export default ({ children }) => <Layout meta={meta}>{children}</Layout>
